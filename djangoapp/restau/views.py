@@ -6,3 +6,10 @@ def index(request):
         request,
         'restau/pages/index.html'
     )
+
+
+def adminsetup(request):
+    return render(
+        request,
+        'restau/pages/adminsetup.html',
+    )

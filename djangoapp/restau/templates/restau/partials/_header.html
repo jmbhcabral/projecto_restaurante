@@ -1,1 +1,29 @@
-<h1>Header</h1>
+<header class="header section-wrapper">
+    <div class="section-content-wide">
+      <div class="section-gap">
+  
+        <h1 class="rest-title center pb-base">
+          <a class="rest-link" href="/"> {{ site_setup.title }} </a>
+        </h1>
+        {% if site_setup.show_menu %}
+          <nav class="menu">
+            <ul class="menu-items">
+              {% for link in site_setup.menulink_set.all %}
+                <li class="menu-item">
+                  {% if link.new_tab %}
+                    <a target="_blank" class="menu-link" href="{{ link.url_or_path }}">
+                      {{ link.text }}
+                    </a>
+                  {% else %}
+                    <a class="menu-link" href="{{ link.url_or_path }}">
+                      {{ link.text }}
+                    </a>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          </nav>
+        {% endif %}
+      </div>
+    </div>
+  </header>
