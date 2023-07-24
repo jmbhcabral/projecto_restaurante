@@ -1,4 +1,8 @@
 from django.shortcuts import render
+from restau.models import Products
+
+
+PER_PAGE = 9
 
 
 def index(request):
@@ -8,8 +12,12 @@ def index(request):
     )
 
 
-def adminsetup(request):
+def admin_home(request):
+    produtos = Products.objects.all()
+    print(produtos)
     return render(
         request,
-        'restau/pages/adminsetup.html',
+        'restau/pages/admin-home.html',
+        {'produtos': produtos},
+
     )

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from restau.models import (
-    Category, SubCategory, Percentage, Produts
+    Category, SubCategory, Percentage, Products
 )
 
 
@@ -22,7 +22,7 @@ class PercentagemAdmin(admin.ModelAdmin):
     list_display_links = 'id', 'valor'
 
 
-@admin.register(Produts)
+@admin.register(Products)
 class ProductsAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'nome', 'descricao_curta', 'descricao_longa', 'image',

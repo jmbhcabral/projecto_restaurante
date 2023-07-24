@@ -41,7 +41,7 @@ class Percentage(models.Model):
         return str(self.valor)
 
 
-class Produts(models.Model):
+class Products(models.Model):
     class Meta:
         verbose_name = 'Produto'
         verbose_name_plural = 'Produtos'
