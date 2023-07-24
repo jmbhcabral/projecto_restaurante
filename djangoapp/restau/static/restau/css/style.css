@@ -406,7 +406,25 @@
     display: block;
     padding: var(--spacing-micro);
   }
+  /* Products list */
+  .prod {
+    border-top: 1px solid hsl(var(--clr-gray-ltst));
+  }
+
+  .prod:hover {
+    box-shadow: 0 5px 15px hsl(var(--clr-black) / 0.3);
+  }
   
+  .prod-text-wrapper {
+    padding: var(--spacing-smlst);
+  }
+  
+  .prod-nome {
+      font-size: var(--fs-bg);
+      margin-top: 0;
+      margin-bottom: var(--spacing-micro);
+  }
+
   /* Card Grid */
   .card-grid {
     display: grid;
