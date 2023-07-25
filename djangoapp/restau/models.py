@@ -47,15 +47,22 @@ class Products(models.Model):
         verbose_name_plural = 'Produtos'
 
     nome = models.CharField(max_length=200)
-    descricao_curta = models.CharField(max_length=200)
-    descricao_longa = models.TextField()
+    descricao_curta = models.CharField(
+        max_length=200,
+        verbose_name='Descrição Curta',
+    )
+    descricao_longa = models.TextField(
+        verbose_name='Descrição Longa',
+    )
     preco = models.FloatField(
         default=0.00,
-        validators=[positive_price]
+        validators=[positive_price],
+        verbose_name='Preço',
     )
     preco_promo = models.FloatField(
         default=0.00,
-        validators=[positive_price]
+        validators=[positive_price],
+        verbose_name='Preço Promocional',
     )
     percentagem_desconto = models.ForeignKey(
         Percentage,
@@ -81,6 +88,7 @@ class Products(models.Model):
         blank=True,
         null=True,
         default='default_image.jpg',
+        verbose_name='Imagem',
         # validators=[validate_png]
     )
 

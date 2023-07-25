@@ -3,7 +3,7 @@ from . import models
 
 
 class ProductForm(forms.ModelForm):
-    picture = forms.ImageField(
+    imagem = forms.ImageField(
         widget=forms.FileInput(
             attrs={
                 'accept': 'image/*',

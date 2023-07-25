@@ -1,19 +1,20 @@
 {% extends 'restau/base.html' %}
 {% block content %}
-<div class="form-wrapper">
-
-  <h2>Produtos</h2>
-
-  <form 
-    action="restau:create_product"
-    method="POST"
-    enctype="multipart/form-data"
-  >
-    {% csrf_token %}
-
-    <div class="form-content">
-      {% for field in form %}
-        <div class="form-group">
+<div class="section-content-wide">
+  <div class="section-gap">
+    <div class="form-wrapper">
+      <h3>Produtos</h3>
+      <form 
+      action="restau:create_product"
+      method="POST"
+      enctype="multipart/form-data"
+      >
+      {% csrf_token %}
+      <div class="form-content">
+        {% for field in form %}
+        {% if field.name == 'visibilidade' %}
+        
+        <div class="form-visib form-group">
           <label for="{{ field.id_for_label }}">{{ field.label }}</label>
           {{ field }}
           {{ field.errors }}
@@ -21,31 +22,41 @@
             <p class="help-text">{{ field.help_text }}</p>
           {% endif %}
         </div>
-
-        {% if field.name == 'image' and field.value.url %}
+        {% else %}
         <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {{ field.errors }}
+          {% if field.help_text %}
+          <p class="help-text">{{ field.help_text }}</p>
+          {% endif %}
+        </div>
+        {% endif %}
+        {% if field.name == 'image' and field.value.url %}
+        <div class="">
           <img src="{{ field.value.url }}" alt="">
         </div>
         {% endif %}
-      {% endfor %}
-    </div>
-
-    {% if form.non_field_errors %}
+        {% endfor %}
+      </div>
+      {% if form.non_field_errors %}
       <div class="form-content">
-        <div class="form-group">
+        <div class="">
           <div class="message error">
             {{ form.non_field_errors }}
           </div>
         </div>
       </div>
-    {% endif %}
-    <div class="form-content">
-      <div class="form-group">
-        <button class="btn" type="submit">Send</button>
-      </div>
-    </div>
-
-  </form>
+      {% endif %}
+      <div class="form-content">
+        <div class="form-group">
+          <button class="btn" type="submit">Enviar</button>
+        </div>
+      </div>  
+    </form>
+  </div>
 </div>
-{% endblock content %}
-
+</div>
+  {% endblock content %}
+  
+  
