@@ -4,7 +4,7 @@ from restau.forms import ProductForm
 
 def create_product(request):
     context = {
-
+        'form': ProductForm
     }
     return render(
         request,
