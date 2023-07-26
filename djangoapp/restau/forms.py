@@ -1,5 +1,7 @@
+from typing import Any, Dict
+from django.core.exceptions import ValidationError
 from django import forms
-from . import models
+from restau.models import Products
 
 
 class ProductForm(forms.ModelForm):
@@ -13,11 +15,23 @@ class ProductForm(forms.ModelForm):
     )
 
     class Meta:
-        model = models.Products
+        model = Products
         fields = (
-            'image', 'nome', 'descricao_curta', 'descricao_longa',
+            'imagem', 'nome', 'descricao_curta', 'descricao_longa',
             'preco', 'preco_promo', 'percentagem_desconto',
             'categoria', 'subcategoria', 'visibilidade',
 
 
         )
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+
+        self.add_error(
+            'nome',
+            ValidationError(
+                'Mensagem de erro',
+                code='invalid'
+            )
+        )
+        return super().clean()

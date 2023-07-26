@@ -5,7 +5,7 @@
     <div class="form-wrapper">
       <h3>Produtos</h3>
       <form 
-      action="restau:create_product"
+      action="{% url 'restau:create_product' %}"
       method="POST"
       enctype="multipart/form-data"
       >
@@ -32,7 +32,7 @@
           {% endif %}
         </div>
         {% endif %}
-        {% if field.name == 'image' and field.value.url %}
+        {% if field.name == 'imagem' and field.value.url %}
         <div class="">
           <img src="{{ field.value.url }}" alt="">
         </div>

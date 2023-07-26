@@ -46,7 +46,10 @@ class Products(models.Model):
         verbose_name = 'Produto'
         verbose_name_plural = 'Produtos'
 
-    nome = models.CharField(max_length=200)
+    nome = models.CharField(
+        max_length=200,
+        verbose_name='Produto'
+    )
     descricao_curta = models.CharField(
         max_length=200,
         verbose_name='Descrição Curta',
@@ -83,7 +86,7 @@ class Products(models.Model):
     )
     visibilidade = models.BooleanField(default=True)
 
-    image = models.ImageField(
+    imagem = models.ImageField(
         upload_to='assets/Products/',
         blank=True,
         null=True,
@@ -93,15 +96,15 @@ class Products(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        current_image_name = str(self.image.name)
+        current_imagem_name = str(self.imagem.name)
         super().save(*args, **kwargs)
-        image_changed = False
+        imagem_changed = False
 
-        if self.image:
-            image_changed = current_image_name != self.image.name
+        if self.imagem:
+            imagem_changed = current_imagem_name != self.imagem.name
 
-        if image_changed:
-            resize_image(self.image, 500)
+        if imagem_changed:
+            resize_image(self.imagem, 500)
 
     def __str__(self):
         return self.nome

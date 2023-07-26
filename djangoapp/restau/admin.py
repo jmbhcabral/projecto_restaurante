@@ -25,11 +25,11 @@ class PercentagemAdmin(admin.ModelAdmin):
 @admin.register(Products)
 class ProductsAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'nome', 'descricao_curta', 'descricao_longa', 'image',
+        'id', 'nome', 'descricao_curta', 'descricao_longa', 'imagem',
         'preco', 'preco_promo', 'percentagem_desconto',
         'categoria', 'subcategoria', 'visibilidade')
     list_display_links = 'id', 'nome'
     search_fields = (
-        'id', 'nome', 'descricao_curta', 'descricao_longa', 'image',
+        'id', 'nome', 'descricao_curta', 'descricao_longa', 'imagem',
         'preco', 'preco_promo', 'percentagem_desconto',
         'categoria', 'subcategoria', 'visibilidade')
