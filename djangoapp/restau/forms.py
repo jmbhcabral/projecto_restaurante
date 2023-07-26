@@ -11,8 +11,22 @@ class ProductForm(forms.ModelForm):
                 'accept': 'image/*',
             }
         ),
+        label='Fotografia',
         required=False,
     )
+
+    nome = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': 'digite aqui',
+            }
+        ),
+        label='Produto',
+        help_text='Nome do artigo.'
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = Products
@@ -26,12 +40,14 @@ class ProductForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = self.cleaned_data
+        nome = cleaned_data.get('nome')
+        if Products.objects.filter(nome=nome).exists():
 
-        self.add_error(
-            'nome',
-            ValidationError(
-                'Mensagem de erro',
-                code='invalid'
+            self.add_error(
+                'nome',
+                ValidationError(
+                    'O produto já existe.',
+                    code='invalid'
+                )
             )
-        )
         return super().clean()

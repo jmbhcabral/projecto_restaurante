@@ -56,6 +56,9 @@ class Products(models.Model):
     )
     descricao_longa = models.TextField(
         verbose_name='Descrição Longa',
+        blank=True,
+        null=True,
+        default=None,
     )
     preco = models.FloatField(
         default=0.00,
@@ -76,6 +79,9 @@ class Products(models.Model):
     categoria = models.ForeignKey(
         Category,
         on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        default=None,
     )
     subcategoria = models.ForeignKey(
         SubCategory,

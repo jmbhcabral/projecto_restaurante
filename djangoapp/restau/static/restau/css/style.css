@@ -482,7 +482,7 @@ html,
 
 .errorlist {
   list-style: none;
-  font-size: var(--fs-smlr);
+  font-size: var(--fs-smlst);
   color: tomato;
   text-align: left;
   padding: 0;
@@ -502,7 +502,7 @@ html,
   padding: var(--spacing-micro);
   border-radius: var(--br-base);
   border: 1px solid hsl(var(--clr-black));
-  font-size: var(--fs-sm);
+  font-size: var(--fs-smlr);
 }
 
 .form-group input:focus,
@@ -513,7 +513,7 @@ html,
 }
 
 .form-group label {
-  font-size: var(--fs-bg);
+  font-size: var(--fs-base);
 }
 
 .btn {
