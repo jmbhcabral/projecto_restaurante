@@ -24,34 +24,27 @@
                 {% for product in produtos %}
                   <tr class="table-row">
                     <td class="table-cell">
-                      <a href="#" class="table-link">
+                      <a 
+                      href="{% url 'restau:product' product.id %}" 
+                      class="table-link"
+                      >
                         {{ product.nome }}
                       </a>
                     </td>
                     <td class="table-cell">
-                      <a href="#" class="table-link">
-                        {{ product.categoria }}
-                      </a>
+                      {{ product.categoria }}
                     </td>
                     <td class="table-cell">
-                      <a href="#" class="table-link">
-                        {{ product.subcategoria }}
-                      </a>
+                      {{ product.subcategoria }}
                     </td>
                     <td class="table-cell">
-                      <a href="#" class="table-link">
-                        {{ product.preco }}
-                      </a>
+                      {{ product.preco }}
                     </td>
                     <td class="table-cell">
-                      <a href="#" class="table-link">
-                        {{ product.preco_promo }}
-                      </a>
+                      {{ product.preco_promo }}
                     </td>
                     <td class="table-cell">
-                      <a href="#" class="table-link">
-                        {{ product.visibilidade }}
-                      </a>
+                      {{ product.visibilidade }}
                     </td>
                   </tr>
                 {% endfor %}
