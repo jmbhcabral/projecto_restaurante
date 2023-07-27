@@ -14,7 +14,6 @@ def index(request):
 
 def admin_home(request):
     produtos = Products.objects.all()
-    print(produtos)
     return render(
         request,
         'restau/pages/admin-home.html',

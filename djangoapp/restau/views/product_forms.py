@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from restau.forms import ProductForm
 
 
 def create_product(request):
+    form_action = reverse('restau:create_product')
     if request.method == 'POST':
         form = ProductForm(request.POST)
         context = {

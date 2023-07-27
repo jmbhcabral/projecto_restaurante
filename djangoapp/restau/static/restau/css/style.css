@@ -65,13 +65,23 @@
   --mw-grid: 120rem;
   --mw-post: 90rem;
 
+  /* table min-width */
+  --tb-min-width: 60rem;
+
   /* Border Radius */
   --br-base: 0.4rem;
+
+  /* transitions*/
+  --transition-fast: 300ms;
+  --transition-medium: 600ms;
+  --transition-slow: 1s;
 }
+
 
 /* Base */
 html {
   font-size: 62.5%;
+  height: 100%;
 }
 
 body {
@@ -84,6 +94,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Set minimum height to viewport height to ensure footer sticks to the bottom */
+  margin: 0;
 }
 
 a {
@@ -137,44 +151,23 @@ h6 {
   font-size: var(--fs-h6);
 }
 
-pre {
-  max-width: 100%;
-  overflow-x: auto;
-  line-height: var(--lh-mono);
-  font-size: var(--fs-smlr);
-}
-
-pre,
-code {
-  font-family: var(--ff-mono);
-}
-
-input[type='search']::-webkit-search-decoration,
-input[type='search']::-webkit-search-cancel-button,
-input[type='search']::-webkit-search-results-button,
-input[type='search']::-webkit-search-results-decoration {
-  -webkit-appearance: none;
-}
-
 img {
   margin: 0 auto;
 }
 
-
-/* Blog */
+/* Restau */
 body,
-html,
-.blog-wrapper {
-  height: 100%;
-}
-
-.blog-wrapper {
-  display: flex;
-  flex-direction: column;
-}
-
 .main-content {
   flex-grow: 1;
+}
+
+.content {
+  max-width: var(--main-page-width);
+  margin: calc(var(--spacing) * 2) auto;
+  padding: var(--spacing);
+  background: hsl(var(--clr-white));
+  box-shadow: 2px 2px 5px var(--clr-dark-shadow-20);
+  border-radius: var(--default-border-radius);
 }
 
 /* Sections */
@@ -189,6 +182,7 @@ html,
 .section-content-wide,
 .section-content-narrow {
   margin-inline: auto;
+  height: 100%;
 }
 
 .section-gap {
@@ -262,8 +256,9 @@ html,
   background: hsl(var(--clr-gray-dk));
   color: hsl(var(--clr-white));
   bottom: 0;
-  position: static;
+  /* position: static; */
   width: 100%;
+  flex-shrink: 0;
 }
 
 .footer a {
@@ -280,94 +275,66 @@ html,
   gap: var(--spacing-base);
 }
 
-/* Single Post */
-.single-post-content {
-  padding-top: var(--spacing-smlst);
-}
-
-.single-post-title,
-.single-post-excerpt {
-  margin: 0;
-}
-
-.single-post-excerpt {
-  color: hsl(var(--clr-gray-base));
-  font-size: var(--fs-bg);
-  font-style: italic;
-}
-
-/* Post Meta */
-.post-meta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-base);
-  flex-flow: row wrap;
-}
-
-.post-meta-link {
-  display: flex;
-  gap: var(--spacing-micro);
-  align-items: center;
-  justify-content: center;
-  color: hsl(var(--clr-gray-base));
-  text-decoration: none;
-}
-
-.post-meta-link:hover {
-  text-decoration: none;
-}
-
-/* Post tags */
-.post-tags {
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-  gap: var(--spacing-smlst);
-}
-
-.post-tags .post-tag-link,
-.post-tags .post-tag-link i {
-  color: hsl(var(--clr-gray-base));
-}
-
-.post-tags .post-tag-link:hover,
-.post-tags .post-tag-link:hover i {
-  color: hsl(var(--clr-primary-base));
-  text-decoration: none;
-}
-
-.post-tag-link {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--spacing-micro);
-}
-
-/* Pagination */
-.pagination-wrapper {
-  font-size: var(--fs-bg);
-}
-
-.step-links {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: center;
-}
-
-.step-links > * {
-  display: block;
-  padding: var(--spacing-micro);
-}
 /* Products list */
+
+.responsive-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.products-table {
+  width: 100%;
+  min-width: var(--tb-min-width);
+  border-collapse: collapse;
+}
+
+.table-row {
+  text-align: left;
+  text-overflow: ellipsis;
+  transition: background-color var(--transition-fast) ease-in-out;
+}
+
+.table-row:nth-of-type(2n) {
+  background: hsl(var(--clr-gray-lt));
+}
+
+.table-row:not(.table-row-header):hover {
+  background: hsl(var(--clr-gray-ltr));
+}
+
+.table-row-header {
+  background: hsl(var(--clr-gray-base));
+  color: var(--clr-black);
+}
+
+.table-cel,
+.table-header {
+  padding: var(--spacing-smlr);
+}
+
+.table-link {
+  color: var(--link-dark-color);
+  transition: color var(--transition-fast) ease-in-out;
+  text-decoration: none;
+}
+
+.table-link:hover {
+  color: var(--clr-black);
+}
+
 .prod {
   border-top: 1px solid hsl(var(--clr-gray-ltst));
 }
 
 .prod:hover {
   box-shadow: 0 5px 15px hsl(var(--clr-black) / 0.3);
+}
+
+.prod-list {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .prod-text-wrapper {
@@ -380,88 +347,16 @@ html,
     margin-bottom: var(--spacing-micro);
 }
 
-/* Card Grid */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(32rem, 100%), 1fr));
-  gap: var(--spacing-base);
-}
-
-.card {
-  border: 1px solid hsl(var(--clr-gray-ltst));
-  border-radius: var(--br-base);
-  box-shadow: 0 5px 5px hsl(var(--clr-black) / 0.1);
-  transition: scale 300ms ease-in-out, box-shadow 300ms ease-in-out;
-}
-
-.card:hover {
-  scale: 1.02;
-  box-shadow: 0 5px 15px hsl(var(--clr-black) / 0.3);
-}
-
-.card-text-wrapper {
-  padding: var(--spacing-base);
-}
-
-.card-cover-wrapper {
-  aspect-ratio: 16 / 9;
-}
-
-.card-cover {
-  border-radius: var(--br-base) var(--br-base) 0 0;
-  aspect-ratio: 16 / 9;
-  object-position: center;
-  object-fit: cover;
-  transition: opacity 300ms ease-in-out;
-}
-
-.card-cover:hover {
-  opacity: 0.8;
-}
-
-.card-title-link {
-  color: inherit;
-}
-
-.card-title-link:hover {
-  text-decoration: none;
-}
-
-.card-title {
-  font-size: var(--fs-bg);
-  margin-top: 0;
-  margin-bottom: var(--spacing-micro);
-}
-
-.card-actions {
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-  justify-content: end;
-  gap: var(--spacing-smlst);
-}
-
-.card-action-link {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-micro);
-}
-
-.card-action-link:hover {
-  text-decoration: none;
-}
-
 .form-wrapper {
   max-width: 60rem;
+  width: 100%;
   margin: var(--spacing-sm) auto;
 }
 
 .form-content {
   margin: var(--spacing-sm) 0;
+  width: 100%;
 }
-
 
 .form-group {
   display: flex;
