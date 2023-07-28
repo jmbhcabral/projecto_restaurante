@@ -7,7 +7,7 @@ from restau.models import Products
 def create_product(request):
     form_action = reverse('restau:create_product')
     if request.method == 'POST':
-        form = ProductForm(request.POST)
+        form = ProductForm(request.POST, request.FILES)
         context = {
             'form': form,
             'form_action': form_action,
@@ -36,11 +36,10 @@ def create_product(request):
 
 def update(request, product_id):
     product = get_object_or_404(
-        Products, pk=product_id, visibilidade=True
-    )
+        Products, pk=product_id)
     form_action = reverse('restau:update', args=(product_id,))
     if request.method == 'POST':
-        form = ProductForm(request.POST, instance=product)
+        form = ProductForm(request.POST, request.FILES, instance=product)
         context = {
             'form': form,
             'form_action': form_action,
@@ -48,7 +47,7 @@ def update(request, product_id):
 
         if form.is_valid():
             product = form.save()
-            return redirect('restau:product', product_id=product.pk)
+            return redirect('restau:admin-home')
 
         return render(
             request,

@@ -305,11 +305,13 @@ body,
 .table-row-header {
   background: hsl(var(--clr-gray-base));
   color: var(--clr-black);
+  text-align: left;
 }
 
 .table-cel,
 .table-header {
   padding: var(--spacing-smlr);
+  text-align: left;
 }
 
 .table-link {

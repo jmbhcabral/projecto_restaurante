@@ -14,7 +14,6 @@ def index(request):
 
 def admin_home(request):
     produtos = Products.objects \
-        .filter(visibilidade=True) \
         .order_by('id')
 
     return render(
@@ -28,7 +27,7 @@ def admin_home(request):
 def product(request, product_id):
     single_product = get_object_or_404(
         Products.objects
-        .filter(pk=product_id, visibilidade=True))
+        .filter(pk=product_id,))
 
     context = {
         'product': single_product,

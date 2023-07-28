@@ -1,4 +1,3 @@
-from typing import Any, Dict
 from django.core.exceptions import ValidationError
 from django import forms
 from restau.models import Products
@@ -42,11 +41,6 @@ class ProductForm(forms.ModelForm):
         cleaned_data = self.cleaned_data
         nome = cleaned_data.get('nome')
         instance = self.instance
-
-        print("Debug: Clean method execution.")
-        print("Debug: Nome =", nome)
-        print("Debug: Instance =", instance)
-        print("Debug: Instance =", instance.preco)
 
         if instance and instance.nome == nome:
             return cleaned_data
