@@ -48,7 +48,7 @@ def update(request, product_id):
 
         if form.is_valid():
             product = form.save()
-            return redirect('restau:update', product_id=product.pk)
+            return redirect('restau:product', product_id=product.pk)
 
         return render(
             request,

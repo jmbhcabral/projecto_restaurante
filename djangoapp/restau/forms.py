@@ -41,6 +41,15 @@ class ProductForm(forms.ModelForm):
     def clean(self):
         cleaned_data = self.cleaned_data
         nome = cleaned_data.get('nome')
+        instance = self.instance
+
+        print("Debug: Clean method execution.")
+        print("Debug: Nome =", nome)
+        print("Debug: Instance =", instance)
+        print("Debug: Instance =", instance.preco)
+
+        if instance and instance.nome == nome:
+            return cleaned_data
         if Products.objects.filter(nome=nome).exists():
 
             self.add_error(
@@ -50,4 +59,5 @@ class ProductForm(forms.ModelForm):
                     code='invalid'
                 )
             )
+
         return super().clean()
