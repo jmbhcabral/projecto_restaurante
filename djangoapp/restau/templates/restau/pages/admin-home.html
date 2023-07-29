@@ -1,68 +1,59 @@
 {% extends 'restau/base.html' %}
 {% block content %}
-  <main class="main-content section-wrapper">
-    <div class="section-content-wide">
-      <div class="section-gap">
+  {% if produtos %}
+    <div class="content responsive-table">
+      <table class="products-table">
         <h3>Produtos</h3>
-
-        {% if produtos %}
-          <div class="content responsive-table">
-            <table class="products-table">
-
-              <thead>
-                <tr class="table-row table-row-header">
-                  <th class="table-header">Produto</th>
-                  <th class="table-header">Categoria</th>
-                  <th class="table-header">Subcategoria</th>
-                  <th class="table-header">Preço</th>
-                  <th class="table-header">Preço Promo</th>
-                  <th class="table-header">Visib</th>
-                </tr>
-              </thead>
-              
-              <tbody>
-                {% for product in produtos %}
-                  <tr class="table-row">
-                    <td class="table-cell">
-                      <a 
-                      href="{% url 'restau:product' product.id %}" 
-                      class="table-link"
-                      >
-                        {{ product.nome }}
-                      </a>
-                    </td>
-                    <td class="table-cell">
-                      {{ product.categoria }}
-                    </td>
-                    <td class="table-cell">
-                      {{ product.subcategoria }}
-                    </td>
-                    <td class="table-cell">
-                      {{ product.preco }}
-                    </td>
-                    <td class="table-cell">
-                      {{ product.preco_promo }}
-                    </td>
-                    <td class="table-cell">
-                      {{ product.visibilidade }}
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        {% else %}
-          <div class="not-found center">
-            <h1>Nada encontrado 😞</h1>
-              <p>
-                Não encontrei nada nesse link, clique em outro
-                link do nosso admin ou vá para a
-                <a href="{% url 'restau:index' %}">Home</a>
-              </p>
-          </div>
-        {% endif %}
-
-      </div>
+        <thead>
+          <tr class="table-row table-row-header">
+            <th class="table-header">Produto</th>
+            <th class="table-header">Categoria</th>
+            <th class="table-header">Subcategoria</th>
+            <th class="table-header">Preço</th>
+            <th class="table-header">Preço Promo</th>
+            <th class="table-header">Visib</th>
+          </tr>
+        </thead>
+        
+        <tbody>
+          {% for product in produtos %}
+            <tr class="table-row">
+              <td class="table-cell">
+                <a 
+                href="{% url 'restau:product' product.id %}" 
+                class="table-link"
+                >
+                  {{ product.nome }}
+                </a>
+              </td>
+              <td class="table-cell">
+                {{ product.categoria }}
+              </td>
+              <td class="table-cell">
+                {{ product.subcategoria }}
+              </td>
+              <td class="table-cell">
+                {{ product.preco }}
+              </td>
+              <td class="table-cell">
+                {{ product.preco_promo }}
+              </td>
+              <td class="table-cell">
+                {{ product.visibilidade }}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-  </main>
+  {% else %}
+    <div class="not-found center">
+      <h1>Nada encontrado 😞</h1>
+        <p>
+          Não encontrei nada nesse link, clique em outro
+          link do nosso admin ou vá para a
+          <a href="{% url 'restau:index' %}">Home</a>
+        </p>
+    </div>
+  {% endif %}
 {% endblock content %}

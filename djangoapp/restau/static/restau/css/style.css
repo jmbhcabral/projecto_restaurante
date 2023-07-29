@@ -155,7 +155,7 @@ img {
   margin: 0 auto;
 }
 
-/* Restau */
+/* Restau-admin */
 body,
 .main-content {
   flex-grow: 1;
@@ -266,7 +266,7 @@ body,
 }
 
 .footer a:hover {
-  color: hsl(var(--clr-primary-ltst));
+  color: hsl(var(--clr-white));
 }
 
 .footer-columns {
@@ -446,7 +446,7 @@ body,
 .btn:focus,
 .btn:active {
   filter: brightness(80%);
-  box-shadow: 0 0 5px var(--clr-gray-dk);
+  box-shadow: 0 0 5px hsl(var(--clr-gray-dk));
 }
 
 .product-links {
@@ -467,4 +467,12 @@ body,
 
 .btn-delete {
   background: tomato;
+}
+
+/* Restau website*/
+.front-content {
+  background-color: hsl(var(--clr-black));
+  color: hsl(var(--clr-white));
+  max-width: var(--mw-grid);
+  margin: 0, auto;
 }
