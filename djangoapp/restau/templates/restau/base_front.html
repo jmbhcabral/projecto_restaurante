@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    
+    {% include 'restau/partials/_head.html' %}
+</head>
+<body>
+    {% include 'restau/partials/_header.html' %}
+    {% comment %} {% include 'restau/partials/_promo.html' %} {% endcomment %}
+    {% block content %}{% endblock content %}
+    {% include 'restau/partials/_footer_front.html' %}
+</body>
+</html>

@@ -24,6 +24,17 @@
   --clr-gray-dkr: var(--_clr-gray) 20%;
   --clr-gray-dkst: var(--_clr-gray) 10%;
 
+  /* Frontend*/
+  --clr-dark-wood: hsl(30, 50%, 15%);
+  --clr-raw-pine: hsl(36, 45%, 73%);
+  --clr-creamy-white: hsl(42, 30%, 95%);
+  --clr-charcoal: hsl(200, 10%, 26%);
+  --clr-olive-green: hsl(82, 23%, 41%);
+  --clr-amber: hsl(35, 70%, 67%);
+
+  /* Frontend font family */
+  --ff-frontend: 'Montserrat', sans serif;
+
   /* Font-family */
   --ff-regular: Georgia, 'Times New Roman', Times, serif;
   --ff-headings: Georgia, 'Times New Roman', Times, serif;
@@ -255,8 +266,9 @@ body,
 .footer {
   background: hsl(var(--clr-gray-dk));
   color: hsl(var(--clr-white));
+  position: fixed;
+  left: 0;
   bottom: 0;
-  /* position: static; */
   width: 100%;
   flex-shrink: 0;
 }
@@ -270,9 +282,31 @@ body,
 }
 
 .footer-columns {
-  display: grid;
+  display: inline;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-base);
+}
+
+.container {
+  display: flex;
+  align-items: center;
+}
+
+.custom {
+  margin-left: auto;
+}
+
+.footer-front {
+  background: var(--clr-dark-wood);
+  color: var(--crl-olive-green);
+}
+
+.footer-front a {
+  color: var(--clr-olive-green);
+}
+
+.footer-front a:hover {
+  color: var(--clr-amber);
 }
 
 /* Products list */
@@ -470,9 +504,13 @@ body,
 }
 
 /* Restau website*/
-.front-content {
-  background-color: hsl(var(--clr-black));
+.front-content body {
+  background-color: hsl(var(--clr-creamy-white));
   color: hsl(var(--clr-white));
   max-width: var(--mw-grid);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100vh;
   margin: 0, auto;
 }
