@@ -266,7 +266,6 @@ body,
 .footer {
   background: hsl(var(--clr-gray-dk));
   color: hsl(var(--clr-white));
-  position: fixed;
   left: 0;
   bottom: 0;
   width: 100%;
@@ -504,13 +503,16 @@ body,
 }
 
 /* Restau website*/
-.front-content body {
-  background-color: hsl(var(--clr-creamy-white));
-  color: hsl(var(--clr-white));
+body.frontend {
+  background-color: var(--clr-olive-green);
+}
+
+.imagem-topo {
+  background-image: url('../../restau/site/20211202_151924.jpg');
+  background-size: cover;
+  background-position: center center;
+}
+.front-content {
   max-width: var(--mw-grid);
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 100vh;
-  margin: 0, auto;
+  height: 10rem;
 }
