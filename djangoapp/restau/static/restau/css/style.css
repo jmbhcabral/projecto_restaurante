@@ -511,6 +511,7 @@ body.frontend {
   background-image: url('../../restau/site/20211202_151924.jpg');
   background-size: cover;
   background-position: center center;
+  margin: 0;
 }
 .front-content {
   max-width: var(--mw-grid);
@@ -519,4 +520,21 @@ body.frontend {
 
 .header-front {
   background-color: var(--clr-dark-wood);
+}
+
+.top-background {
+  min-height: 100vh;
+}
+
+.menu-front {
+  background: var(--clr-dark-wood);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+}
+
+.white_bg {
+  background-color: var(--clr-creamy-white);
 }
