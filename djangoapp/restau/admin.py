@@ -1,6 +1,6 @@
 from django.contrib import admin
 from restau.models import (
-    Category, SubCategory, Percentage, Products
+    Category, SubCategory, Percentage, Products, FrontendSetup
 )
 
 
@@ -33,3 +33,9 @@ class ProductsAdmin(admin.ModelAdmin):
         'id', 'nome', 'descricao_curta', 'descricao_longa', 'imagem',
         'preco', 'preco_promo', 'percentagem_desconto',
         'categoria', 'subcategoria', 'visibilidade')
+
+
+@admin.register(FrontendSetup)
+class FrontendSetupAdmin(admin.ModelAdmin):
+    list_display = 'id', 'nome', 'imagem_topo'
+    list_display_links = 'id', 'nome', 'imagem_topo'

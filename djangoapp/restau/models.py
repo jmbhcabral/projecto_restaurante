@@ -114,3 +114,38 @@ class Products(models.Model):
 
     def __str__(self):
         return self.nome
+
+
+class FrontendSetup(models.Model):
+    class Meta:
+        verbose_name = 'FrontendSetup'
+        verbose_name_plural = 'FrontendSetup'
+
+    nome = models.CharField(
+        max_length=200,
+        verbose_name='Nome',
+        help_text='Nome da configuração'
+    )
+
+    imagem_topo = models.ImageField(
+
+        upload_to='assets/frontend/',
+        blank=True,
+        null=True,
+        verbose_name='Imagem',
+        # validators=[validate_png]
+    )
+
+    def save(self, *args, **kwargs):
+        current_imagem_name = str(self.imagem_topo.name)
+        super().save(*args, **kwargs)
+        imagem_changed = False
+
+        if self.imagem_topo:
+            imagem_changed = current_imagem_name != self.imagem_topo.name
+
+        if imagem_changed:
+            resize_image(self.imagem_topo, 1200)
+
+    def __str__(self):
+        return self.nome

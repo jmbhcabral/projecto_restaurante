@@ -516,3 +516,7 @@ body.frontend {
   max-width: var(--mw-grid);
   height: 10rem;
 }
+
+.header-front {
+  background-color: var(--clr-dark-wood);
+}
