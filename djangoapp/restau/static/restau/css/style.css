@@ -527,14 +527,51 @@ body.frontend {
 }
 
 .menu-front {
-  background: var(--clr-dark-wood);
+  background: transparent;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   width: 100%;
+  transition: background-color 0.3s;
 }
 
-.white_bg {
+
+body:not(:target) .menu-front {
+  background-color: transparent; /* Cor de fundo transparente quando a página é carregada */
+}
+
+body:target .menu-front {
+  background-color: brown; /* Cor de fundo final (castanho) quando a página é rolada para baixo */
+}
+
+
+.white-bg {
   background-color: var(--clr-creamy-white);
+}
+
+.menu-content-front {
+  display: flex;
+  justify-content:space-around;
+  align-items: center;
+  padding: 3rem;
+  padding-bottom: 1rem;
+}
+
+.menu-content-front h1 {
+  font-family: verdana;
+  color: var(--clr-amber)
+}
+
+.menu-content-front ul {
+  list-style: none;
+}
+
+.menu-content-front ul li {
+  display: inline-flex;
+  gap: 20px;
+}
+
+.menu-content-front ul li a {
+  color: var(--clr-olive-green);
 }
