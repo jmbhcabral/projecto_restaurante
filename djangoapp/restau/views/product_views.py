@@ -1,14 +1,17 @@
 from django.shortcuts import render, get_object_or_404
-from restau.models import Products
+from restau.models import Products, FrontendSetup
 
 
 PER_PAGE = 9
 
 
 def index(request):
+    imagem = FrontendSetup.objects \
+        .all()
     return render(
         request,
-        'restau/pages/index.html'
+        'restau/pages/index.html',
+        {'imagem': imagem},
     )
 
 

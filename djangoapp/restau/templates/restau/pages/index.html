@@ -1,24 +1,34 @@
 {% extends 'restau/base_front.html' %}
 {% block content %}
-<div class="imagem-topo top-background">
-
-</div>
+{% for imagem in imagem %}
+<img class="imagem-topo" src="{{ imagem.imagem_topo.url }}" alt="{{ imagem.nome }}">
+{% endfor %}
+<header class="header-front">
+    <div>
+      <h1>EXTREME WAY</h1>
+    </div>
+    <nav>
+        <ul>
+            <li class="links-front">
+                <a href="#">Home</a>
+                <a href="#">Ementa</a>
+                <a href="#">Reservas</a>
+                <a href="#">Extreme Way</a>
+                <a href="#">contatos</a>
+            </li>
+        </ul>
+    </nav>
+  
+  </header>
 <aside class="">
     <section class="fade menu-front menu-content-front">
-        <div>
-            <h1>EXTREME WAY</h1>
-        </div>
-        <nav>
-            <ul>
-                <li>
-                    <a href="#">Home</a>
-                    <a href="#">Ementa</a>
-                    <a href="#">Reservas</a>
-                    <a href="#">Extreme Way</a>
-                    <a href="#">contatos</a>
-                </li>
-            </ul>
-        </nav>
+        
+    </section>
+    <section class="front-content section-content-wide white-bg top-background">
+        <h1>Lorem ipsum dolor sit amet.</h1>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magni, 
+            laborum?
+        </p>
     </section>
     <section class="front-content section-content-wide white-bg top-background">
         <h1>Lorem ipsum dolor sit amet.</h1>
