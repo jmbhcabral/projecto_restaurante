@@ -124,7 +124,7 @@ h4,
 h5,
 h6 {
   font-family: var(--ff-headings);
-  line-height: var(--lh-headings);
+  line-height: var(--lh-mono);
   margin: var(--spacing-base) 0;
 }
 
