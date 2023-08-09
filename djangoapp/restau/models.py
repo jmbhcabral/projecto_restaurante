@@ -126,6 +126,25 @@ class FrontendSetup(models.Model):
         verbose_name='Nome',
         help_text='Nome da configuração'
     )
+    imagem_logo = models.ImageField(
+
+        upload_to='assets/frontend/logo',
+        blank=True,
+        null=True,
+        verbose_name='Logo',
+        # validators=[validate_png]
+    )
+
+    def save_logo(self, *args, **kwargs):
+        current_imagem_name = str(self.imagem_logo.name)
+        super().save(*args, **kwargs)
+        imagem_changed = False
+
+        if self.imagem_logo:
+            imagem_changed = current_imagem_name != self.imagem_logo.name
+
+        if imagem_changed:
+            resize_image(self.imagem_logo, 50)
 
     imagem_topo = models.ImageField(
 
@@ -136,7 +155,7 @@ class FrontendSetup(models.Model):
         # validators=[validate_png]
     )
 
-    def save(self, *args, **kwargs):
+    def save_topo(self, *args, **kwargs):
         current_imagem_name = str(self.imagem_topo.name)
         super().save(*args, **kwargs)
         imagem_changed = False

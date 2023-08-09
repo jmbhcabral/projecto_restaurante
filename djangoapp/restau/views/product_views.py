@@ -6,12 +6,20 @@ PER_PAGE = 9
 
 
 def index(request):
-    imagem = FrontendSetup.objects \
-        .all()
+    main_logo = FrontendSetup.objects \
+        .filter(imagem_logo__isnull=False) \
+        .order_by('-id') \
+        .first()
+
+    main_image = FrontendSetup.objects \
+        .filter(imagem_topo__isnull=False) \
+        .order_by('-id') \
+        .first()
     return render(
         request,
         'restau/pages/index.html',
-        {'imagem': imagem},
+        {'main_logo': main_logo,
+         'main_image': main_image},
     )
 
 

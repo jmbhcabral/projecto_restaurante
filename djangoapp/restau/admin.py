@@ -37,5 +37,5 @@ class ProductsAdmin(admin.ModelAdmin):
 
 @admin.register(FrontendSetup)
 class FrontendSetupAdmin(admin.ModelAdmin):
-    list_display = 'id', 'nome', 'imagem_topo'
-    list_display_links = 'id', 'nome', 'imagem_topo'
+    list_display = 'id', 'nome', 'imagem_logo', 'imagem_topo'
+    list_display_links = 'id', 'nome', 'imagem_logo', 'imagem_topo'

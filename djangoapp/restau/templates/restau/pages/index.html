@@ -1,12 +1,20 @@
 {% extends 'restau/base_front.html' %}
 {% block content %}
-{% for imagem in imagem %}
-<img class="imagem-topo" src="{{ imagem.imagem_topo.url }}" alt="{{ imagem.nome }}">
-{% endfor %}
+<img class="imagem-topo" src="{{ main_image.imagem_topo.url }}" alt="{{ main_image.nome }}">
 <header class="header-front">
+    {% if main_logo %}
     <div>
-      <h1>EXTREME WAY</h1>
+        {% if main_logo.imagem_logo %}
+        <img src="{{ main_logo.imagem_logo.url }}" alt="Logo">
+        {% else %}
+        <h1>Extreme Way</h1>
+        {% endif %}
     </div>
+    {% else %}
+    <div>
+        <h1>EXTREME WAY</h1>
+    </div> 
+    {% endif %} 
     <nav>
         <ul>
             <li class="links-front">
