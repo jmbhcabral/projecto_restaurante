@@ -1,6 +1,12 @@
 {% extends 'restau/base_front.html' %}
 {% block content %}
-<img class="imagem-topo" src="{{ main_image.imagem_topo.url }}" alt="{{ main_image.nome }}">
+{% if main_image %}
+    {% if main_image.imagem_topo %}
+        <img class="imagem-topo" src="{{ main_image.imagem_topo.url }}" alt="{{ main_image.nome }}">
+    {% else %}
+        <h1>Extreme Way</h1>
+    {% endif %}
+{% endif %}
 <header class="header-front">
     {% if main_logo %}
     <div>
@@ -27,10 +33,10 @@
         </ul>
     </nav>
     <div class="links-front">
-        <a href="https://www.facebook.com/" target="_blank">
+        <a href="https://www.facebook.com/extremewaycanecas/" target="_blank">
             <img src="https://www.facebook.com/images/fb_icon_325x325.png" alt="Facebook" width="30" height="30">
         </a>
-        <a href="https://www.instagram.com/" target="_blank">
+        <a href="https://www.instagram.com/extremeway_ramada" target="_blank">
             <img src="https://www.instagram.com/static/images/ico/favicon-192.png/68d99ba29cc8.png" alt="Instagram" width="30" height="30">
         </a>
     </div>

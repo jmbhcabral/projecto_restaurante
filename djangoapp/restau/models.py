@@ -110,6 +110,7 @@ class Products(models.Model):
             imagem_changed = current_imagem_name != self.imagem.name
 
         if imagem_changed:
+            print('resizing')
             resize_image(self.imagem, 500)
 
     def __str__(self):
@@ -117,54 +118,52 @@ class Products(models.Model):
 
 
 class FrontendSetup(models.Model):
-    class Meta:
-        verbose_name = 'FrontendSetup'
-        verbose_name_plural = 'FrontendSetup'
-
     nome = models.CharField(
         max_length=200,
         verbose_name='Nome',
         help_text='Nome da configuração'
     )
     imagem_logo = models.ImageField(
-
         upload_to='assets/frontend/logo',
         blank=True,
         null=True,
         verbose_name='Logo',
+        default='',
         # validators=[validate_png]
     )
 
-    def save_logo(self, *args, **kwargs):
-        current_imagem_name = str(self.imagem_logo.name)
-        super().save(*args, **kwargs)
-        imagem_changed = False
-
-        if self.imagem_logo:
-            imagem_changed = current_imagem_name != self.imagem_logo.name
-
-        if imagem_changed:
-            resize_image(self.imagem_logo, 50)
-
     imagem_topo = models.ImageField(
-
         upload_to='assets/frontend/',
         blank=True,
         null=True,
         verbose_name='Imagem',
+        default='',
         # validators=[validate_png]
     )
 
-    def save_topo(self, *args, **kwargs):
-        current_imagem_name = str(self.imagem_topo.name)
+    def save(self, *args, **kwargs):
+        current_imagem_logo_name = str(self.imagem_logo.name)
+        current_imagem_topo_name = str(self.imagem_topo.name)
         super().save(*args, **kwargs)
-        imagem_changed = False
+        imagem_logo_changed = False
+        imagem_topo_changed = False
+
+        if self.imagem_logo:
+            imagem_logo_changed = current_imagem_logo_name != \
+                self.imagem_logo.name
 
         if self.imagem_topo:
-            imagem_changed = current_imagem_name != self.imagem_topo.name
+            imagem_topo_changed = current_imagem_topo_name != \
+                self.imagem_topo.name
 
-        if imagem_changed:
-            resize_image(self.imagem_topo, 1200)
+        if imagem_logo_changed:
+            print('Resizing logo')
+            resize_image(self.imagem_logo, 200)
+
+        if imagem_topo_changed:
+            print('Resizing imagem de topo')
+            # Substitua 200 pelo tamanho desejado
+            resize_image(self.imagem_topo, 900)
 
     def __str__(self):
         return self.nome
