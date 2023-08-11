@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Berkshire+Swash&family=Mrs+Saint+Delafield&display=swap');
+
 :root {
   /* Colors */
   --_clr-base-hue: 213;
@@ -32,8 +34,8 @@
   --clr-olive-green: hsl(82, 23%, 41%);
   --clr-amber: hsl(35, 70%, 67%);
 
-  /* Frontend font family */
-  --ff-frontend: 'Montserrat', sans serif;
+  /* Frontend font-family */
+  --ff-frontend: 'Berkshire Swash', cursive;
 
   /* Font-family */
   --ff-regular: Georgia, 'Times New Roman', Times, serif;
@@ -205,7 +207,7 @@ img {
 }
 
 .separator {
-  background: hsl(var(--clr-gray-ltst));
+  background: var(--clr-amber);
   width: 50%;
   margin-inline: auto;
   height: 1px;
@@ -529,7 +531,13 @@ body.frontend {
 }
 
 .top-background {
+  font-family: var(--ff-frontend);
   min-height: 100vh;
+}
+
+.top-background h1{
+  font-family: var(--ff-frontend);
+  font-size: var(--fs-h1);
 }
 
 .white-bg {
@@ -537,7 +545,7 @@ body.frontend {
 }
 
 .header-front h1 {
-  font-family: verdana;
+  font-family: var(--ff-frontend);
   color: var(--clr-amber)
 }
 
