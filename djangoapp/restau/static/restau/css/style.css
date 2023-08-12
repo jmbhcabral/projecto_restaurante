@@ -208,7 +208,7 @@ img {
 
 .separator {
   background: var(--clr-amber);
-  width: 50%;
+  width: 75%;
   margin-inline: auto;
   height: 1px;
   flex-shrink: 0;
@@ -532,12 +532,26 @@ body.frontend {
 
 .top-background {
   font-family: var(--ff-frontend);
-  min-height: 100vh;
+  min-height: 100%;
 }
 
-.top-background h1{
+.top-background h1 {
   font-family: var(--ff-frontend);
   font-size: var(--fs-h1);
+}
+
+.top-background h2 {
+  font-family: var(--ff-frontend);
+  font-size: var(--fs-h2);
+}
+.top-background h3 {
+  font-family: var(--ff-frontend);
+  font-size: var(--fs-h3);
+  margin: 0;
+}
+.top-background p {
+  font-family: var(--ff-frontend);
+  margin: 0;
 }
 
 .white-bg {
