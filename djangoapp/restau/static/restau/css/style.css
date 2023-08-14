@@ -1,4 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Berkshire+Swash&family=Mrs+Saint+Delafield&display=swap');
+@font-face {
+  font-family: 'frontendfont';
+  src: url("../fonts/frontendfont.TTF") format('truetype');
+}
 
 :root {
   /* Colors */
@@ -35,7 +38,7 @@
   --clr-amber: hsl(35, 70%, 67%);
 
   /* Frontend font-family */
-  --ff-frontend: 'Berkshire Swash', cursive;
+  --ff-frontend: 'frontendfont', sans-serif;
 
   /* Font-family */
   --ff-regular: Georgia, 'Times New Roman', Times, serif;
@@ -208,7 +211,7 @@ img {
 
 .separator {
   background: var(--clr-amber);
-  width: 75%;
+  width: 50%;
   margin-inline: auto;
   height: 1px;
   flex-shrink: 0;
@@ -508,6 +511,8 @@ body.frontend {
   top: 0;
   left: 0;
   z-index: -1;
+  box-shadow: 2px 2px 5px hsl(var(--clr-gray-dkr));
+  border-radius: var(--br-base);
 }
 .front-content {
   max-width: var(--mw-grid);
@@ -551,6 +556,7 @@ body.frontend {
 }
 .top-background p {
   font-family: var(--ff-frontend);
+  font-weight: bold;
   margin: 0;
 }
 
@@ -561,6 +567,23 @@ body.frontend {
 .header-front h1 {
   font-family: var(--ff-frontend);
   color: var(--clr-amber)
+}
+
+.map-box {
+  box-shadow: 2px 2px 5px hsl(var(--clr-gray-dkr));
+  border-radius: var(--br-base);
+}
+
+.contatos {
+  display: flex;
+  justify-content: center;
+}
+
+.morada {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  padding: var(--spacing-bgst);
 }
 
 .header-front ul {
@@ -577,4 +600,73 @@ body.frontend {
 }
 .header-front a:hover {
   color: var(--clr-amber);
+}
+
+.product-frame {
+  margin: 1rem 0 1rem 0;
+  width: 100%;
+  height: 25%;
+  background-color: #fff;
+  border: 0.1rem solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.product-image img {
+  width: 40%;
+  height: 50%;
+  object-fit: cover;
+}
+
+.product-details {
+  margin: 0;
+  padding: 10px;
+  width: 60%;
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.product-name {
+  margin: 0;
+  font-size: 1.2em;
+  align-items: flex-start;
+}
+
+.product-description {
+  margin-top: 5px;
+  font-size: 0.9em;
+  color: #777;
+}
+
+.product-price-section {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  
+}
+
+.product-quantity {
+  font-size: 0.9em;
+  color: #777;
+}
+
+.product-price {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #33aa33;
+}
+
+.product-old-price {
+  font-size: 0.9em;
+  color: #777;
+}
+
+.old-price {
+  text-decoration: line-through;
+  text-decoration-color: #777;
+  color: tomato;
 }
