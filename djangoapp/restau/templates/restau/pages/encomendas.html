@@ -7,40 +7,7 @@
         <h1>Extreme Way</h1>
     {% endif %}
 {% endif %}
-<header class="header-front">
-    {% if main_logo %}
-    <div>
-        {% if main_logo.imagem_logo %}
-        <img src="{{ main_logo.imagem_logo.url }}" alt="Logo">
-        {% else %}
-        <h1>Extreme Way</h1>
-        {% endif %}
-    </div>
-    {% else %}
-    <div>
-        <h1>EXTREME WAY</h1>
-    </div> 
-    {% endif %} 
-    <nav>
-        <ul>
-            <li class="links-front">
-                <a href="#">Home</a>
-                <a href="#">Ementa</a>
-                <a href="#">Reservas</a>
-                <a href="#">Extreme Way</a>
-                <a href="#">Contatos</a>
-            </li>
-        </ul>
-    </nav>
-    <div class="links-front">
-        <a href="https://www.facebook.com/extremewaycanecas/" target="_blank">
-            <img src="https://www.facebook.com/images/fb_icon_325x325.png" alt="Facebook" width="30" height="30">
-        </a>
-        <a href="https://www.instagram.com/extremeway_ramada" target="_blank">
-            <img src="https://www.instagram.com/static/images/ico/favicon-192.png/68d99ba29cc8.png" alt="Instagram" width="30" height="30">
-        </a>
-    </div>
-</header>
+
 <main class="section-content-wide section-gap front-content">
     <section class="section-gap white-bg top-background">
         <div class="separator"></div>
@@ -50,20 +17,35 @@
     <section class="section-gap white-bg top-background">
         <h1 class="left">Ementa</h1>
         {% for produto in produtos %}
+        {% if not produto.imagem %}
+        <div class="product-frame">
+            <div class="product-image">
+                <img src="{{ default_image.imagem_padrao.url }}" alt="Product Image">
+            </div>
+            <div class="product-details">
+                <h3 class="product-name">{{ produto.nome }}</h3>
+                <p class="product-description">{{ produto.descricao_curta }}</p>
+                <div class="product-price-section">
+                    <div class="product-price">{{ produto.preco|floatformat:2 }}</div>
+                    <div class="product-old-price">Preço anterior: <span class="old-price">{{ produto.preco_promo }}</span></div>
+                </div>
+            </div>
+        </div>
+        {% else %}
         <div class="product-frame">
             <div class="product-image">
                 <img src="{{ produto.imagem.url }}" alt="Product Image">
             </div>
             <div class="product-details">
                 <h3 class="product-name">{{ produto.nome }}</h3>
-                <p class="product-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                <p class="product-description">{{ produto.descricao_curta }}</p>
                 <div class="product-price-section">
-                    <div class="product-quantity">Quantity: 10</div>
-                    <div class="product-price">$25.99</div>
-                    <div class="product-old-price">Old Price: <span class="old-price">$30.99</span></div>
+                    <div class="product-price">{{ produto.preco|floatformat:2 }}</div>
+                    <div class="product-old-price">Preço anterior: <span class="old-price">{{ produto.preco_promo }}</span></div>
                 </div>
             </div>
         </div>
+        {% endif %}
         {% endfor %}
     </section>
 

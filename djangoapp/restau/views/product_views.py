@@ -33,15 +33,23 @@ def encomendas(request):
         .filter(imagem_topo__isnull=False) \
         .order_by('-id') \
         .first()
+
+    default_image = FrontendSetup.objects \
+        .filter(imagem_topo__isnull=False) \
+        .order_by('-id') \
+        .first()
+
     produtos = Products.objects \
         .all() \
         .order_by('id')
+
     return render(
         request,
         'restau/pages/encomendas.html',
         {
             'main_logo': main_logo,
             'main_image': main_image,
+            'default_image': default_image,
             'produtos': produtos
         },
     )

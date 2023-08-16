@@ -6,14 +6,14 @@ from restau.models import (
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = 'id', 'categoria'
-    list_display_links = 'id', 'categoria'
+    list_display = 'id', 'nome', 'subcategoria', 'ordem'
+    list_display_links = 'id', 'nome'
 
 
 @admin.register(SubCategory)
 class SubCategoryAdmin(admin.ModelAdmin):
-    list_display = 'id', 'subcategoria'
-    list_display_links = 'id', 'subcategoria'
+    list_display = 'id', 'nome', 'ordem'
+    list_display_links = 'id', 'nome'
 
 
 @admin.register(Percentage)
@@ -37,5 +37,7 @@ class ProductsAdmin(admin.ModelAdmin):
 
 @admin.register(FrontendSetup)
 class FrontendSetupAdmin(admin.ModelAdmin):
-    list_display = 'id', 'nome', 'imagem_logo', 'imagem_topo'
-    list_display_links = 'id', 'nome', 'imagem_logo', 'imagem_topo'
+    list_display = ('id', 'nome', 'imagem_logo',
+                    'imagem_topo', 'imagem_padrao',)
+    list_display_links = ('id', 'nome', 'imagem_logo', 'imagem_topo',
+                          'imagem_padrao',)

@@ -8,10 +8,19 @@ class Category(models.Model):
         verbose_name = 'Categoria'
         verbose_name_plural = 'Categorias'
 
-    categoria = models.CharField(max_length=200)
+    nome = models.CharField(max_length=200, null=False,
+                            default='nova_categoria',)
+    ordem = models.IntegerField(default=0)
+    subcategoria = models.ForeignKey(
+        'SubCategory',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        default=None,
+    )
 
     def __str__(self):
-        return self.categoria
+        return self.nome
 
 
 class SubCategory(models.Model):
@@ -19,10 +28,12 @@ class SubCategory(models.Model):
         verbose_name = 'Subcategoria'
         verbose_name_plural = 'Subcategorias'
 
-    subcategoria = models.CharField(max_length=200)
+    nome = models.CharField(max_length=200, null=False,
+                            default='nova_subcategoria',)
+    ordem = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.subcategoria
+        return self.nome
 
 
 class Percentage(models.Model):
@@ -39,6 +50,77 @@ class Percentage(models.Model):
 
     def __str__(self):
         return str(self.valor)
+
+
+class FrontendSetup(models.Model):
+    nome = models.CharField(
+        max_length=200,
+        verbose_name='Nome',
+        help_text='Nome da configuração'
+    )
+    imagem_logo = models.ImageField(
+        upload_to='assets/frontend/logo',
+        blank=True,
+        null=True,
+        verbose_name='Logo',
+        default='',
+        # validators=[validate_png]
+    )
+
+    imagem_topo = models.ImageField(
+        upload_to='assets/frontend/',
+        blank=True,
+        null=True,
+        verbose_name='Imagem',
+        default='',
+        # validators=[validate_png]
+    )
+
+    imagem_padrao = models.ImageField(
+        upload_to='assets/Products/default/',
+        blank=True,
+        null=True,
+        default='default_image.jpg',
+        verbose_name='Imagem Padrão',
+        # validators=[validate_png]
+    )
+
+    def save(self, *args, **kwargs):
+        current_imagem_logo_name = str(self.imagem_logo.name)
+        current_imagem_topo_name = str(self.imagem_topo.name)
+        current_imagem_padrao_name = str(self.imagem_padrao.name)
+        super().save(*args, **kwargs)
+        imagem_logo_changed = False
+        imagem_topo_changed = False
+        imagem_padrao_changed = False
+
+        if self.imagem_logo:
+            imagem_logo_changed = current_imagem_logo_name != \
+                self.imagem_logo.name
+
+        if self.imagem_topo:
+            imagem_topo_changed = current_imagem_topo_name != \
+                self.imagem_topo.name
+
+        if self.imagem_padrao:
+            imagem_padrao_changed = current_imagem_padrao_name != \
+                self.imagem_padrao.name
+
+        if imagem_logo_changed:
+            print('Resizing logo')
+            resize_image(self.imagem_logo, 200)
+
+        if imagem_topo_changed:
+            print('Resizing imagem de topo')
+            # Substitua 200 pelo tamanho desejado
+            resize_image(self.imagem_topo, 900)
+
+        if imagem_padrao_changed:
+            print('resizing')
+            resize_image(self.imagem_padrao, 500)
+
+    def __str__(self):
+        return self.nome
 
 
 class Products(models.Model):
@@ -96,7 +178,7 @@ class Products(models.Model):
         upload_to='assets/Products/',
         blank=True,
         null=True,
-        default='default_image.jpg',
+        default='',
         verbose_name='Imagem',
         # validators=[validate_png]
     )
@@ -112,58 +194,6 @@ class Products(models.Model):
         if imagem_changed:
             print('resizing')
             resize_image(self.imagem, 500)
-
-    def __str__(self):
-        return self.nome
-
-
-class FrontendSetup(models.Model):
-    nome = models.CharField(
-        max_length=200,
-        verbose_name='Nome',
-        help_text='Nome da configuração'
-    )
-    imagem_logo = models.ImageField(
-        upload_to='assets/frontend/logo',
-        blank=True,
-        null=True,
-        verbose_name='Logo',
-        default='',
-        # validators=[validate_png]
-    )
-
-    imagem_topo = models.ImageField(
-        upload_to='assets/frontend/',
-        blank=True,
-        null=True,
-        verbose_name='Imagem',
-        default='',
-        # validators=[validate_png]
-    )
-
-    def save(self, *args, **kwargs):
-        current_imagem_logo_name = str(self.imagem_logo.name)
-        current_imagem_topo_name = str(self.imagem_topo.name)
-        super().save(*args, **kwargs)
-        imagem_logo_changed = False
-        imagem_topo_changed = False
-
-        if self.imagem_logo:
-            imagem_logo_changed = current_imagem_logo_name != \
-                self.imagem_logo.name
-
-        if self.imagem_topo:
-            imagem_topo_changed = current_imagem_topo_name != \
-                self.imagem_topo.name
-
-        if imagem_logo_changed:
-            print('Resizing logo')
-            resize_image(self.imagem_logo, 200)
-
-        if imagem_topo_changed:
-            print('Resizing imagem de topo')
-            # Substitua 200 pelo tamanho desejado
-            resize_image(self.imagem_topo, 900)
 
     def __str__(self):
         return self.nome
