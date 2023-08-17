@@ -26,7 +26,7 @@
                 <h3 class="product-name">{{ produto.nome }}</h3>
                 <p class="product-description">{{ produto.descricao_curta }}</p>
                 <div class="product-price-section">
-                    <div class="product-price">{{ produto.preco|floatformat:2 }}</div>
+                    <div class="product-price">Preço: <span class="price">{{ produto.preco|floatformat:2 }}</span></div>
                     <div class="product-old-price">Preço anterior: <span class="old-price">{{ produto.preco_promo }}</span></div>
                 </div>
             </div>
@@ -40,7 +40,7 @@
                 <h3 class="product-name">{{ produto.nome }}</h3>
                 <p class="product-description">{{ produto.descricao_curta }}</p>
                 <div class="product-price-section">
-                    <div class="product-price">{{ produto.preco|floatformat:2 }}</div>
+                    <div class="product-price">Preço: <span class="price">{{ produto.preco|floatformat:2 }}</span></div>
                     <div class="product-old-price">Preço anterior: <span class="old-price">{{ produto.preco_promo }}</span></div>
                 </div>
             </div>
