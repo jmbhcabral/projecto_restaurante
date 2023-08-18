@@ -1,7 +1,7 @@
 from django.urls import path
 from restau.views import (                      # type: ignore
     index, admin_home, product, create_product, update, delete,
-    encomendas, create_category, update_categories, delete_category
+    encomendas, category, create_category, update_categories, delete_category
 )
 
 # namespace
@@ -16,10 +16,12 @@ urlpatterns = [
          create_product, name='create_product'),
     path('restau/pages/<int:product_id>/update/', update, name='update'),
     path('restau/pages/<int:product_id>/delete/', delete, name='delete'),
+    path('restau/pages/category/<int:category_id>/',
+         category, name='category'),
     path('restau/pages/create_category/',
          create_category, name='create_category'),
-    path('restau/pages/<int:category_id>/update/',
+    path('restau/pages/<int:category_id>/update_category/',
          update_categories, name='update_categories'),
-    path('restau/pages/<int:category_id>/delete/',
+    path('restau/pages/<int:category_id>/delete_category/',
          delete_category, name='delete_category'),
 ]

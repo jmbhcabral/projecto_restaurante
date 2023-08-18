@@ -2,19 +2,16 @@
 {% block content %}
     <div class="single-product">
         <h3 class="single-product">
-        {{ product.nome}}
+        {{ category.nome}}
         </h3>
-        <p><b>Produto:</b>{{ product.nome}}</p>
-        <p><b>Categoria:</b>{{ product.categoria }}</p>
-        <p><b>Subcategoria:</b>{{ product.subcategoria }}</p>
-        <p><b>Preço:</b>{{ product.preco }}</p>
-        <p><b>Preço Promo:</b>{{  product.preco_promo }}</p>
-        <p><b>Visib:</b>{{ product.visibilidade }}</p>
+        <p><b>Produto:</b>{{ category.nome}}</p>
+        <p><b>Ordem:</b>{{ category.ordem }}</p>
+        {% comment %} <p><b>Subcategoria:</b>{{ category.subcategoria }}</p> {% endcomment %}
 
         <div class="product-links">
-            <a class="btn btn-link" href="{% url 'restau:update' product.id %}">Update</a>
+            <a class="btn btn-link" href="{% url 'restau:update_categories' category.id %}">Update</a>
 
-            <form action="{% url 'restau:delete' product.id %}" method='POST'>
+            <form action="{% url 'restau:delete_category' category.id %}" method='POST'>
                 {% csrf_token %}
                 {% if confirmation == 'no' %}
                     <input type="hidden" name="confirmation" value="yes">

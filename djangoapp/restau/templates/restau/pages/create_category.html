@@ -3,7 +3,7 @@
 {% if categorias %}
 <div class="main-content content responsive-table">
   <table class="products-table">
-    <h3>Produtos</h3>
+    <h3>Categorias</h3>
     <thead>
       <tr class="table-row table-row-header">
         <th class="table-header">Categoria</th>
@@ -15,7 +15,12 @@
       {% for categoria in categorias %}
         <tr class="table-row">
           <td class="table-cell">
+            <a 
+                href="{% url 'restau:category' categoria.id %}" 
+                class="table-link"
+                >
             {{ categoria.nome }}
+            </a>
           </td>
           <td class="table-cell">
             {{ categoria.ordem }}
@@ -36,7 +41,7 @@
 </div>
 {% endif %}
   <div class="content form-wrapper"> 
-    <h3>Categorias</h3>
+    <h3>Adicionar Categoria</h3>
     <form 
     action="{{ form_action }}"
     method="POST"

@@ -19,7 +19,7 @@ def create_category(request):
 
         if form.is_valid():
             categoria = form.save()
-            return redirect('restau:update_categories',
+            return redirect('restau:create_category',
                             category_id=categoria.id)
 
         return render(
@@ -53,7 +53,7 @@ def update_categories(request, category_id):
 
         if form.is_valid():
             category = form.save()
-            return redirect('restau:index')
+            return redirect('restau:create_category')
 
         return render(
             request,
@@ -74,17 +74,17 @@ def update_categories(request, category_id):
 
 def delete_category(request, category_id):
     category = get_object_or_404(
-        Category, pk=category_id, visibilidade=True
+        Category, pk=category_id
     )
     confirmation = request.POST.get('confirmation', 'no')
 
     if confirmation == 'yes':
         category.delete()
-        return redirect('restau:admin-home')
+        return redirect('restau:create_category')
 
     return render(
         request,
-        'restau/pages/categorias.html',
+        'restau/pages/category.html',
         {
             'category': category,
             'confirmation': confirmation,
