@@ -1,0 +1,77 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+{% if categorias %}
+<div class="main-content content responsive-table">
+  <table class="products-table">
+    <h3>Produtos</h3>
+    <thead>
+      <tr class="table-row table-row-header">
+        <th class="table-header">Categoria</th>
+        <th class="table-header">Ordem</th>
+      </tr>
+    </thead>
+    
+    <tbody>
+      {% for categoria in categorias %}
+        <tr class="table-row">
+          <td class="table-cell">
+            {{ categoria.nome }}
+          </td>
+          <td class="table-cell">
+            {{ categoria.ordem }}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="not-found center">
+  <h1>Nada encontrado 😞</h1>
+    <p>
+      Não encontrei nada nesse link, clique em outro
+      link do nosso admin ou vá para a
+      <a href="{% url 'restau:index' %}">Home</a>
+    </p>
+</div>
+{% endif %}
+  <div class="content form-wrapper"> 
+    <h3>Categorias</h3>
+    <form 
+    action="{{ form_action }}"
+    method="POST"
+    enctype="multipart/form-data"
+    >
+      {% csrf_token %}
+      <div class="form-content">
+        {% for field in form %}
+        
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {{ field.errors }}
+          {% if field.help_text %}
+          <p class="help-text">{{ field.help_text }}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% if form.non_field_errors %}
+      <div class="form-content">
+        <div class="">
+          <div class="message error">
+            {{ form.non_field_errors }}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      <div class="form-content">
+        <div class="form-group">
+          <button class="btn" type="submit">Enviar</button>
+        </div>
+      </div>  
+    </form>
+  </div>
+{% endblock content %}
+  
+  

@@ -13,7 +13,7 @@ class Category(models.Model):
     ordem = models.IntegerField(default=0)
     subcategoria = models.ForeignKey(
         'SubCategory',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
         default=None,
@@ -154,20 +154,20 @@ class Products(models.Model):
     )
     percentagem_desconto = models.ForeignKey(
         Percentage,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
     categoria = models.ForeignKey(
         Category,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
         default=None,
     )
     subcategoria = models.ForeignKey(
         SubCategory,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
         default=None,
