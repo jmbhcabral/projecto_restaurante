@@ -19,14 +19,10 @@
         <tr class="table-row">
           <td class="table-cell">
             <a 
-              {% for categoria in categorias %}
-                {% if categoria.id == form.instance.id %}
-                href="{% url 'restau:category' categoria.id %}" 
+                {% comment %} href="{% url 'restau:category' form.instance.id %}"  {% endcomment %}
                 class="table-link"
                 >
-            {{ categoria.nome }}
-            {% endif %}
-            {% endfor %}
+            {{ form.instance.nome }}
             </a>
           </td>
           <td class="table-cell">
@@ -34,6 +30,14 @@
           </td>
         </tr>
       {% endfor %}
+        <tr>
+          <td>
+
+          </td>
+          <td>
+            <button class="btn" type="submit">Enviar</button>
+          </td>
+        </tr>
     </tbody>
   </table>
   </form>
