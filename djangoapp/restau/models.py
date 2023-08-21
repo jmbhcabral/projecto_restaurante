@@ -11,12 +11,9 @@ class Category(models.Model):
     nome = models.CharField(max_length=200, null=False,
                             default='nova_categoria',)
     ordem = models.IntegerField(default=0)
-    subcategoria = models.ForeignKey(
+    subcategoria = models.ManyToManyField(
         'SubCategory',
-        on_delete=models.SET_NULL,
         blank=True,
-        null=True,
-        default=None,
     )
 
     def __str__(self):

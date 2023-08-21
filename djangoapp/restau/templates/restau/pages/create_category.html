@@ -1,93 +1,148 @@
 {% extends 'restau/base.html' %}
 {% block content %}
-{% if formset %}
-<div class="main-content content responsive-table">
-  <form action="{% url 'restau:create_category' %}" method="post">
-  {% csrf_token %}
-  {{ formset.management_form }}
-  <table class="products-table">
-    <h3>Categorias</h3>
-    <thead>
-      <tr class="table-row table-row-header">
-        <th class="table-header"></th>
-        <th class="table-header">Categoria</th>
-        <th class="table-header">Ordem</th>
-      </tr>
-    </thead>
-    
-    <tbody>
-      {% for form in formset %}
-        <tr class="table-row">
-          <td class="table-cell">
-            {{ form.id }}
-          </td>
-          <td class="table-cell">
-              {{ form.nome }}
-          </td>
-          <td class="table-cell">
-            {{ form.ordem }}
-          </td>
-        </tr>
-      {% endfor %}
-        <tr>
-          <td>
-
-          </td>
-          <td>
-            <button class="btn" type="submit">Enviar</button>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-  </form>
-</div>
-{% else %}
-<div class="not-found center">
-  <h1>Nada encontrado 😞</h1>
+<div class="section-content-wide formset-update">
+  {% if formset %}
+  <div class="content">
+    <form action="{% url 'restau:create_category' %}" method="post">
+      {% csrf_token %}
+      {{ formset.management_form }}
+      <table class="">
+        <h3>Categorias</h3>
+        <thead>
+          <tr class="">
+            <th class=""></th>
+            <th class="">Categoria</th>
+            <th class="">Subategoria</th>
+            <th class="">Ordem</th>
+          </tr>
+        </thead>
+      
+        <tbody>
+          {% for form in formset %}
+          <tr class="">
+            <td class="t">
+              {{ form.id }}
+            </td>
+            <td class="">
+                {{ form.nome }}
+            </td>
+            <td class="">
+                {{ form.subcategoria }}
+            </td>
+            <td class="">
+              {{ form.ordem }}
+            </td>
+          </tr>
+          {% endfor %}
+          <tr>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td>
+              <button class="btn" type="submit">Update</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+  </div>
+  {% else %}
+  <div class="not-found center">
+    <h1>Nada encontrado 😞</h1>
     <p>
       Não encontrei nada nesse link, clique em outro
       link do nosso admin ou vá para a
       <a href="{% url 'restau:index' %}">Home</a>
     </p>
-</div>
-{% endif %}
-  <div class="content form-wrapper"> 
-    <h3>Adicionar Categoria</h3>
-    <form 
-    action="{{ form_action }}"
-    method="POST"
-    enctype="multipart/form-data"
-    >
+  </div>
+  {% endif %}
+  {% if subformset %}
+  <div class="content">
+    <form action="{% url 'restau:create_category' %}" method="post">
       {% csrf_token %}
-      <div class="form-content">
-        {% for field in form %}
-        
-        <div class="form-group">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {{ field.errors }}
-          {% if field.help_text %}
-          <p class="help-text">{{ field.help_text }}</p>
-          {% endif %}
-        </div>
-        {% endfor %}
-      </div>
-      {% if form.non_field_errors %}
-      <div class="form-content">
-        <div class="">
-          <div class="message error">
-            {{ form.non_field_errors }}
-          </div>
-        </div>
-      </div>
-      {% endif %}
-      <div class="form-content">
-        <div class="form-group">
-          <button class="btn" type="submit">Enviar</button>
-        </div>
-      </div>  
+      {{ subformset.management_form }}
+      <table class="">
+        <h3>SubCategorias</h3>
+        <thead>
+          <tr class="">
+            <th class=""></th>
+            <th class="">SubCategoria</th>
+            <th class="">Ordem</th>
+          </tr>
+        </thead> 
+        <tbody>
+          {% for form in subformset %}
+          <tr class="">
+            <td class="">
+              {{ form.id }}
+            </td>
+            <td class="">
+                {{ form.nome }}
+            </td>
+            <td class="">
+              {{ form.ordem }}
+            </td>
+          </tr>
+          {% endfor %}
+          <tr>
+            <td></td>
+            <td></td>
+            <td>
+              <button class="btn" type="submit">Update</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </form>
   </div>
+  {% else %}
+  <div class="not-found center">
+    <h1>Nada encontrado 😞</h1>
+      <p>
+        Não encontrei nada nesse link, clique em outro
+        link do nosso admin ou vá para a
+        <a href="{% url 'restau:index' %}">Home</a>
+      </p>
+  </div>
+</div>
+{% endif %}
+<div class="content form-wrapper"> 
+  <h3>Adicionar Categoria</h3>
+  <form 
+  action="{{ form_action }}"
+  method="POST"
+  enctype="multipart/form-data"
+  >
+    {% csrf_token %}
+    <div class="form-content">
+      {% for field in form %}
+      
+      <div class="form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {{ field.errors }}
+        {% if field.help_text %}
+        <p class="help-text">{{ field.help_text }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% if form.non_field_errors %}
+    <div class="form-content">
+      <div class="">
+        <div class="message error">
+          {{ form.non_field_errors }}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    <div class="form-content">
+      <div class="form-group">
+        <button class="btn" type="submit">Enviar</button>
+      </div>
+    </div>  
+  </form>
+</div> 
 {% endblock content %}
   
   

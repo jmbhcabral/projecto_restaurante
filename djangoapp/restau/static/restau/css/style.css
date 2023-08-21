@@ -353,6 +353,37 @@ img {
   color: var(--clr-black);
 }
 
+.formset-update {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-flow: row wrap;
+  justify-content: space-between;
+}
+
+.formset-responsive-table {
+  max-width: 100%;
+  
+}
+
+.formset-products-table {
+  max-width: 50%;
+  min-width: var(--tb-min-width);
+  border-collapse: collapse;
+}
+
+.formset-table-row {
+  width: 50%;
+  text-align: left;
+  text-overflow: ellipsis;
+  transition: background-color var(--transition-fast) ease-in-out;
+}
+.formset-table-cell {
+  max-width: 20%;
+  padding: var(--spacing-smlr);
+  text-align: left;
+}
+
 @media (min-width: 600px) {
   .single-product {
     max-width: 80%;

@@ -3,7 +3,7 @@ from django import forms
 from restau.models import Products, Category, SubCategory
 
 
-class SubcategoryForm(forms.ModelForm):
+class SubCategoryForm(forms.ModelForm):
     nome = forms.CharField(
         widget=forms.TextInput(
             attrs={
@@ -80,7 +80,7 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = (
-            'nome', 'ordem',
+            'nome', 'ordem', 'subcategoria',
         )
 
     def clean(self):

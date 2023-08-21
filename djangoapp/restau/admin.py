@@ -6,7 +6,7 @@ from restau.models import (
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = 'id', 'nome', 'subcategoria', 'ordem'
+    list_display = 'id', 'nome', 'ordem',
     list_display_links = 'id', 'nome'
 
 
