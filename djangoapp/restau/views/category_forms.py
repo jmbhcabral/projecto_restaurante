@@ -7,32 +7,53 @@ from django.forms import modelformset_factory
 
 def create_category(request):
     CategoriaFormSet = modelformset_factory(
-        Category, fields=('ordem',), extra=0)
+        Category, fields=('id', 'nome', 'ordem',), extra=0)
 
-    formset = CategoriaFormSet(queryset=Category.objects.all())
+    formset = CategoriaFormSet(queryset=Category.objects
+                               .all()
+                               .order_by('ordem')
+                               )
+
+    for f in formset:
+        print(f'formset: {f.instance.id}')
+        print(f'formset: {f.instance.nome}')
+        print(f'formset: {f.instance.ordem}')
+    print(f'formset beggining: {formset.is_valid()}')
 
     form_action = reverse('restau:create_category')
 
     if request.method == 'POST':
-        formset = CategoriaFormSet(request.POST)
+        formset = CategoriaFormSet(
+            request.POST, request.FILES, queryset=Category.objects.all())
+        # print(f'formset: {formset}')
         form = CategoryForm(request.POST, request.FILES)
         context = {
             'formset': formset,
             'form': form,
             'form_action': form_action,
         }
-        print(f'formset: {formset}')
+        for f in formset:
+            print(f'formset: {f.instance.id}')
+            print(f'formset: {f.instance.nome}')
+            print(f'formset: {f.instance.ordem}')
+        print(f'formset: {formset.is_valid()}')
         print(f'form: {form.instance.id}')
 
         if form.is_valid():
+            print(f'form is valid: {form.is_valid()}')
             categoria = form.save()
-            return redirect('restau:category',
-                            category_id=categoria.id)
+            print('form saved')
+            return redirect('restau:category', category_id=categoria.id)
 
         if formset.is_valid():
-            print(f'formset: {formset}')
-            formset.save()
-            return redirect('restau:category',)
+            print(f'formset is valid: {formset.is_valid()}')
+            formset.save()  # Salva o formset diretamente
+            print('formset saved')
+            return redirect('restau:create_category',)
+
+        else:
+            print(f'formset: {formset.errors}')
+            print(f'form: {form.errors}')
 
         return render(
             request,

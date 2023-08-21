@@ -1,0 +1,53 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+{% if formset %}
+<div class="main-content content responsive-table">
+  <form action="{% url 'restau:category_order' %}" method="post">
+  {% csrf_token %}
+  {{ formset.management_form }}
+  <table class="products-table">
+    <h3>Categorias</h3>
+    <thead>
+      <tr class="table-row table-row-header">
+        <th class="table-header">ID</th>
+        <th class="table-header">Categoria</th>
+        <th class="table-header">Ordem</th>
+      </tr>
+    </thead>
+    
+    <tbody>
+      {% for form in formset %}
+        <tr class="table-row">
+          <td class="table-cell">
+            {{ form.id }}
+          <td class="table-cell">
+              {{ form.instance.nome }}
+          </td>
+          <td class="table-cell">
+            {{ form.ordem }}
+          </td>
+        </tr>
+      {% endfor %}
+        <tr>
+          <td>
+
+          </td>
+          <td>
+            <button class="btn" type="submit">Enviar</button>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+  </form>
+</div>
+{% else %}
+<div class="not-found center">
+  <h1>Nada encontrado 😞</h1>
+    <p>
+      Não encontrei nada nesse link, clique em outro
+      link do nosso admin ou vá para a
+      <a href="{% url 'restau:index' %}">Home</a>
+    </p>
+</div>
+{% endif %}
+{% endblock %}

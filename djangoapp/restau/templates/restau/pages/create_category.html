@@ -9,6 +9,7 @@
     <h3>Categorias</h3>
     <thead>
       <tr class="table-row table-row-header">
+        <th class="table-header"></th>
         <th class="table-header">Categoria</th>
         <th class="table-header">Ordem</th>
       </tr>
@@ -18,12 +19,10 @@
       {% for form in formset %}
         <tr class="table-row">
           <td class="table-cell">
-            <a 
-                {% comment %} href="{% url 'restau:category' form.instance.id %}"  {% endcomment %}
-                class="table-link"
-                >
-            {{ form.instance.nome }}
-            </a>
+            {{ form.id }}
+          </td>
+          <td class="table-cell">
+              {{ form.nome }}
           </td>
           <td class="table-cell">
             {{ form.ordem }}
