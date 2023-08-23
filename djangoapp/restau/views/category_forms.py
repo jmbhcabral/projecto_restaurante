@@ -48,7 +48,9 @@ def create_category(request):
             request.POST, request.FILES, queryset=Category.objects.all())
 
         subformset = SubCategoriaFormSet(
-            request.POST, request.FILES, queryset=SubCategory.objects.all())
+            request.POST, request.FILES, queryset=SubCategory.objects
+            .all())
+        # .filter(category__in=formset.queryset))
         # print(f'formset: {formset}')
 
         form = CategoryForm(request.POST, request.FILES)
@@ -62,6 +64,7 @@ def create_category(request):
         print('-------------Debugging---------------')
         print('-------------------------------------')
         print('-------------------------------------')
+        print(f'Queryset: {subformset.queryset}')
         for f in formset:
             print(f'formset: {f.instance.id}')
             print(f'formset: {f.instance.nome}')

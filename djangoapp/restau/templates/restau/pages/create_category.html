@@ -58,7 +58,41 @@
   {% endif %}
   {% if subformset %}
   <div class="content">
-    <form action="{% url 'restau:create_category' %}" method="post">
+    <form method="post">
+      {% csrf_token %}
+      {{ subformset.management_form }} {# Adicionar o management form do formset #}
+      
+      <table>
+        <thead>
+          <tr>
+            <th>Categoria</th>
+            <th>Subcategoria</th>
+            <th>Ordem</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for categoria_form in formset.forms %}
+            <tr>
+              <td>{{ categoria_form.instance.nome }}</td>
+              <td>
+                <ul>
+                  {% for subcategoria in categoria_form.instance.subcategoria.all %}
+                    <li>
+                      {{ subcategoria.nome }} -
+                      {{ subcategoria.ordem }}
+                      <input type="number" name="subcategoria-{{ subcategoria.id }}-ordem" value="{{ subcategoria.ordem }}" {% if subcategoria.id is None %}disabled{% endif %}>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      
+      <button type="submit">Salvar</button>
+    </form>
+    {% comment %} <form action="{% url 'restau:create_category' %}" method="post">
       {% csrf_token %}
       {{ subformset.management_form }}
       <table class="">
@@ -72,6 +106,7 @@
         </thead> 
         <tbody>
           {% for form in subformset %}
+          <tr class=""><h3>{{ form.category }}</h3></tr>
           <tr class="">
             <td class="">
               {{ form.id }}
@@ -93,7 +128,7 @@
           </tr>
         </tbody>
       </table>
-    </form>
+    </form> {% endcomment %}
   </div>
   {% else %}
   <div class="not-found center">
