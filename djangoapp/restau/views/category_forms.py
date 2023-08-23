@@ -7,10 +7,10 @@ from django.forms import modelformset_factory
 
 def create_category(request):
     CategoriaFormSet = modelformset_factory(
-        Category, fields=('id', 'nome', 'ordem', 'subcategoria',), extra=0)
+        Category, fields=('id', 'nome', 'ordem',), extra=0)
 
     SubCategoriaFormSet = modelformset_factory(
-        SubCategory, fields=('id', 'nome', 'ordem',), extra=0)
+        SubCategory, fields=('id', 'nome', 'ordem', 'categoria',), extra=0)
 
     formset = CategoriaFormSet(queryset=Category.objects
                                .all()
@@ -40,6 +40,10 @@ def create_category(request):
         print(f'subformset: {f.instance.nome}')
         print(f'subformset: {f.instance.ordem}')
     print(f'subformset: {subformset.is_valid()}')
+    print('-------------------------------------')
+    print('-------------Debugging---------------')
+    print('-------------------------------------')
+    print('-------------------------------------')
 
     form_action = reverse('restau:create_category')
 
@@ -50,8 +54,6 @@ def create_category(request):
         subformset = SubCategoriaFormSet(
             request.POST, request.FILES, queryset=SubCategory.objects
             .all())
-        # .filter(category__in=formset.queryset))
-        # print(f'formset: {formset}')
 
         form = CategoryForm(request.POST, request.FILES)
         context = {
@@ -64,22 +66,39 @@ def create_category(request):
         print('-------------Debugging---------------')
         print('-------------------------------------')
         print('-------------------------------------')
-        print(f'Queryset: {subformset.queryset}')
+
         for f in formset:
             print(f'formset: {f.instance.id}')
             print(f'formset: {f.instance.nome}')
             print(f'formset: {f.instance.ordem}')
         print(f'formset: {formset.is_valid()}')
-        print(f'form: {form.instance.id}')
+
         print('-------------------------------------')
         print('-------------Debugging---------------')
         print('-------------------------------------')
         print('-------------------------------------')
+        print(f'instance.subcategoria: {subformset.queryset[0].nome}')
+        print(f'Queryset: {subformset.queryset}')
         for f in subformset:
             print(f'subformset: {f.instance.id}')
             print(f'subformset: {f.instance.nome}')
             print(f'subformset: {f.instance.ordem}')
         print(f'subformset: {subformset.is_valid()}')
+        print('-------------------------------------')
+        print('-------------Debugging---------------')
+        print('-------------------------------------')
+        print('-------------------------------------')
+        print(f'form: {form.instance.id}')
+        print('-------------------------------------')
+        print('-------------Debugging---------------')
+        print('-------------------------------------')
+        print('-------------------------------------')
+
+        if subformset.is_valid():
+            print(f'Subformset is valid: {subformset.is_valid()}')
+            subformset.save()  # Salva o formset diretamente
+            print('Subformset saved')
+            return redirect('restau:create_category',)
 
         if form.is_valid():
             print(f'form is valid: {form.is_valid()}')
@@ -91,12 +110,6 @@ def create_category(request):
             print(f'formset is valid: {formset.is_valid()}')
             formset.save()  # Salva o formset diretamente
             print('formset saved')
-            return redirect('restau:create_category',)
-
-        if subformset.is_valid():
-            print(f'Subformset is valid: {subformset.is_valid()}')
-            subformset.save()  # Salva o formset diretamente
-            print('Subformset saved')
             return redirect('restau:create_category',)
 
         else:

@@ -30,7 +30,7 @@ class SubCategoryForm(forms.ModelForm):
     class Meta:
         model = SubCategory
         fields = (
-            'nome', 'ordem',
+            'nome', 'categoria', 'ordem',
         )
 
     def clean(self):
@@ -80,7 +80,7 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = (
-            'nome', 'ordem', 'subcategoria',
+            'nome', 'ordem',
         )
 
     def clean(self):

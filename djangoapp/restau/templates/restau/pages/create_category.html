@@ -71,26 +71,35 @@
           </tr>
         </thead>
         <tbody>
-          {% for categoria_form in formset.forms %}
+          {% for i in subformset %}
             <tr>
-              <td>{{ categoria_form.instance.nome }}</td>
+              <td>{{ i.instance.categoria }}</td>
+            </tr>
+            
+            {% comment %} {% for subcategoria in i.instance.cate %} {% endcomment %}
+            
+            <tr>
               <td>
-                <ul>
-                  {% for subcategoria in categoria_form.instance.subcategoria.all %}
-                    <li>
-                      {{ subcategoria.nome }} -
-                      {{ subcategoria.ordem }}
-                      <input type="number" name="subcategoria-{{ subcategoria.id }}-ordem" value="{{ subcategoria.ordem }}" {% if subcategoria.id is None %}disabled{% endif %}>
-                    </li>
-                  {% endfor %}
-                </ul>
+                {{ subcategoria.id }}
+              </td>
+              <td>
+                {% comment %} {{ subcategoria.nome.label_tag }} {% endcomment %}
+                {{ subcategoria.nome }}
+              </td>
+              <td>
+                {% comment %} {{ subcategoria.ordem.label_tag }} {% endcomment %}
+                {{ subcategoria.ordem }}
               </td>
             </tr>
-          {% endfor %}
+            {% comment %} {% endfor %} {% endcomment %}
+            {% endfor %}
+            <tr>
+              <td></td>
+              <td></td>
+              <td><button class="btn" type="submit">Salvar</button></td>
+            </tr>
         </tbody>
       </table>
-      
-      <button type="submit">Salvar</button>
     </form>
     {% comment %} <form action="{% url 'restau:create_category' %}" method="post">
       {% csrf_token %}
