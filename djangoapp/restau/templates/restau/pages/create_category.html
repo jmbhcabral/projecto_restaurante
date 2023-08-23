@@ -60,47 +60,48 @@
   <div class="content">
     <form method="post">
       {% csrf_token %}
-      {{ subformset.management_form }} {# Adicionar o management form do formset #}
-      
+
+      {{ formset.management_form }}
+      {{ subformset.management_form }}
+
       <table>
-        <thead>
+          <thead>
+              <tr>
+                  <th>Categoria</th>
+                  <th>Subcategoria</th>
+                  <th>Ordem</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for i in formset.forms %}
           <tr>
-            <th>Categoria</th>
-            <th>Subcategoria</th>
-            <th>Ordem</th>
+            <td>{{ i.instance.nome }}</td>
+            <td>
           </tr>
-        </thead>
-        <tbody>
-          {% for i in subformset %}
-            <tr>
-              <td>{{ i.instance.categoria }}</td>
-            </tr>
+          {% for subform in subformset.forms %}                        
+            {% if subform.categoria.value == i.id.value %}
+          <tr>
+            <td>{{ subform.id }}</td>
+            <td>{{ subform.nome }}</td>
+            <td>{{ subform.ordem }}</td>
+          </tr>
             
-            {% comment %} {% for subcategoria in i.instance.cate %} {% endcomment %}
-            
-            <tr>
-              <td>
-                {{ subcategoria.id }}
-              </td>
-              <td>
-                {% comment %} {{ subcategoria.nome.label_tag }} {% endcomment %}
-                {{ subcategoria.nome }}
-              </td>
-              <td>
-                {% comment %} {{ subcategoria.ordem.label_tag }} {% endcomment %}
-                {{ subcategoria.ordem }}
-              </td>
-            </tr>
-            {% comment %} {% endfor %} {% endcomment %}
-            {% endfor %}
-            <tr>
-              <td></td>
-              <td></td>
-              <td><button class="btn" type="submit">Salvar</button></td>
-            </tr>
-        </tbody>
+            {% endif %}
+          {% endfor %}
+          {% if not subform.categoria.value == i.id.value %}
+          <tr>
+            <td>sem dados</td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+          <tr>
+            <td></td>
+            <td></td>
+            <td><button class="btn" type="submit">Salvar</button></td>
+          </tr>
+        </tbody>  
       </table>
-    </form>
+  </form>
     {% comment %} <form action="{% url 'restau:create_category' %}" method="post">
       {% csrf_token %}
       {{ subformset.management_form }}

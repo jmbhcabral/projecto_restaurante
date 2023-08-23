@@ -40,8 +40,8 @@ def encomendas(request):
         .first()
 
     produtos = Products.objects \
-        .all() \
-        .order_by('id')
+        .filter('categoria') \
+        .order_by('ordem')
 
     return render(
         request,
