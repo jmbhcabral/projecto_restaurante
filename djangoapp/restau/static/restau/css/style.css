@@ -586,11 +586,19 @@ body.frontend {
   font-family: var(--ff-frontend);
   font-size: var(--fs-h2);
 }
+
 .top-background h3 {
   font-family: var(--ff-frontend);
   font-size: var(--fs-h3);
   margin: 0;
 }
+
+.top-background h4 {
+  font-family: var(--ff-frontend);
+  font-size: var(--fs-h4);
+  margin: 0;
+}
+
 .top-background p {
   font-family: var(--ff-frontend);
   font-weight: bold;

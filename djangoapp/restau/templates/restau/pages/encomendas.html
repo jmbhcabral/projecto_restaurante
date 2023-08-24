@@ -16,7 +16,15 @@
     </section>
     <section class="section-gap white-bg top-background">
         <h1 class="left">Ementa</h1>
+        {% for categoria in categorias %}
+        <h3>{{ categoria.nome }}</h3>
+        {% for subcategoria in subcategorias %}
+        {% if subcategoria.categoria == categoria %}
+        <h4>{{ subcategoria.nome }}</h4>
+        {% endif %}
+    
         {% for produto in produtos %}
+        {% if produto.categoria == categoria and produto.subcategoria == subcategoria %}
         {% if not produto.imagem %}
         <div class="product-frame">
             <div class="product-image">
@@ -46,6 +54,9 @@
             </div>
         </div>
         {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
         {% endfor %}
     </section>
 

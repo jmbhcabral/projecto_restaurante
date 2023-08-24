@@ -7,12 +7,11 @@
       {% csrf_token %}
       {{ formset.management_form }}
       <table class="">
-        <h3>Categorias</h3>
+        <h3 class="center">Categorias</h3>
         <thead>
           <tr class="">
             <th class=""></th>
             <th class="">Categoria</th>
-            <th class="">Subategoria</th>
             <th class="">Ordem</th>
           </tr>
         </thead>
@@ -24,10 +23,7 @@
               {{ form.id }}
             </td>
             <td class="">
-                {{ form.nome }}
-            </td>
-            <td class="">
-                {{ form.subcategoria }}
+                {{ form.instance.nome }}
             </td>
             <td class="">
               {{ form.ordem }}
@@ -36,7 +32,6 @@
           {% endfor %}
           <tr>
             <td></td>
-            <td> </td>
             <td> </td>
             <td>
               <button class="btn" type="submit">Update</button>
@@ -82,7 +77,7 @@
             {% if subform.categoria.value == i.id.value %}
           <tr>
             <td>{{ subform.id }}</td>
-            <td>{{ subform.nome }}</td>
+            <td>{{ subform.instance.nome }}</td>
             <td>{{ subform.ordem }}</td>
           </tr>
             
