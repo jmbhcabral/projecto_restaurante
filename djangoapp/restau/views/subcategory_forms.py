@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from restau.forms import CategoryForm
+from restau.forms import SubCategoryForm
 from restau.models import Category, SubCategory
 from django.forms import modelformset_factory
 
 
-def create_category(request):
+def create_subcategory(request):
     CategoriaFormSet = modelformset_factory(
         Category, fields=('id', 'nome', 'ordem',), extra=0)
 
@@ -22,7 +22,7 @@ def create_category(request):
                                      .order_by('ordem')
                                      )
 
-    form_action = reverse('restau:create_category')
+    form_action = reverse('restau:create_subcategory')
 
     if request.method == 'POST':
         formset = CategoriaFormSet(
@@ -32,7 +32,7 @@ def create_category(request):
             request.POST, request.FILES, queryset=SubCategory.objects
             .all())
 
-        form = CategoryForm(request.POST, request.FILES)
+        form = SubCategoryForm(request.POST, request.FILES)
         context = {
             'formset': formset,
             'subformset': subformset,
@@ -40,23 +40,24 @@ def create_category(request):
             'form_action': form_action,
         }
 
-        # if subformset.is_valid():
-        #     print(f'Subformset is valid: {subformset.is_valid()}')
-        #     subformset.save()  # Salva o formset diretamente
-        #     print('Subformset saved')
-        #     return redirect('restau:create_category',)
+        if subformset.is_valid():
+            print(f'Subformset is valid: {subformset.is_valid()}')
+            subformset.save()  # Salva o formset diretamente
+            print('Subformset saved')
+            return redirect('restau:create_subcategory',)
 
         if form.is_valid():
             print(f'form is valid: {form.is_valid()}')
-            categoria = form.save()
+            subcategoria = form.save()
             print('form saved')
-            return redirect('restau:create_category', category_id=categoria.id)
+            return redirect('restau:create_subcategory',
+                            subcategory_id=subcategoria.id)
 
-        if formset.is_valid():
-            print(f'formset is valid: {formset.is_valid()}')
-            formset.save()  # Salva o formset diretamente
-            print('formset saved')
-            return redirect('restau:create_category',)
+        # if formset.is_valid():
+        #     print(f'formset is valid: {formset.is_valid()}')
+        #     formset.save()  # Salva o formset diretamente
+        #     print('formset saved')
+        #     return redirect('restau:create_category',)
 
         else:
             print(f'formset: {formset.errors}')
@@ -65,14 +66,14 @@ def create_category(request):
 
         return render(
             request,
-            'restau/pages/create_category.html',
+            'restau/pages/create_subcategory.html',
             context
         )
 
     context = {
         'formset': formset,
         'subformset': subformset,
-        'form': CategoryForm(),
+        'form': SubCategoryForm(),
         'form_action': form_action,
     }
     print('-------------------------------------')
@@ -82,58 +83,60 @@ def create_category(request):
     print(context)
     return render(
         request,
-        'restau/pages/create_category.html',
+        'restau/pages/create_subcategory.html',
         context
     )
 
 
-def update_categories(request, category_id):
-    category = get_object_or_404(
-        Category, pk=category_id)
-    form_action = reverse('restau:update_categories', args=(category_id,))
+def update_subcategories(request, subcategory_id):
+    subcategory = get_object_or_404(
+        SubCategory, pk=subcategory_id)
+    form_action = reverse('restau:update_subcategories',
+                          args=(subcategory_id,))
     if request.method == 'POST':
-        form = CategoryForm(request.POST, request.FILES, instance=category)
+        form = SubCategoryForm(
+            request.POST, request.FILES, instance=subcategory)
         context = {
             'form': form,
             'form_action': form_action,
         }
 
         if form.is_valid():
-            category = form.save()
-            return redirect('restau:create_category')
+            subcategory = form.save()
+            return redirect('restau:create_subcategory')
 
         return render(
             request,
-            'restau/pages/create_category.html',
+            'restau/pages/create_subcategory.html',
             context
         )
 
     context = {
-        'form': CategoryForm(instance=category),
+        'form': SubCategoryForm(instance=subcategory),
         'form_action': form_action,
     }
     return render(
         request,
-        'restau/pages/create_category.html',
+        'restau/pages/create_subcategory.html',
         context
     )
 
 
-def delete_category(request, category_id):
-    category = get_object_or_404(
-        Category, pk=category_id
+def delete_subcategory(request, subcategory_id):
+    subcategory = get_object_or_404(
+        SubCategory, pk=subcategory_id
     )
     confirmation = request.POST.get('confirmation', 'no')
 
     if confirmation == 'yes':
-        category.delete()
-        return redirect('restau:create_category')
+        subcategory.delete()
+        return redirect('restau:create_subcategory')
 
     return render(
         request,
-        'restau/pages/category.html',
+        'restau/pages/subcategory.html',
         {
-            'category': category,
+            'subcategory': subcategory,
             'confirmation': confirmation,
         }
     )

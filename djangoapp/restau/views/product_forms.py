@@ -14,8 +14,8 @@ def create_product(request):
         }
 
         if form.is_valid():
-            product = form.save()
-            return redirect('restau:update', product_id=product.id)
+            form.save()
+            return redirect('restau:create_product')
 
         return render(
             request,
@@ -47,7 +47,7 @@ def update(request, product_id):
 
         if form.is_valid():
             product = form.save()
-            return redirect('restau:admin-home')
+            return redirect('restau:produtos')
 
         return render(
             request,
@@ -74,7 +74,7 @@ def delete(request, product_id):
 
     if confirmation == 'yes':
         product.delete()
-        return redirect('restau:admin-home')
+        return redirect('restau:produtos')
 
     return render(
         request,

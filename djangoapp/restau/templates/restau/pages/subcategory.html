@@ -1,0 +1,26 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+    <div class="single-product">
+        <h3 class="single-product">
+        {{ subcategory.nome}}
+        </h3>
+        <p><b>Nome:</b>{{ subcategory.nome}}</p>
+        <p><b>Ordem:</b>{{ subcategory.ordem }}</p>
+
+        <div class="product-links">
+            <a class="btn btn-link" href="{% url 'restau:update_subcategories' subcategory.id %}">Update</a>
+
+            <form action="{% url 'restau:delete_subcategory' subcategory.id %}" method='POST'>
+                {% csrf_token %}
+                {% if confirmation == 'no' %}
+                    <input type="hidden" name="confirmation" value="yes">
+                    <button class="btn btn-link btn-delete" type="submit">Confirma?</button>
+                {% else %}
+                    <button class="btn btn-link btn-delete" type="submit">Delete</button>
+                
+                {% endif %}
+            </form>
+        </div>
+
+    </div>
+{% endblock content %}

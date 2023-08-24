@@ -1,60 +1,65 @@
 {% extends 'restau/base.html' %}
 {% block content %}
 <div class="section-content-wide formset-update">
-  {% if formset %}
+  {% if subformset %}
   <div class="content">
-    <form action="{% url 'restau:create_category' %}" method="post">
+    <form method="post">
       {% csrf_token %}
+
       {{ formset.management_form }}
-      <table class="">
-        <h3 class="center">Categorias</h3>
-        <thead>
-          <tr class="">
-            <th class=""></th>
-            <th class="">Categoria</th>
-            <th class="">Ordem</th>
+      {{ subformset.management_form }}
+
+      <table>
+          <thead>
+              <tr>
+                  <th>Categoria</th>
+                  <th>Subcategoria</th>
+                  <th>Ordem</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for i in formset.forms %}
+          <tr>
+            <td>{{ i.instance.nome }}</td>
+            <td>
           </tr>
-        </thead>
-      
-        <tbody>
-          {% for form in formset %}
-          <tr class="">
-            <td class="">
-              {{ form.id }}
-            </td>
-            <td class="">
-              <a href="{% url 'restau:category' form.instance.id %}">
-                {{ form.instance.nome }}
+          {% for subform in subformset.forms %}                        
+            {% if subform.categoria.value == i.id.value %}
+          <tr>
+            <td>{{ subform.id }}</td>
+            <td>
+              <a href="{% url 'restau:subcategory' subform.instance.id %}"> 
+              {{ subform.instance.nome }}
               </a>
             </td>
-            <td class="">
-              {{ form.ordem }}
-            </td>
+            <td>{{ subform.ordem }}</td>
           </tr>
+            
+            {% endif %}
+          {% endfor %}
           {% endfor %}
           <tr>
             <td></td>
-            <td> </td>
-            <td>
-              <button class="btn" type="submit">Update</button>
-            </td>
+            <td></td>
+            <td><button class="btn" type="submit">Salvar</button></td>
           </tr>
-        </tbody>
+        </tbody>  
       </table>
-    </form>
+  </form>
   </div>
   {% else %}
   <div class="not-found center">
     <h1>Nada encontrado</h1>
-    <p>
-      Não encontrei nada nesse link, clique em outro
-      link do nosso admin ou vá para a
-      <a href="{% url 'restau:index' %}">Home</a>
-    </p>
+      <p>
+        Não encontrei nada nesse link, clique em outro
+        link do nosso admin ou vá para a
+        <a href="{% url 'restau:index' %}">Home</a>
+      </p>
   </div>
-  {% endif %}
+</div>
+{% endif %}
 <div class="content form-wrapper"> 
-  <h3 class="center">Adicionar Categoria</h3>
+  <h3 class="center">Adicionar Subcategoria</h3>
   <form 
   action="{{ form_action }}"
   method="POST"

@@ -51,18 +51,6 @@ def encomendas(request):
         .all() \
         .order_by('ordem')
 
-    # # Obtém o ID da categoria da URL
-    # categoria_id = request.GET.get('categoria_id')
-    # # Obtém o ID da subcategoria da URL
-    # subcategoria_id = request.GET.get('subcategoria_id')
-
-    # if categoria_id and subcategoria_id:
-    #     produtos = Products.objects \
-    #         .filter(
-    #             categoria_id=categoria_id,
-    #             subcategoria_id=subcategoria_id) \
-    #         .order_by('id')
-
     return render(
         request,
         'restau/pages/encomendas.html',
@@ -73,20 +61,29 @@ def encomendas(request):
             'produtos': produtos,
             'categorias': categorias,
             'subcategorias': subcategorias,
-            'categoria_id': int(request.GET.get('categoria_id', 0)),
-            'subcategoria_id': int(request.GET.get('subcategoria_id', 0)),
         },
     )
 
 
-def admin_home(request):
+def produtos(request):
+    categorias = Category.objects \
+        .all() \
+        .order_by('ordem')
+    subcategorias = SubCategory.objects \
+        .all() \
+        .order_by('ordem')
+
     produtos = Products.objects \
+        .all() \
         .order_by('id')
 
     return render(
         request,
-        'restau/pages/admin-home.html',
-        {'produtos': produtos},
+        'restau/pages/produtos.html', {
+            'produtos': produtos,
+            'categorias': categorias,
+            'subcategorias': subcategorias,
+        },
 
     )
 

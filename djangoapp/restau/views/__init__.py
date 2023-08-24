@@ -4,3 +4,6 @@ from .product_views import *
 from .product_forms import *
 from .category_views import *
 from .category_forms import *
+from .basic_views import *
+from .subcategory_forms import *
+from .subcategory_views import *
