@@ -27,7 +27,7 @@ class ProductsAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'nome', 'descricao_curta', 'descricao_longa', 'imagem',
         'preco', 'preco_promo', 'percentagem_desconto',
-        'categoria', 'subcategoria', 'visibilidade')
+        'categoria', 'subcategoria', 'ordem', 'visibilidade')
     list_display_links = 'id', 'nome'
     search_fields = (
         'id', 'nome', 'descricao_curta', 'descricao_longa', 'imagem',

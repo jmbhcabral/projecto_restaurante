@@ -2,7 +2,8 @@ from django.urls import path
 from restau.views import (                      # type: ignore
     index, admin_home, produtos, product, create_product, update, delete,
     encomendas, category, create_category, update_categories, delete_category,
-    subcategory, create_subcategory, update_subcategories, delete_subcategory
+    subcategory, create_subcategory, update_subcategories, delete_subcategory,
+    ordenar_produtos,
 )
 
 # namespace
@@ -14,6 +15,8 @@ urlpatterns = [
     path('restau/pages/admin_home/', admin_home, name='admin_home'),
     # product
     path('restau/pages/produtos/', produtos, name='produtos'),
+    path('restau/pages/ordenar_produtos/',
+         ordenar_produtos, name='ordenar_produtos'),
     path('restau/pages/<int:product_id>/', product, name='product'),
     path('restau/pages/create_product/',
          create_product, name='create_product'),

@@ -121,7 +121,17 @@ class ProductForm(forms.ModelForm):
             }
         ),
         label='Produto',
-        help_text='Nome do artigo.'
+        help_text='Nome do artigo.',
+    )
+
+    ordem = forms.IntegerField(
+        widget=forms.NumberInput(
+            attrs={
+                'placeholder': 'digite aqui',
+            }
+        ),
+        label='Ordem',
+        help_text='Ordem do artigo.',
     )
 
     def __init__(self, *args, **kwargs):
@@ -132,7 +142,7 @@ class ProductForm(forms.ModelForm):
         fields = (
             'imagem', 'nome', 'descricao_curta', 'descricao_longa',
             'preco', 'preco_promo', 'percentagem_desconto',
-            'categoria', 'subcategoria', 'visibilidade',
+            'categoria', 'subcategoria', 'visibilidade', 'ordem',
 
 
         )

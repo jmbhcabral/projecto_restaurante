@@ -171,6 +171,9 @@ class Products(models.Model):
         null=True,
         default=None,
     )
+
+    ordem = models.IntegerField(default=0)
+
     visibilidade = models.BooleanField(default=True)
 
     imagem = models.ImageField(

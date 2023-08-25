@@ -7,6 +7,9 @@
         <a href="{% url 'restau:create_product' %}" class="menu-link">Criar Produto</a>
       </li>
       <li class="menu-item">
+        <a href="{% url 'restau:ordenar_produtos' %}" class="menu-link">Ordenar Produtos</a>
+      </li>
+      <li class="menu-item">
         <a href="{% url 'restau:create_category' %}" class="menu-link">Categorias</a> 
       </li>
       <li class="menu-item">
@@ -46,9 +49,15 @@
               <td class="table-cell">
                 {{ produto.categoria }}
               </td>
+              {% if produto.subcategoria %}
               <td class="table-cell">
                 {{ produto.subcategoria }}
               </td>
+              {% else %}
+              <td class="table-cell">
+                ----------
+              </td>
+              {% endif %}
               <td class="table-cell">
                 {{ produto.preco }}
               </td>

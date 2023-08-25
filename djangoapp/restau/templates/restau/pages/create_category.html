@@ -17,18 +17,18 @@
         </thead>
       
         <tbody>
-          {% for form in formset %}
+          {% for f in formset %}
           <tr class="">
             <td class="">
-              {{ form.id }}
+              {{ f.id }}
             </td>
             <td class="">
-              <a href="{% url 'restau:category' form.instance.id %}">
-                {{ form.instance.nome }}
+              <a href="{% url 'restau:category' f.instance.id %}">
+                {{ f.nome }}
               </a>
             </td>
             <td class="">
-              {{ form.ordem }}
+              {{ f.ordem }}
             </td>
           </tr>
           {% endfor %}

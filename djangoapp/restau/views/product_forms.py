@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from restau.forms import ProductForm
-from restau.models import Products
+from restau.models import Products, SubCategory, Category
+from django.forms import modelformset_factory
 
 
 def create_product(request):
@@ -83,4 +84,68 @@ def delete(request, product_id):
             'product': product,
             'confirmation': confirmation,
         }
+    )
+
+
+def ordenar_produtos(request):
+    categorias = Category.objects \
+        .all() \
+        .order_by('ordem')
+
+    subcategorias = SubCategory.objects \
+        .all() \
+        .order_by('ordem')
+
+    Produtosformset = modelformset_factory(
+        Products, fields=('nome', 'ordem'), extra=0
+    )
+    formset = Produtosformset(queryset=Products.objects
+                              .all()
+                              .order_by('ordem')
+                              )
+    form_action = reverse('restau:ordenar_produtos')
+    if request.method == 'POST':
+        formset = Produtosformset(request.POST,
+                                  request.FILES,
+                                  queryset=Products.objects.all(),
+                                  )
+        context = {
+            'categorias': categorias,
+            'subcategorias': subcategorias,
+            'formset': formset,
+            'form_action': form_action,
+        }
+        # for form in formset:
+        #     print(f'este é o {form} do formset')
+        #     for field in form:
+        #         print(f'este é o {field} do form')
+
+        print(formset.is_valid())
+        print(formset.is_valid())
+        if formset.is_valid():
+            print(f'formset is valid: {formset.is_valid()}')
+            formset.save()
+            print('formset saved')
+            return redirect('restau:ordenar_produtos')
+
+        else:
+            print(f'formset: {formset.errors}')
+
+        return render(
+            request,
+            'restau/pages/ordenar_produtos.html',
+            context
+        )
+    context = {
+        'categorias': categorias,
+        'subcategorias': subcategorias,
+        'formset': formset,
+        'form': ProductForm(),
+        'form_action': form_action,
+    }
+
+    return render(
+        request,
+        'restau/pages/ordenar_produtos.html',
+        context
     )

@@ -41,7 +41,7 @@ def encomendas(request):
 
     produtos = Products.objects \
         .all() \
-        .order_by('id')
+        .order_by('categoria', 'subcategoria', 'ordem')
 
     categorias = Category.objects \
         .all() \
@@ -75,7 +75,7 @@ def produtos(request):
 
     produtos = Products.objects \
         .all() \
-        .order_by('id')
+        .order_by('categoria', 'subcategoria', 'ordem')
 
     return render(
         request,

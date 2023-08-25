@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from restau.forms import CategoryForm
-from restau.models import Category, SubCategory
+from restau.models import Category
 from django.forms import modelformset_factory
 
 
@@ -9,18 +9,10 @@ def create_category(request):
     CategoriaFormSet = modelformset_factory(
         Category, fields=('id', 'nome', 'ordem',), extra=0)
 
-    SubCategoriaFormSet = modelformset_factory(
-        SubCategory, fields=('id', 'nome', 'ordem', 'categoria',), extra=0)
-
     formset = CategoriaFormSet(queryset=Category.objects
                                .all()
                                .order_by('ordem')
                                )
-
-    subformset = SubCategoriaFormSet(queryset=SubCategory.objects
-                                     .select_related('categoria')
-                                     .order_by('ordem')
-                                     )
 
     form_action = reverse('restau:create_category')
 
@@ -28,29 +20,12 @@ def create_category(request):
         formset = CategoriaFormSet(
             request.POST, request.FILES, queryset=Category.objects.all())
 
-        subformset = SubCategoriaFormSet(
-            request.POST, request.FILES, queryset=SubCategory.objects
-            .all())
-
         form = CategoryForm(request.POST, request.FILES)
         context = {
             'formset': formset,
-            'subformset': subformset,
             'form': form,
             'form_action': form_action,
         }
-
-        # if subformset.is_valid():
-        #     print(f'Subformset is valid: {subformset.is_valid()}')
-        #     subformset.save()  # Salva o formset diretamente
-        #     print('Subformset saved')
-        #     return redirect('restau:create_category',)
-
-        if form.is_valid():
-            print(f'form is valid: {form.is_valid()}')
-            categoria = form.save()
-            print('form saved')
-            return redirect('restau:create_category', category_id=categoria.id)
 
         if formset.is_valid():
             print(f'formset is valid: {formset.is_valid()}')
@@ -58,9 +33,14 @@ def create_category(request):
             print('formset saved')
             return redirect('restau:create_category',)
 
+        if form.is_valid():
+            print(f'form is valid: {form.is_valid()}')
+            categoria = form.save()
+            print('form saved')
+            return redirect('restau:create_category', category_id=categoria.id)
+
         else:
             print(f'formset: {formset.errors}')
-            print(f'Subformset: {subformset.errors}')
             print(f'form: {form.errors}')
 
         return render(
@@ -71,7 +51,6 @@ def create_category(request):
 
     context = {
         'formset': formset,
-        'subformset': subformset,
         'form': CategoryForm(),
         'form_action': form_action,
     }
