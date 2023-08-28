@@ -727,7 +727,7 @@ body.frontend {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  flex-direction: row;
   margin: 0;
   padding: var(--spacing-smlr);
   height: auto;

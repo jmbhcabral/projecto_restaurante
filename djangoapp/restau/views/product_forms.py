@@ -113,16 +113,21 @@ def ordenar_produtos(request):
 
     for cat in categorias:
         print(f'categoria: {cat.nome}')
+        found_matching_subcat = False
         for subcat in subcategorias:
             if subcat.categoria == cat:
                 print(f'subcategoria: {subcat.nome}')
                 for produto in formset:
-                    # print(f'produto: {produto.instance.nome}')
                     if produto.instance.categoria == cat and \
                             produto.instance.subcategoria == subcat:
-                        # print(f'categoria: {cat.nome}')
-                        # print(f'subcategoria: {subcat.nome}')
                         print(f'produto: {produto.instance.nome}')
+                found_matching_subcat = True
+
+        if not found_matching_subcat:
+            for produto in formset:
+                if produto.instance.categoria == cat and not \
+                        produto.instance.subcategoria:
+                    print(f'produto sem subcat: {produto.instance.nome}')
 
     print('-------------------------------------')
     print('-------------------------------------')
@@ -140,6 +145,10 @@ def ordenar_produtos(request):
             'formset': formset,
             'form_action': form_action,
         }
+        for f in formset:
+            print(f'formset-id: {f.instance.id}')
+            print(f'formset-nome: {f.instance.nome}')
+            print(f'formset-ordem: {f.instance.ordem}')
 
         print(formset.is_valid())
         print(formset.is_valid())

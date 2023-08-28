@@ -5,7 +5,7 @@
         {{ product.nome}}
         </h3>
         <p><b>Produto:</b>{{ product.nome}}</p>
-        <p><b>Imagem:</b><img src="{{ product.imagem.url}}" alt=""></p>
+        <p><b>Imagem:</b>{% if product.imagem %}<img src="{{ product.imagem.url}}" alt="">{% endif %}</p>
         <p><b>Categoria:</b>{{ product.categoria }}</p>
         <p><b>Subcategoria:</b>{{ product.subcategoria }}</p>
         <p><b>Preço:</b>{{ product.preco }}</p>
