@@ -722,3 +722,14 @@ body.frontend {
   text-decoration-color: hsl(var(--clr-black));
   color: tomato;
 }
+
+.ordenar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 0;
+  padding: var(--spacing-smlr);
+  height: auto;
+  width: 50%;
+}

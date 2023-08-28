@@ -6,17 +6,30 @@
   {% csrf_token %}
   {{ formset.management_form }}
   <div class="form-content">
-    {% for field in formset %}
+    {% comment %} <p>{{ context|safe }}</p> {% endcomment %}
     
     <div class="form-group">
+      {% for cat in categorias %}
+      <p>{{ cat.nome }}</p>
+      {% for sub in subcategorias %}
+      {% if sub.categoria == cat %}
+      <p>{{ sub.nome }}</p>
+      {% for field in formset %}
+      {% if field.instance.categoria == cat and field.instance.subcategoria == sub %}
+      <div class="ordenar">
       <label for="{{ field.id_for_label }}">{{ field.label }}</label>
       {{ field }}
       {{ field.errors }}
       {% if field.help_text %}
       <p class="help-text">{{ field.help_text }}</p>
       {% endif %}
+      </div>
+      {% endif %}
+      {% endfor %}
+      {% endif %}
+      {% endfor %}
+      {% endfor %}
     </div>
-    {% endfor %}
   </div>
   {% if form.non_field_errors %}
   <div class="form-content">

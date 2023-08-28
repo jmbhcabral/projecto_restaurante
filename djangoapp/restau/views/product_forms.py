@@ -104,6 +104,31 @@ def ordenar_produtos(request):
                               .order_by('ordem')
                               )
     form_action = reverse('restau:ordenar_produtos')
+
+    print('-------------------------------------')
+    print('-------------------------------------')
+    print('--------------DEBUGGING--------------')
+    print('-------------------------------------')
+    print('-------------------------------------')
+
+    for cat in categorias:
+        print(f'categoria: {cat.nome}')
+        for subcat in subcategorias:
+            if subcat.categoria == cat:
+                print(f'subcategoria: {subcat.nome}')
+                for produto in formset:
+                    # print(f'produto: {produto.instance.nome}')
+                    if produto.instance.categoria == cat and \
+                            produto.instance.subcategoria == subcat:
+                        # print(f'categoria: {cat.nome}')
+                        # print(f'subcategoria: {subcat.nome}')
+                        print(f'produto: {produto.instance.nome}')
+
+    print('-------------------------------------')
+    print('-------------------------------------')
+    print('--------------DEBUGGING--------------')
+    print('-------------------------------------')
+    print('-------------------------------------')
     if request.method == 'POST':
         formset = Produtosformset(request.POST,
                                   request.FILES,
@@ -115,10 +140,6 @@ def ordenar_produtos(request):
             'formset': formset,
             'form_action': form_action,
         }
-        # for form in formset:
-        #     print(f'este é o {form} do formset')
-        #     for field in form:
-        #         print(f'este é o {field} do form')
 
         print(formset.is_valid())
         print(formset.is_valid())
