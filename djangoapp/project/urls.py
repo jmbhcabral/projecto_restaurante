@@ -6,10 +6,12 @@ from django.urls import path, include
 urlpatterns = [
     path('', include('restau.urls')),
     path('admin/', admin.site.urls),
-]
+] + static(settings.MEDIA_URL,
+           document_root=settings.MEDIA_ROOT)
 
+# TODO: Remover
 if settings.DEBUG:
-    urlpatterns += static(
-        settings.MEDIA_URL,
-        document_root=settings.MEDIA_ROOT
-    )
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns

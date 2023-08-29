@@ -42,8 +42,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'perfil',
     'restau',
     'site_setup',
+
+
+    # TODO: Remover
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -54,6 +59,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+
+    # TODO: Remover
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -143,6 +152,12 @@ MESSAGE_TAGS = {
     constants.SUCCESS: 'alert-success',
     constants.WARNING: 'alert-warning',
 }
+# TODO: Remover
+if DEBUG:
+    import socket  # only if you haven't already imported this
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+    INTERNAL_IPS = [
+        ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
 
 # Sessão em dias: 60s * 60m * 24h * 1d
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7
