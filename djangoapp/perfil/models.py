@@ -35,8 +35,9 @@ class Perfil(models.Model):
             error_messages['data_nascimento'] = 'Data de Nascimento \
             é obrigatória.'
 
-        if not self.telemovel:
-            error_messages['telemovel'] = 'Telemóvel é obrigatório.'
+        if not self.telemovel or len(self.telemovel) != 9:
+            error_messages['telemovel'] = 'Telemóvel é obrigatório e tem de \
+                ter 9 digitos.'
 
         if self.nif and not validar_nif(self.nif):
             error_messages['nif'] = 'NIF inválido.'
@@ -75,6 +76,22 @@ class Morada(models.Model):
         max_length=3,
         blank=True,
         verbose_name="Extensão Código Postal",)
+
+    def clean(self):
+        error_messages = {}
+        if not self.morada:
+            error_messages['morada'] = 'Morada é obrigatória.'
+
+        if not self.numero:
+            error_messages['numero'] = 'Número é obrigatório.'
+
+        if not self.codigo_postal:
+            error_messages['codigo_postal'] = 'Código Postal é obrigatório.'
+
+        if not self.ext_codigo_postal:
+            error_messages['ext_codigo_postal'] = 'Extensão Código Postal é obrigatória.'
+
+        raise ValidationError(error_messages)
 
     def __str__(self):
         return self.finalidade_morada
