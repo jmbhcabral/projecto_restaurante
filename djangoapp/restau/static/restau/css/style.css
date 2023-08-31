@@ -740,7 +740,7 @@ body.frontend {
   flex-wrap: wrap;
   margin-right: -15px;
   margin-left: -15px; 
-  justify-content: space-between;
+  justify-content:space-between;
 }
 
 
@@ -748,10 +748,21 @@ body.frontend {
   flex-basis: 0;
   flex-grow: 1;
   max-width: 100%;
-  position: relative;
+  /* position: relative; */
   width: 100%;
   padding-right: 15px;
   padding-left: 15px;
   }
+
+.col p {
+  font-size: var(--fs-smlst);
+  color: tomato;
+}
+
+.col label, input, select, button {
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 0.5rem; }
+
 
 
