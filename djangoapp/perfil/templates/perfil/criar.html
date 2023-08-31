@@ -1,5 +1,34 @@
 {% extends 'restau/base_front.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <h1>qwerty</h1>
+{% if main_image %}
+{% if main_image.imagem_topo %}
+    <img class="imagem-topo" src="{{ main_image.imagem_topo.url }}" alt="{{ main_image.nome }}">
+{% else %}
+    <h1>Extreme Way</h1>
+{% endif %}
+{% endif %}
+<main class="section-content-wide section-gap front-content">
+    <section class="section-gap white-bg top-background">
+        <div class="separator"></div>
+        <h1 class="center">Hamburgueria artesanal</h1>
+        <div class="separator"></div>
+        <div class="row">
+            <div class="col"><h1>Login</h1></div>
+            <div class="col">
+                <h1>Registrar</h1>
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    {{ userform|crispy }}
+                    <div class="row">
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary">Registrar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+    
 {% endblock content %}

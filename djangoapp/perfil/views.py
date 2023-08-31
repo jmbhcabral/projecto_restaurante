@@ -5,6 +5,7 @@ from django.views.generic import ListView
 from django.views import View
 from django.http import HttpResponse
 from . import models, forms
+from restau.models import FrontendSetup
 
 
 class BasePerfil(View):
@@ -13,7 +14,19 @@ class BasePerfil(View):
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
 
+        main_image = FrontendSetup.objects \
+            .filter(imagem_topo__isnull=False) \
+            .order_by('-id') \
+            .first()
+
+        main_logo = FrontendSetup.objects \
+            .filter(imagem_logo__isnull=False) \
+            .order_by('-id') \
+            .first()
+
         self.context = {
+            'main_logo': main_logo,
+            'main_image': main_image,
             'userform': forms.UserForm(
                 data=self.request.POST or None
             ),
