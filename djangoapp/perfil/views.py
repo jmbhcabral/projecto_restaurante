@@ -1,11 +1,14 @@
 from typing import Any
 from django import http
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
 from django.views import View
 from django.http import HttpResponse
-from . import models, forms
+from . import models
+from . import forms
 from restau.models import FrontendSetup
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
 
 
 class BasePerfil(View):
@@ -37,10 +40,11 @@ class BasePerfil(View):
                 'userform': forms.UserForm(
                     data=self.request.POST or None,
                     usuario=self.request.user,
-                    instance=self.request.user
+                    instance=self.request.user,
                 ),
                 'perfilform': forms.PerfilForm(
                     data=self.request.POST or None,
+                    instance=self.perfil
                 )
             }
         else:
@@ -58,7 +62,11 @@ class BasePerfil(View):
         self.userform = self.context['userform']
         self.perfilform = self.context['perfilform']
 
-        self.renderizar = render(self.request, self.template_name, self.context)
+        if self.request.user.is_authenticated:
+            self.template_name = 'perfil/atualizar.html'
+
+        self.renderizar = render(self.request, self.template_name,
+                                 self.context)
 
     def get(self, *args, **kwargs):
         return self.renderizar
@@ -72,10 +80,35 @@ class Criar(BasePerfil):
         username = self.userform.cleaned_data.get('username')
         password = self.userform.cleaned_data.get('password')
         email = self.userform.cleaned_data.get('email')
+        first_name = self.userform.cleaned_data.get('first_name')
+        last_name = self.userform.cleaned_data.get('last_name')
 
         # Usuários logados
         if self.request.user.is_authenticated:
-            usuario = self.request.user
+            usuario = get_object_or_404(
+                User, username=self.request.user.username)
+            print(usuario.username)
+
+            usuario.username = username
+
+            if password:
+                usuario.set_password(password)
+
+            usuario.email = email
+            usuario.first_name = first_name
+            usuario.last_name = last_name
+            usuario.save()
+
+            if not self.perfil:
+                self.perfilform.cleaned_data['usuario'] = usuario
+                print(self.perfilform.cleaned_data)
+                perfil = models.Perfil(**self.perfilform.cleaned_data)
+                perfil.save()
+
+            else:
+                perfil = self.perfilform.save(commit=False)
+                perfil.usuario = usuario
+                perfil.save()
 
         # Usuários não logados (criação)
         else:
@@ -86,6 +119,16 @@ class Criar(BasePerfil):
             perfil = self.perfilform.save(commit=False)
             perfil.usuario = usuario
             perfil.save()
+
+        if password:
+            autentica = authenticate(
+                self.request,
+                username=usuario,
+                password=password
+            )
+
+            if autentica:
+                login(self.request, user=usuario)
 
         return self.renderizar
 

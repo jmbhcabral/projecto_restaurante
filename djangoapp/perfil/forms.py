@@ -46,7 +46,6 @@ class UserForm(forms.ModelForm):
 
         usuario_db = User.objects.filter(username=usuario_data).first()
         email_db = User.objects.filter(email=email_data).first()
-        password_db = User.objects.filter(password=password_data).first()
 
         error_msg_user_exists = 'Este nome de usuário já existe.'
         error_msg_email_exists = 'Este email já existe.'
@@ -102,4 +101,4 @@ class UserForm(forms.ModelForm):
                     error_msg_password_short
 
         if validation_error_msgs:
-            raise forms.ValidationError(validation_error_msgs)
+            raise (forms.ValidationError(validation_error_msgs))

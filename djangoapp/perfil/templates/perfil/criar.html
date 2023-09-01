@@ -14,9 +14,15 @@
         <h1 class="center">Hamburgueria artesanal</h1>
         <div class="separator"></div>
         <div class="row">
-            <div class="col"><h1>Login</h1></div>
+            {% if not request.user.is_authenticated %}
             <div class="col">
+                <h1>Login</h1>
+            </div>
+            {% endif %}
+            <div class="col">
+                {% block tituloregistar %}
                 <h1>Registrar</h1>
+                {% endblock  %}
                 <form action="" method="POST">
                     {% csrf_token %}
                     {{ userform|crispy }}
