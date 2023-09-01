@@ -13,15 +13,17 @@
         <div class="separator"></div>
         <h1 class="center">Hamburgueria artesanal</h1>
         <div class="separator"></div>
-        <div class="row">
+        <div class="section-gap row">
             {% if not request.user.is_authenticated %}
-            <div class="col">
-                <h1>Login</h1>
+            <div class="col section-gap">
+                <h4>Login</h4>
+                <p>Se já se registou, entre com usuário e senha.</p>
             </div>
             {% endif %}
-            <div class="col">
+            <div class="col section-gap">
                 {% block tituloregistar %}
-                <h1>Registrar</h1>
+                <h4>Registrar</h4>
+                <p>Se ainda não se registou, preencha os campos abaixo.</p>
                 {% endblock  %}
                 <form action="" method="POST">
                     {% csrf_token %}

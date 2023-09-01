@@ -755,14 +755,25 @@ body.frontend {
   }
 
 .col p {
-  font-size: var(--fs-smlst);
+  font-size: var(--fs-smlr);
+  
+}
+
+.invalid-feedback {
   color: tomato;
+  font-size: var(--fs-smlr);
 }
 
 .col label, input, select, button {
   display: inline-block;
   width: 100%;
-  margin-bottom: 0.5rem; }
+  /* margin-bottom: 0.5rem;  */
+  padding-top: 0.5rem;
+}
+
+
+
+
 
 
 
