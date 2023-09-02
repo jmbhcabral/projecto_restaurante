@@ -3,8 +3,12 @@ from django.urls import reverse
 from restau.forms import SubCategoryForm
 from restau.models import Category, SubCategory
 from django.forms import modelformset_factory
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def create_subcategory(request):
     CategoriaFormSet = modelformset_factory(
         Category, fields=('id', 'nome', 'ordem',), extra=0)
@@ -88,6 +92,9 @@ def create_subcategory(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def update_subcategories(request, subcategory_id):
     subcategory = get_object_or_404(
         SubCategory, pk=subcategory_id)
@@ -122,6 +129,9 @@ def update_subcategories(request, subcategory_id):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def delete_subcategory(request, subcategory_id):
     subcategory = get_object_or_404(
         SubCategory, pk=subcategory_id

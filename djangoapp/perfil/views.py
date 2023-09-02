@@ -1,6 +1,7 @@
+from django.contrib import messages
 from typing import Any
 from django import http
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
 from django.views import View
 from django.http import HttpResponse
@@ -130,6 +131,11 @@ class Criar(BasePerfil):
             if autentica:
                 login(self.request, user=usuario)
 
+        messages.success(
+            self.request,
+            'Perfil atualizado com sucesso!')
+
+        return redirect('perfil:criar')
         return self.renderizar
 
 
@@ -139,10 +145,67 @@ class Atualizar(View):
 
 
 class Login(View):
-    def get(self, *args, **kwargs):
-        return HttpResponse('Login')
+    def post(self, *args, **kwargs):
+        username = self.request.POST.get('username')
+        password = self.request.POST.get('password')
+        if not username or not password:
+            messages.error(
+                self.request,
+                'Usuário ou senha inválidos!'
+            )
+            return redirect('perfil:criar')
+
+        usuario = authenticate(
+            self.request,
+            username=username,
+            password=password
+        )
+        if not usuario:
+            messages.error(
+                self.request,
+                'Usuário ou senha inválidos!'
+            )
+            return redirect('perfil:criar')
+
+        login(self.request, user=usuario)
+        messages.success(
+            self.request,
+            'Login efetuado com sucesso!'
+        )
+        return redirect('perfil:criar')
 
 
 class Logout(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('Logout')
+        logout(self.request)
+        return redirect('restau:index')
+
+
+class Conta(View):
+    template_name = 'perfil/conta.html'
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+
+        main_image = FrontendSetup.objects \
+            .filter(imagem_topo__isnull=False) \
+            .order_by('-id') \
+            .first()
+
+        main_logo = FrontendSetup.objects \
+            .filter(imagem_logo__isnull=False) \
+            .order_by('-id') \
+            .first()
+
+        perfil = models.Perfil.objects.filter(
+            usuario=self.request.user
+        ).first()
+
+        self.context = {
+            'main_logo': main_logo,
+            'main_image': main_image,
+            'perfil': perfil,
+        }
+
+    def get(self, *args, **kwargs):
+        return render(self.request, self.template_name, self.context)

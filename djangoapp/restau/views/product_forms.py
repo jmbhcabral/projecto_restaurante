@@ -3,8 +3,12 @@ from django.urls import reverse
 from restau.forms import ProductForm
 from restau.models import Products, SubCategory, Category
 from django.forms import modelformset_factory
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def create_product(request):
     form_action = reverse('restau:create_product')
     if request.method == 'POST':
@@ -35,6 +39,9 @@ def create_product(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def update(request, product_id):
     product = get_object_or_404(
         Products, pk=product_id)
@@ -67,6 +74,9 @@ def update(request, product_id):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def delete(request, product_id):
     product = get_object_or_404(
         Products, pk=product_id, visibilidade=True
@@ -87,6 +97,9 @@ def delete(request, product_id):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def ordenar_produtos(request):
     categorias = Category.objects \
         .all() \

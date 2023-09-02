@@ -3,8 +3,12 @@ from django.urls import reverse
 from restau.forms import CategoryForm
 from restau.models import Category
 from django.forms import modelformset_factory
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def create_category(request):
     CategoriaFormSet = modelformset_factory(
         Category, fields=('id', 'nome', 'ordem',), extra=0)
@@ -66,6 +70,9 @@ def create_category(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def update_categories(request, category_id):
     category = get_object_or_404(
         Category, pk=category_id)
@@ -98,6 +105,9 @@ def update_categories(request, category_id):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def delete_category(request, category_id):
     category = get_object_or_404(
         Category, pk=category_id
