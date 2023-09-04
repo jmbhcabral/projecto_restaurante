@@ -7,7 +7,7 @@ class PerfilForm(forms.ModelForm):
     class Meta:
         model = models.Perfil
         fields = '__all__'
-        exclude = ('usuario', 'created_at', 'updated_at',)
+        exclude = ('usuario', 'created_at', 'updated_at', 'nif',)
 
 
 class UserForm(forms.ModelForm):
@@ -15,14 +15,14 @@ class UserForm(forms.ModelForm):
         required=False,
         widget=forms.PasswordInput(),
         label='Palavra-passe',
-        help_text='Deixe em branco para não alterar.'
+        # help_text='Deixe em branco para não alterar.'
     )
 
     password2 = forms.CharField(
         required=False,
         widget=forms.PasswordInput(),
         label='Confirmação Palavra-passe',
-        help_text='Deixe em branco para não alterar.'
+        # help_text='Deixe em branco para não alterar.'
     )
 
     def __init__(self, usuario=None, *args, **kwargs):

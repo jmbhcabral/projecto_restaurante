@@ -1,25 +1,18 @@
 {% extends 'restau/base_front.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-{% if main_image %}
-{% if main_image.imagem_topo %}
-    <img class="imagem-topo" src="{{ main_image.imagem_topo.url }}" alt="{{ main_image.nome }}">
-{% else %}
-    <h1>Extreme Way</h1>
-{% endif %}
-{% endif %}
-<main class="section-content-wide section-gap front-content">
-    <section class="section-gap white-bg top-background">
-        <div class="separator"></div>
-        <h1 class="center">Hamburgueria artesanal</h1>
-        <div class="separator"></div>
-        <div class="section-gap row"></div>
-        <div>
-            <h3>Conta</h3>
-            <p><a href="" class="">Actualizar dados</a></p>
-            <p><a href="" class="">Cartão cliente</a></p>
-            <p><a href="" class="">Vantagens</a></p>
 
+        <div class="">
+            <div>
+                <h3>Conta</h3>
+                <p><a href="" class="">Actualizar dados</a></p>
+                <p><a href="" class="">Alterar Password</a></p>
+                <p><a href="" class="">Cartão cliente</a></p>
+                <p><a href="" class="">Vantagens</a></p>
+            </div>
+            <div>
+
+            </div>
         </div>
     </section>
 </main>

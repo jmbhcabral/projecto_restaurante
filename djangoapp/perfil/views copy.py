@@ -135,7 +135,7 @@ class Criar(BasePerfil):
             self.request,
             'Perfil atualizado com sucesso!')
 
-        return redirect('perfil:conta')
+        return redirect('perfil:criar')
         return self.renderizar
 
 
@@ -172,7 +172,7 @@ class Login(View):
             self.request,
             'Login efetuado com sucesso!'
         )
-        return redirect('perfil:conta')
+        return redirect('perfil:criar')
 
 
 class Logout(View):

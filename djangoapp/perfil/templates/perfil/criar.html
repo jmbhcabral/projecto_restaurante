@@ -1,20 +1,8 @@
 {% extends 'restau/base_front.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-{% if main_image %}
-{% if main_image.imagem_topo %}
-    <img class="imagem-topo" src="{{ main_image.imagem_topo.url }}" alt="{{ main_image.nome }}">
-{% else %}
-    <h1>Extreme Way</h1>
-{% endif %}
-{% endif %}
-<main class="section-content-wide section-gap front-content">
-    <section class="section-gap white-bg top-background">
-        <div class="separator"></div>
-        <h1 class="center">Hamburgueria artesanal</h1>
-        <div class="separator"></div>
-        <div class="section-gap row">
             {% if not request.user.is_authenticated %}
+            <div class="section-gap row">
             <div class="col section-gap">
                 <h4>Login</h4>
                 <p>Se já se registou, entre com usuário e senha.</p>
@@ -28,8 +16,9 @@
                       <label for="exampleInputPassword1">Palavra-passe:</label>
                       <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Digite a sua palavra-passe">
                     </div>
-                    <button type="submit" class="btn btn-primary">Entrar</button>
+                    <button type="submit" class="btn btn-primary btn-block">Entrar</button>
                   </form>
+                </div>
             </div>
             {% endif %}
             <div class="col section-gap">

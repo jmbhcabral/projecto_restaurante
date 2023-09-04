@@ -1,0 +1,13 @@
+{% if main_image %}
+{% if main_image.imagem_topo %}
+    <img class="imagem-topo" src="{{ main_image.imagem_topo.url }}" alt="{{ main_image.nome }}">
+{% else %}
+    <h1>Extreme Way</h1>
+{% endif %}
+{% endif %}
+<main class="section-content-wide section-gap front-content">
+    <section class="section-gap white-bg top-background">
+        <div class="separator"></div>
+        <h1 class="center">Hamburgueria artesanal</h1>
+        <div class="separator"></div>
+        
