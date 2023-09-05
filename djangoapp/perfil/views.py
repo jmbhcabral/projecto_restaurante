@@ -1,10 +1,10 @@
 from django.contrib import messages
-from typing import Any
-from django import http
+# from typing import Any
+# from django import http
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView
+# from django.views.generic import ListView
 from django.views import View
-from django.http import HttpResponse
+# from django.http import HttpResponse
 from . import models
 from . import forms
 from restau.models import FrontendSetup
@@ -139,9 +139,47 @@ class Criar(BasePerfil):
         return self.renderizar
 
 
-class Atualizar(View):
+class Atualizar(BasePerfil):
+    template_name = 'perfil/atualizar.html'
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+
+        main_image = FrontendSetup.objects \
+            .filter(imagem_topo__isnull=False) \
+            .order_by('-id') \
+            .first()
+
+        main_logo = FrontendSetup.objects \
+            .filter(imagem_logo__isnull=False) \
+            .order_by('-id') \
+            .first()
+
+        self.perfil = None
+
+        if self.request.user.is_authenticated:
+            self.perfil = models.Perfil.objects.filter(
+                usuario=self.request.user
+            ).first()
+
+            self.context = {
+                'main_logo': main_logo,
+                'main_image': main_image,
+                'userform': forms.UserForm(
+                    data=self.request.POST or None,
+                    usuario=self.request.user,
+                    instance=self.request.user,
+                ),
+                'perfilform': forms.PerfilForm(
+                    data=self.request.POST or None,
+                    instance=self.perfil
+                )
+            }
+        else:
+            return redirect('perfil:criar')
+
     def get(self, *args, **kwargs):
-        return HttpResponse('Atualizar')
+        return render(self.request, self.template_name, self.context)
 
 
 class Login(View):
