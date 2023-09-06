@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.forms import ValidationError
 from utils.model_validators import validar_nif
+import qrcode
+from io import BytesIO
+from django.core.files import File
 
 
 class Perfil(models.Model):
@@ -27,6 +30,36 @@ class Perfil(models.Model):
         verbose_name="Telemóvel",
     )
     nif = models.CharField(max_length=9, blank=True)
+
+    qr_code = models.ImageField(
+        upload_to='assets/qrcodes/', blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        # Crie um QRCode com base nas informações do perfil
+        dados_perfil = f"Username: {self.usuario}"
+
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+
+        qr.add_data(dados_perfil)
+        qr.make(fit=True)
+
+        # Crie uma imagem QRCode
+        img_qr = qr.make_image(fill_color="black", back_color="white")
+
+        # Salve a imagem QRCode no campo qr_code
+        img_io = BytesIO()
+        img_qr.save(img_io, 'PNG')
+        self.qr_code.save(
+            f'qrcode_{self.usuario}.png', File(img_io), save=False)
+
+        super().save(*args, **kwargs)
 
     def clean(self):
         error_messages = {}

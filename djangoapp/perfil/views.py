@@ -63,8 +63,8 @@ class BasePerfil(View):
         self.userform = self.context['userform']
         self.perfilform = self.context['perfilform']
 
-        if self.request.user.is_authenticated:
-            self.template_name = 'perfil/atualizar.html'
+        # if self.request.user.is_authenticated:
+        #     self.template_name = 'perfil/atualizar.html'
 
         self.renderizar = render(self.request, self.template_name,
                                  self.context)
@@ -75,6 +75,79 @@ class BasePerfil(View):
 
 class Criar(BasePerfil):
     def post(self, *args, **kwargs):
+        if not self.userform.is_valid() or not self.perfilform.is_valid():
+            return self.renderizar
+
+        # username = self.userform.cleaned_data.get('username')
+        password = self.userform.cleaned_data.get('password')
+        # email = self.userform.cleaned_data.get('email')
+        # first_name = self.userform.cleaned_data.get('first_name')
+        # last_name = self.userform.cleaned_data.get('last_name')
+
+        # Usuários logados
+        # if self.request.user.is_authenticated:
+        #     usuario = get_object_or_404(
+        #         User, username=self.request.user.username)
+        #     print(usuario.username)
+
+        #     usuario.username = username
+
+        #     if password:
+        #         usuario.set_password(password)
+
+        #     usuario.email = email
+        #     usuario.first_name = first_name
+        #     usuario.last_name = last_name
+        #     usuario.save()
+
+        #     if not self.perfil:
+        #         self.perfilform.cleaned_data['usuario'] = usuario
+        #         print(self.perfilform.cleaned_data)
+        #         perfil = models.Perfil(**self.perfilform.cleaned_data)
+        #         perfil.save()
+
+        #     else:
+        #         perfil = self.perfilform.save(commit=False)
+        #         perfil.usuario = usuario
+        #         perfil.save()
+
+        # Usuários não logados (criação)
+        # else:
+        usuario = self.userform.save(commit=False)
+        usuario.set_password(password)
+        usuario.save()
+
+        perfil = self.perfilform.save(commit=False)
+        perfil.usuario = usuario
+        perfil.save()
+
+        if password:
+            autentica = authenticate(
+                self.request,
+                username=usuario,
+                password=password
+            )
+
+            if autentica:
+                login(self.request, user=usuario)
+
+        messages.success(
+            self.request,
+            'Conta criada com sucesso!')
+
+        return redirect('perfil:conta')
+
+
+class Atualizar(BasePerfil):
+    template_name = 'perfil/atualizar.html'
+
+    def get(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('perfil:criar')
+        return render(self.request, self.template_name, self.context)
+
+    def post(self, *args, **kwargs):
+
         if not self.userform.is_valid() or not self.perfilform.is_valid():
             return self.renderizar
 
@@ -111,15 +184,12 @@ class Criar(BasePerfil):
                 perfil.usuario = usuario
                 perfil.save()
 
-        # Usuários não logados (criação)
         else:
-            usuario = self.userform.save(commit=False)
-            usuario.set_password(password)
-            usuario.save()
-
-            perfil = self.perfilform.save(commit=False)
-            perfil.usuario = usuario
-            perfil.save()
+            messages.error(
+                self.request,
+                'Não foi possivel atualizar o perfil!'
+            )
+            return redirect('perfil:criar')
 
         if password:
             autentica = authenticate(
@@ -133,53 +203,9 @@ class Criar(BasePerfil):
 
         messages.success(
             self.request,
-            'Perfil atualizado com sucesso!')
+            'Conta atualizada com sucesso!')
 
         return redirect('perfil:conta')
-        return self.renderizar
-
-
-class Atualizar(BasePerfil):
-    template_name = 'perfil/atualizar.html'
-
-    def setup(self, *args, **kwargs):
-        super().setup(*args, **kwargs)
-
-        main_image = FrontendSetup.objects \
-            .filter(imagem_topo__isnull=False) \
-            .order_by('-id') \
-            .first()
-
-        main_logo = FrontendSetup.objects \
-            .filter(imagem_logo__isnull=False) \
-            .order_by('-id') \
-            .first()
-
-        self.perfil = None
-
-        if self.request.user.is_authenticated:
-            self.perfil = models.Perfil.objects.filter(
-                usuario=self.request.user
-            ).first()
-
-            self.context = {
-                'main_logo': main_logo,
-                'main_image': main_image,
-                'userform': forms.UserForm(
-                    data=self.request.POST or None,
-                    usuario=self.request.user,
-                    instance=self.request.user,
-                ),
-                'perfilform': forms.PerfilForm(
-                    data=self.request.POST or None,
-                    instance=self.perfil
-                )
-            }
-        else:
-            return redirect('perfil:criar')
-
-    def get(self, *args, **kwargs):
-        return render(self.request, self.template_name, self.context)
 
 
 class Login(View):
@@ -219,31 +245,11 @@ class Logout(View):
         return redirect('restau:index')
 
 
-class Conta(View):
+class Conta(BasePerfil):
     template_name = 'perfil/conta.html'
 
-    def setup(self, *args, **kwargs):
-        super().setup(*args, **kwargs)
-
-        main_image = FrontendSetup.objects \
-            .filter(imagem_topo__isnull=False) \
-            .order_by('-id') \
-            .first()
-
-        main_logo = FrontendSetup.objects \
-            .filter(imagem_logo__isnull=False) \
-            .order_by('-id') \
-            .first()
-
-        perfil = models.Perfil.objects.filter(
-            usuario=self.request.user
-        ).first()
-
-        self.context = {
-            'main_logo': main_logo,
-            'main_image': main_image,
-            'perfil': perfil,
-        }
-
     def get(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('perfil:criar')
+
         return render(self.request, self.template_name, self.context)
