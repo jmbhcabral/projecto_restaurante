@@ -481,6 +481,7 @@ img {
   border-radius: var(--br-base);
   border: 1px solid hsl(var(--clr-black));
   font-size: var(--fs-smlr);
+  font-family: sans-serif;
 }
 
 .form-group input:focus,
@@ -864,6 +865,7 @@ body.frontend {
     border-top-color: #b9bbbe; }
   .alert-dark .alert-link {
     color: #040505; }
+
 
 
 
