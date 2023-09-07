@@ -199,3 +199,34 @@ class Products(models.Model):
 
     def __str__(self):
         return self.nome
+
+
+class Fidelizacao(models.Model):
+    class Meta:
+        verbose_name = 'Fidelização'
+        verbose_name_plural = 'Fidelizações'
+
+    nome = models.CharField(max_length=200, verbose_name='Nome')
+    unidade = models.FloatField(default=0.00, verbose_name='Unidade')
+
+    def __str__(self):
+        return self.nome
+
+
+class ProdutosFidelizacao(models.Model):
+    class Meta:
+        verbose_name = 'Produto Fidelização'
+        verbose_name_plural = 'Produtos Fidelizações'
+
+    produto_fidelizacao = models.ForeignKey(
+        Products,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        default=None,
+    )
+    unidades_recompensa = models.FloatField(
+        default=0.00, verbose_name='Unidades Recompensa')
+
+    def __str__(self):
+        return self.produto_fidelizacao

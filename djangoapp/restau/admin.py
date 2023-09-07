@@ -1,6 +1,7 @@
 from django.contrib import admin
 from restau.models import (
-    Category, SubCategory, Percentage, Products, FrontendSetup
+    Category, SubCategory, Percentage, Products, FrontendSetup, Fidelizacao,
+    ProdutosFidelizacao
 )
 
 
@@ -41,3 +42,15 @@ class FrontendSetupAdmin(admin.ModelAdmin):
                     'imagem_topo', 'imagem_padrao',)
     list_display_links = ('id', 'nome', 'imagem_logo', 'imagem_topo',
                           'imagem_padrao',)
+
+
+@admin.register(Fidelizacao)
+class FidelizacaoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'nome', 'unidade')
+    list_display_links = ('id', 'nome', 'unidade')
+
+
+@admin.register(ProdutosFidelizacao)
+class ProdutosFidelizacaoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'produto_fidelizacao', 'unidades_recompensa')
+    list_display_links = ('id', 'produto_fidelizacao', 'unidades_recompensa')
