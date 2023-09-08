@@ -141,8 +141,9 @@ class Products(models.Model):
         null=True,
         default=None,
     )
-    preco = models.FloatField(
-        default=0.00,
+    preco = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
         validators=[positive_price],
         verbose_name='Preço',
     )
@@ -207,7 +208,7 @@ class Fidelizacao(models.Model):
         verbose_name_plural = 'Fidelizações'
 
     nome = models.CharField(max_length=200, verbose_name='Nome')
-    unidade = models.FloatField(default=0.00, verbose_name='Unidade')
+    unidade = models.FloatField(default=0.00, verbose_name='Unidade para Euro')
 
     def __str__(self):
         return self.nome
@@ -218,15 +219,32 @@ class ProdutosFidelizacao(models.Model):
         verbose_name = 'Produto Fidelização'
         verbose_name_plural = 'Produtos Fidelizações'
 
-    produto_fidelizacao = models.ForeignKey(
-        Products,
+    fidelizacao = models.ForeignKey(
+        Fidelizacao,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
         default=None,
     )
-    unidades_recompensa = models.FloatField(
-        default=0.00, verbose_name='Unidades Recompensa')
+
+    produto_fidelizacao = models.ForeignKey(
+        Products,
+        on_delete=models.SET_NULL,
+        related_name='produto_fidelizacao',
+        blank=True,
+        null=True,
+        default=None,
+    )
+    unidades_recompensa = models.ForeignKey(
+        Products,
+        on_delete=models.SET_NULL,
+        related_name='unidades_recompensa',
+        blank=True,
+        null=True,
+        default=None,
+    )
+    pontos_para_oferta = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
         return self.produto_fidelizacao
