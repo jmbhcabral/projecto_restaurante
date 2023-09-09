@@ -229,16 +229,17 @@ class ProdutosFidelizacao(models.Model):
 
     produto_fidelizacao = models.ForeignKey(
         Products,
+        unique=True,
         on_delete=models.SET_NULL,
         related_name='produto_fidelizacao',
         blank=True,
         null=True,
         default=None,
     )
-    unidades_recompensa = models.ForeignKey(
+    pontos_recompensa = models.ForeignKey(
         Products,
         on_delete=models.SET_NULL,
-        related_name='unidades_recompensa',
+        related_name='pontos_recompensa',
         blank=True,
         null=True,
         default=None,
@@ -247,4 +248,4 @@ class ProdutosFidelizacao(models.Model):
         max_digits=10, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
-        return self.produto_fidelizacao
+        return str(self.produto_fidelizacao)

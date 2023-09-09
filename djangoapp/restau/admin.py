@@ -50,7 +50,18 @@ class FidelizacaoAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'nome', 'unidade')
 
 
-@admin.register(ProdutosFidelizacao)
 class ProdutosFidelizacaoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'produto_fidelizacao', 'unidades_recompensa')
-    list_display_links = ('id', 'produto_fidelizacao', 'unidades_recompensa')
+    list_display = ('produto_fidelizacao',
+                    'get_pontos_recompensa', 'pontos_para_oferta')
+
+    def get_pontos_recompensa(self, obj):
+        if obj.pontos_recompensa:
+            # Substitua 'preco' pelo nome real do campo de preço na classe
+            # Products
+            return obj.pontos_recompensa.preco
+        return 'N/A'
+
+    get_pontos_recompensa.short_description = 'Pontos Recompensa'
+
+
+admin.site.register(ProdutosFidelizacao, ProdutosFidelizacaoAdmin)
