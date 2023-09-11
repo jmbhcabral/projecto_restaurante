@@ -118,35 +118,35 @@ def ordenar_produtos(request):
                               )
     form_action = reverse('restau:ordenar_produtos')
 
-    print('-------------------------------------')
-    print('-------------------------------------')
-    print('--------------DEBUGGING--------------')
-    print('-------------------------------------')
-    print('-------------------------------------')
+    # print('-------------------------------------')
+    # print('-------------------------------------')
+    # print('--------------DEBUGGING--------------')
+    # print('-------------------------------------')
+    # print('-------------------------------------')
 
-    for cat in categorias:
-        print(f'categoria: {cat.nome}')
-        found_matching_subcat = False
-        for subcat in subcategorias:
-            if subcat.categoria == cat:
-                print(f'subcategoria: {subcat.nome}')
-                for produto in formset:
-                    if produto.instance.categoria == cat and \
-                            produto.instance.subcategoria == subcat:
-                        print(f'produto: {produto.instance.nome}')
-                found_matching_subcat = True
+    # for cat in categorias:
+    #     print(f'categoria: {cat.nome}')
+    #     found_matching_subcat = False
+    #     for subcat in subcategorias:
+    #         if subcat.categoria == cat:
+    #             print(f'subcategoria: {subcat.nome}')
+    #             for produto in formset:
+    #                 if produto.instance.categoria == cat and \
+    #                         produto.instance.subcategoria == subcat:
+    #                     print(f'produto: {produto.instance.nome}')
+    #             found_matching_subcat = True
 
-        if not found_matching_subcat:
-            for produto in formset:
-                if produto.instance.categoria == cat and not \
-                        produto.instance.subcategoria:
-                    print(f'produto sem subcat: {produto.instance.nome}')
+    #     if not found_matching_subcat:
+    #         for produto in formset:
+    #             if produto.instance.categoria == cat and not \
+    #                     produto.instance.subcategoria:
+    #                 print(f'produto sem subcat: {produto.instance.nome}')
 
-    print('-------------------------------------')
-    print('-------------------------------------')
-    print('--------------DEBUGGING--------------')
-    print('-------------------------------------')
-    print('-------------------------------------')
+    # print('-------------------------------------')
+    # print('-------------------------------------')
+    # print('--------------DEBUGGING--------------')
+    # print('-------------------------------------')
+    # print('-------------------------------------')
     if request.method == 'POST':
         formset = Produtosformset(request.POST,
                                   request.FILES,
@@ -158,13 +158,13 @@ def ordenar_produtos(request):
             'formset': formset,
             'form_action': form_action,
         }
-        for f in formset:
-            print(f'formset-id: {f.instance.id}')
-            print(f'formset-nome: {f.instance.nome}')
-            print(f'formset-ordem: {f.instance.ordem}')
+        # for f in formset:
+        #     print(f'formset-id: {f.instance.id}')
+        #     print(f'formset-nome: {f.instance.nome}')
+        #     print(f'formset-ordem: {f.instance.ordem}')
 
-        print(formset.is_valid())
-        print(formset.is_valid())
+        # print(formset.is_valid())
+        # print(formset.is_valid())
         if formset.is_valid():
             print(f'formset is valid: {formset.is_valid()}')
             formset.save()

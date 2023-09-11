@@ -141,10 +141,9 @@ class ProductForm(forms.ModelForm):
         model = Products
         fields = (
             'imagem', 'nome', 'descricao_curta', 'descricao_longa',
-            'preco', 'preco_promo', 'percentagem_desconto',
-            'categoria', 'subcategoria', 'visibilidade', 'ordem',
-
-
+            'preco_1', 'preco_2', 'preco_3', 'preco_4', 'preco_5', 'preco_6',
+            'preco_promo', 'percentagem_desconto', 'categoria', 'subcategoria',
+            'visibilidade', 'ordem',
         )
 
     def clean(self):

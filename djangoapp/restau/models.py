@@ -1,6 +1,7 @@
 from django.db import models
 from utils.model_validators import positive_price
 from utils.images import resize_image
+from decimal import Decimal
 
 
 class Category(models.Model):
@@ -131,33 +132,92 @@ class Products(models.Model):
         max_length=200,
         verbose_name='Produto'
     )
+
     descricao_curta = models.CharField(
         max_length=200,
         verbose_name='Descrição Curta',
     )
+
     descricao_longa = models.TextField(
         verbose_name='Descrição Longa',
         blank=True,
         null=True,
         default=None,
     )
-    preco = models.DecimalField(
+
+    preco_1 = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         validators=[positive_price],
-        verbose_name='Preço',
+        verbose_name='Preço 1',
+        blank=True,
+        null=True,
+        default=Decimal('0.00'),
     )
+
+    preco_2 = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[positive_price],
+        verbose_name='Preço 2',
+        blank=True,
+        null=True,
+        default=Decimal('0.00'),
+    )
+
+    preco_3 = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[positive_price],
+        verbose_name='Preço 3',
+        blank=True,
+        null=True,
+        default=Decimal('0.00'),
+    )
+
+    preco_4 = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[positive_price],
+        verbose_name='Preço 4',
+        blank=True,
+        null=True,
+        default=Decimal('0.00'),
+    )
+
+    preco_5 = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[positive_price],
+        verbose_name='Preço 5',
+        blank=True,
+        null=True,
+        default=Decimal('0.00'),
+    )
+
+    preco_6 = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[positive_price],
+        verbose_name='Preço 6',
+        blank=True,
+        null=True,
+        default=Decimal('0.00'),
+    )
+
     preco_promo = models.FloatField(
         default=0.00,
         validators=[positive_price],
         verbose_name='Preço Promocional',
     )
+
     percentagem_desconto = models.ForeignKey(
         Percentage,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
+
     categoria = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
@@ -165,6 +225,7 @@ class Products(models.Model):
         null=True,
         default=None,
     )
+
     subcategoria = models.ForeignKey(
         SubCategory,
         on_delete=models.SET_NULL,
@@ -200,6 +261,55 @@ class Products(models.Model):
 
     def __str__(self):
         return self.nome
+
+
+class Ementa(models.Model):
+    class Meta:
+        verbose_name = 'Ementa'
+        verbose_name_plural = 'Ementas'
+
+    nome = models.CharField(
+        max_length=200,
+        verbose_name='Ementa'
+    )
+
+    descricao = models.CharField(
+        max_length=200,
+        verbose_name='Descrição',
+    )
+
+    nome_campo_preco_selecionado = models.CharField(
+        max_length=10,
+        choices=[
+            ('preco_1', 'Preço 1'),
+            ('preco_2', 'Preço 2'),
+            ('preco_3', 'Preço 3'),
+            ('preco_4', 'Preço 4'),
+            ('preco_5', 'Preço 5'),
+            ('preco_6', 'Preço 6'),
+        ],
+        verbose_name='Preço',
+    )
+
+
+class ProdutosEmenta(models.Model):
+    class Meta:
+        verbose_name = 'Produto Ementa'
+        verbose_name_plural = 'Produtos Ementas'
+
+    ementa = models.ForeignKey(
+        Ementa,
+        on_delete=models.CASCADE,
+        verbose_name='Ementa',
+        related_name='produtos_ementa',
+    )
+
+    produto = models.ForeignKey(
+        Products,
+        on_delete=models.CASCADE,
+        verbose_name='Produto',
+        related_name='produtos_ementa',
+    )
 
 
 class Fidelizacao(models.Model):
