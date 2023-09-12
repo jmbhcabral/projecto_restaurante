@@ -1,0 +1,30 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+<h1>ementa</h1>
+
+<div class="single-product">
+  <h3 class="single-product">
+  {{ product.nome}}
+  </h3>
+  <p><b>Nome:</b>{{ ementa.nome}}</p>
+  <p><b>Descrição:</b> {{ ementa.descricao }} </p>
+  <p><b>Preço</b>{{ ementa.nome_campo_preco_selecionado }}</p>
+  
+
+  <div class="product-links">
+      <a class="btn btn-link" href="{% url 'restau:ementas_update' ementa.id %}">Update</a>
+
+      <form action="{% url 'restau:ementas_delete' ementa.id %}" method='POST'>
+          {% csrf_token %}
+          {% if confirmation == 'no' %}
+              <input type="hidden" name="confirmation" value="yes">
+              <button class="btn btn-link btn-delete" type="submit">Confirma?</button>
+          {% else %}
+              <button class="btn btn-link btn-delete" type="submit">Delete</button>
+          
+          {% endif %}
+      </form>
+  </div>
+
+</div>
+{% endblock content %}

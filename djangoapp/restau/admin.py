@@ -1,7 +1,7 @@
 from django.contrib import admin
 from restau.models import (
     Category, SubCategory, Percentage, Products, FrontendSetup, Ementa,
-    Fidelizacao, ProdutosFidelizacao
+    ProdutosEmenta, Fidelizacao,
 )
 
 
@@ -57,24 +57,32 @@ class EmentaAdmin(admin.ModelAdmin):
         'id', 'nome', 'descricao', 'nome_campo_preco_selecionado')
 
 
+@admin.register(ProdutosEmenta)
+class ProdutosEmentaAdmin(admin.ModelAdmin):
+    list_display = ('ementa', 'produto',)
+    list_display_links = ('ementa', 'produto',)
+
+
 @admin.register(Fidelizacao)
 class FidelizacaoAdmin(admin.ModelAdmin):
     list_display = ('id', 'nome', 'unidade')
     list_display_links = ('id', 'nome', 'unidade')
 
 
-class ProdutosFidelizacaoAdmin(admin.ModelAdmin):
-    list_display = ('produto_fidelizacao',
-                    'get_pontos_recompensa', 'pontos_para_oferta')
+# class ProdutosFidelizacaoAdmin(admin.ModelAdmin):
+#     list_display = ('produto_fidelizacao',
+#                     'get_pontos_recompensa', 'pontos_recompensa',
+#                     'pontos_para_oferta'
+#                     )
 
-    def get_pontos_recompensa(self, obj):
-        if obj.pontos_recompensa:
-            # Substitua 'preco' pelo nome real do campo de preço na classe
-            # Products
-            return obj.pontos_recompensa.preco
-        return 'N/A'
+#     def get_pontos_recompensa(self, obj):
+#         if obj.pontos_recompensa:
+#             # Substitua 'preco' pelo nome real do campo de preço na classe
+#             # Products
+#             return obj.pontos_recompensa.preco
+#         return 'N/A'
 
-    get_pontos_recompensa.short_description = 'Pontos Recompensa'
+#     get_pontos_recompensa.pontos_recompensa = 'Pontos Recompensa'
 
 
-admin.site.register(ProdutosFidelizacao, ProdutosFidelizacaoAdmin)
+# admin.site.register(ProdutosFidelizacao, ProdutosFidelizacaoAdmin)

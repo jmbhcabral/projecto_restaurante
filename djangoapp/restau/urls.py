@@ -3,7 +3,7 @@ from restau.views import (                      # type: ignore
     index, admin_home, produtos, product, create_product, update, delete,
     encomendas, category, create_category, update_categories, delete_category,
     subcategory, create_subcategory, update_subcategories, delete_subcategory,
-    ordenar_produtos,
+    ordenar_produtos, ementas_create, ementas_update, ementas_delete, ementa
 )
 
 # namespace
@@ -40,4 +40,12 @@ urlpatterns = [
          update_subcategories, name='update_subcategories'),
     path('restau/pages/<int:subcategory_id>/delete_subcategory/',
          delete_subcategory, name='delete_subcategory'),
+    path('restau/pages/ementas/', ementas_create, name='ementas_create'),
+    path('restau/pages/<int:ementa_id>/ementas_update/',
+         ementas_update, name='ementas_update'),
+    path('restau/pages/<int:ementa_id>/ementas_delete/',
+         ementas_delete, name='ementas_delete'),
+    path('restau/pages/ementa/<int:ementa_id>/',
+         ementa, name='ementa'),
+
 ]

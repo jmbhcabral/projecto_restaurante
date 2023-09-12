@@ -291,11 +291,15 @@ class Ementa(models.Model):
         verbose_name='Preço',
     )
 
+    def __str__(self):
+        return self.nome
+
 
 class ProdutosEmenta(models.Model):
     class Meta:
         verbose_name = 'Produto Ementa'
         verbose_name_plural = 'Produtos Ementas'
+        unique_together = ('ementa', 'produto',)
 
     ementa = models.ForeignKey(
         Ementa,
@@ -310,6 +314,9 @@ class ProdutosEmenta(models.Model):
         verbose_name='Produto',
         related_name='produtos_ementa',
     )
+
+    def __str__(self):
+        return str(self.produto)
 
 
 class Fidelizacao(models.Model):
@@ -337,7 +344,7 @@ class ProdutosFidelizacao(models.Model):
         default=None,
     )
 
-    produto_fidelizacao = models.ForeignKey(
+    produto_fidelizacao = models.OneToOneField(
         Products,
         unique=True,
         on_delete=models.SET_NULL,

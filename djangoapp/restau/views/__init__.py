@@ -7,3 +7,5 @@ from .category_forms import *
 from .basic_views import *
 from .subcategory_forms import *
 from .subcategory_views import *
+from .ementa_forms import *
+from .ementa_views import *
