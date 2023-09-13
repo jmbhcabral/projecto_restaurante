@@ -11,52 +11,36 @@
   <p><b>Preço</b>{{ ementa.nome_campo_preco_selecionado }}</p>
 </div>
 <div>
-    <form 
-    action=" {{ form_action }} "
-    method="POST"
-    >
+  <form action="{{ form_action }}" method="POST">
     {% csrf_token %}
-    <div class="form-content">
-        {% for categoria in categorias %}
-            <h3>{{ categoria.nome }}</h3>
+    {{ form.ementa }}
+    
+    {% for categoria in categorias %}
+    <fieldset>
+        <legend>{{ categoria.nome }}</legend>
+        
         {% for subcategoria in subcategorias %}
         {% if subcategoria.categoria == categoria %}
-            <h4>{{ subcategoria.nome }}</h4>
-            {% endif %}
-        {% for field in form %}
-            {% comment %} {{ ementa.nome }}
-            {{ field.ementa }}
-            {{ ementa.id }}
-            {{ ementa.nome }}
-            {{ ementa.nome }}
-            {{ ementa.nome }} {% endcomment %}
+        <h4>{{ subcategoria.nome }}</h4>
+
+        <!-- AQUI: Customizando a renderização do campo 'produto' do seu formulário -->
+        {% for produto in produtos %}
+        {% if produto.categoria == categoria and produto.subcategoria == subcategoria %}
+        <div class="form-group">
+            <input type="checkbox" id="produto_{{ produto.id }}" name="{{ form.produto.name }}" value="{{ produto.id }}" {% if produto.id in form.produto.value %}checked{% endif %}>
+            <label for="produto_{{ produto.id }}">{{ produto.nome }}</label>
+        </div>
+        {% endif %}
+        {% endfor %}
         
-        <div class="form-group">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {{ field.errors }}
-          {% if field.help_text %}
-          <p class="help-text">{{ field.help_text }}</p>
-          {% endif %}
-        </div>
+        {% endif %}
         {% endfor %}
-        {% endfor %}
-        {% endfor %}
-      </div>
-      {% if form.non_field_errors %}
-      <div class="form-content">
-        <div class="">
-          <div class="message error">
-            {{ form.non_field_errors }}
-          </div>
-        </div>
-      </div>
-      {% endif %}
-      <div class="form-content">
-        <div class="form-group">
-          <button class="btn" type="submit">Enviar</button>
-        </div>
-      </div>
-    </form>
+        
+    </fieldset>
+    {% endfor %}
+    
+    <button type="submit">Adicionar à Ementa</button>
+</form>
+
 </div>
 {% endblock content %}
