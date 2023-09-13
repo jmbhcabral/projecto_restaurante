@@ -212,9 +212,10 @@ class EmentaForm(forms.ModelForm):
 
 class ProdutosEmentaForm(forms.ModelForm):
     ementa = forms.ModelChoiceField(
-        queryset=Ementa.objects.all(),
-        label='Ementa',
-        help_text='Ementa.'
+        queryset=Ementa.objects.none(),  # Empty by default
+        widget=forms.HiddenInput(),
+        # label='Ementa',
+        # help_text='Ementa.'
     )
     produto = forms.ModelMultipleChoiceField(
         queryset=Products.objects.all(),
@@ -223,17 +224,21 @@ class ProdutosEmentaForm(forms.ModelForm):
         help_text='Produto.'
     )
 
+    def __init__(self, *args, **kwargs):
+        ementa_id = kwargs.pop('ementa_id', None)
+        super(ProdutosEmentaForm, self).__init__(*args, **kwargs)
+        if ementa_id:
+            ementa_instance = Ementa.objects.get(pk=ementa_id)
+            self.fields['ementa'].queryset = Ementa \
+                .objects \
+                .filter(
+                pk=ementa_id
+            )
+            # Setting the initial value
+            self.fields['ementa'].initial = ementa_instance
+
     class Meta:
         model = ProdutosEmenta
         fields = (
             'ementa', 'produto',
         )
-
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-
-    # class Meta:
-    #     model = ProdutosEmenta
-    #     fields = (
-    #         'ementa', 'produto',
-    #     )

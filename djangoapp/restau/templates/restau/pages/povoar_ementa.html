@@ -1,0 +1,62 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+<h1>Povoar Ementa</h1>
+
+<div class="single-product">
+  <h3 class="single-product">
+  {{ ementa.nome}}
+  </h3>
+  <p><b>Nome:</b>{{ ementa.nome}}</p>
+  <p><b>Descrição:</b> {{ ementa.descricao }} </p>
+  <p><b>Preço</b>{{ ementa.nome_campo_preco_selecionado }}</p>
+</div>
+<div>
+    <form 
+    action=" {{ form_action }} "
+    method="POST"
+    >
+    {% csrf_token %}
+    <div class="form-content">
+        {% for categoria in categorias %}
+            <h3>{{ categoria.nome }}</h3>
+        {% for subcategoria in subcategorias %}
+        {% if subcategoria.categoria == categoria %}
+            <h4>{{ subcategoria.nome }}</h4>
+            {% endif %}
+        {% for field in form %}
+            {% comment %} {{ ementa.nome }}
+            {{ field.ementa }}
+            {{ ementa.id }}
+            {{ ementa.nome }}
+            {{ ementa.nome }}
+            {{ ementa.nome }} {% endcomment %}
+        
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {{ field.errors }}
+          {% if field.help_text %}
+          <p class="help-text">{{ field.help_text }}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+        {% endfor %}
+        {% endfor %}
+      </div>
+      {% if form.non_field_errors %}
+      <div class="form-content">
+        <div class="">
+          <div class="message error">
+            {{ form.non_field_errors }}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      <div class="form-content">
+        <div class="form-group">
+          <button class="btn" type="submit">Enviar</button>
+        </div>
+      </div>
+    </form>
+</div>
+{% endblock content %}
