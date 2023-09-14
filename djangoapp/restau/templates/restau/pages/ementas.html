@@ -5,7 +5,12 @@
     <ul>
     {% for ementa in ementas %}
     {% if ementa %}
-        <li><a href="{% url 'restau:ementa' ementa.id %} ">{{ ementa.nome }}</a> - <a href="{% url 'restau:povoar_ementa' ementa.id %}">Povoar ementa</a></li>
+        <li>
+          <a href="{% url 'restau:ementa' ementa.id %} ">{{ ementa.nome }}</a> - 
+          <a href="{% url 'restau:povoar_ementa' ementa.id %}">Povoar ementa</a> - 
+          <a href="{% url 'restau:povoar_ementa' ementa.id %}">Modificar</a> - 
+          <a href="{% url 'restau:povoar_ementa' ementa.id %}">Apagar</a> - 
+        </li>
     {% else %}
     <li><em>Não existem ementas.</em></li>
     {% endif %}

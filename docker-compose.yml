@@ -5,6 +5,8 @@ services:
     container_name: djangoapp
     build:
       context: .
+    stdin_open: true # equivalente ao -i do docker run
+    tty: true        # equivalente ao -t do docker run
     ports:
       - 8000:8000
     volumes:

@@ -6,6 +6,7 @@ from restau.models import (
     SubCategory
 )
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib import messages
 
 
 def ementas_create(request):
@@ -110,12 +111,16 @@ def povoar_ementa(request, ementa_id):
     categorias = Category.objects.all().order_by('ordem')
     subcategorias = SubCategory.objects.all().order_by('ordem')
     produtos = Products.objects.all().order_by('ordem')
+    produtos_na_ementa = ProdutosEmenta.objects.filter(
+        ementa=ementa).values_list('produto', flat=True)
 
     form_action = reverse('restau:povoar_ementa', args=[ementa_id])
     if request.method == 'POST':
         form = ProdutosEmentaForm(request.POST or None, ementa_id=ementa_id)
         print("Formulário POST recebido")
         print(request.POST)
+        import pdb
+        pdb.set_trace()
         try:
             valid = form.is_valid()
             print(valid)
@@ -123,6 +128,7 @@ def povoar_ementa(request, ementa_id):
             print("Erro durante a validação: ", e)
 
         if form.is_valid():
+
             print('Formulário é válido.')
 
             ementa = form.cleaned_data['ementa']
@@ -131,15 +137,34 @@ def povoar_ementa(request, ementa_id):
             selected_products = form.cleaned_data['produto']
             print("Selected products: ", selected_products)
 
-            for product in form.cleaned_data['produto']:
-                ProdutosEmenta.objects.create(ementa=ementa, produto=product)
+            current_products = list(
+                ProdutosEmenta.objects.filter(ementa=ementa).values_list(
+                    'produto', flat=True
+                )
+            )
 
-            return redirect('restau:povoar_ementa', args=[ementa_id])
+            for product in form.cleaned_data['produto']:
+                if not ProdutosEmenta.objects.filter(ementa=ementa, produto=product).exists():
+                    ProdutosEmenta.objects.create(
+                        ementa=ementa, produto=product)
+                else:
+                    messages.error(
+                        request,
+                        f"O produto {product.nome} já está na ementa {ementa.nome}."
+                    )
+
+            for product_id in current_products:
+                if product_id not in [
+                        product.id for product in selected_products]:
+                    ProdutosEmenta.objects.filter(
+                        ementa=ementa, produto_id=product_id).delete()
+            return redirect('restau:povoar_ementa', ementa_id=ementa_id)
         else:
             print("O formulário não é válido.")
             print(form.errors)
 
         context = {
+            'produtos_na_ementa': produtos_na_ementa,
             'form': form,
             'form_action': form_action,
             'ementa': ementa,
@@ -154,6 +179,7 @@ def povoar_ementa(request, ementa_id):
         form = ProdutosEmentaForm(ementa_id=ementa_id)
 
     context = {
+        'produtos_na_ementa': produtos_na_ementa,
         'ementa': ementa,
         'produtos': produtos,
         'categorias': categorias,
