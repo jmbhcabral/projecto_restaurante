@@ -59,8 +59,14 @@ class EmentaAdmin(admin.ModelAdmin):
 
 @admin.register(ProdutosEmenta)
 class ProdutosEmentaAdmin(admin.ModelAdmin):
-    list_display = ('ementa', 'produto',)
-    list_display_links = ('ementa', 'produto',)
+    class ProdutosEmentaAdmin(admin.ModelAdmin):
+        list_display = ('ementa', 'produtos_in_ementa',)
+
+        # Vamos incluir um método customizado para representar produtos
+        def produtos_in_ementa(self, obj):
+            return ", ".join([str(p) for p in obj.produto.all()])
+
+        produtos_in_ementa.short_description = 'Produtos na Ementa'
 
 
 @admin.register(Fidelizacao)

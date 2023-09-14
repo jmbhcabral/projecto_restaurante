@@ -291,6 +291,8 @@ class Ementa(models.Model):
         verbose_name='Preço',
     )
 
+    produtos = models.ManyToManyField(Products)
+
     def __str__(self):
         return self.nome
 
@@ -299,24 +301,22 @@ class ProdutosEmenta(models.Model):
     class Meta:
         verbose_name = 'Produto Ementa'
         verbose_name_plural = 'Produtos Ementas'
-        unique_together = ('ementa', 'produto',)
 
     ementa = models.ForeignKey(
         Ementa,
         on_delete=models.CASCADE,
         verbose_name='Ementa',
-        related_name='produtos_ementa',
+        related_name='ementas',
     )
 
-    produto = models.ForeignKey(
+    produto = models.ManyToManyField(
         Products,
-        on_delete=models.CASCADE,
         verbose_name='Produto',
-        related_name='produtos_ementa',
+        related_name='produtos',
     )
 
     def __str__(self):
-        return str(self.produto)
+        return self.ementa.nome
 
 
 class Fidelizacao(models.Model):

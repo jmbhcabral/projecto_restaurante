@@ -101,82 +101,61 @@ def ementas_delete(request, ementa_id):
 
 
 def povoar_ementa(request, ementa_id):
-    print('REQUEST: ', request.POST)
-    print("Estou aqui!")  # Isso deve ser impresso sempre que a view for chamada
-    # Isso vai imprimir o método HTTP da requisição
-    print("Método HTTP:", request.method)
 
     ementa = get_object_or_404(Ementa, pk=ementa_id)
 
     categorias = Category.objects.all().order_by('ordem')
     subcategorias = SubCategory.objects.all().order_by('ordem')
     produtos = Products.objects.all().order_by('ordem')
-    produtos_na_ementa = ProdutosEmenta.objects.filter(
-        ementa=ementa).values_list('produto', flat=True)
 
     form_action = reverse('restau:povoar_ementa', args=[ementa_id])
+
     if request.method == 'POST':
-        form = ProdutosEmentaForm(request.POST or None, ementa_id=ementa_id)
-        print("Formulário POST recebido")
-        print(request.POST)
-        import pdb
-        pdb.set_trace()
-        try:
-            valid = form.is_valid()
-            print(valid)
-        except Exception as e:
-            print("Erro durante a validação: ", e)
+        form = ProdutosEmentaForm(request.POST, ementa_id=ementa_id)
 
         if form.is_valid():
+            # Crie um novo objeto ProdutosEmenta, mas não o salve ainda.
+            instance = form.save(commit=False)
+            instance.ementa = ementa
+            instance.save()  # Agora, salve-o.
 
-            print('Formulário é válido.')
-
-            ementa = form.cleaned_data['ementa']
-            print("Ementa: ", ementa)
-
+            # Obtém os produtos selecionados no formulário.
             selected_products = form.cleaned_data['produto']
-            print("Selected products: ", selected_products)
 
-            current_products = list(
-                ProdutosEmenta.objects.filter(ementa=ementa).values_list(
-                    'produto', flat=True
-                )
-            )
+            # Obtém os produtos que já estão associados a esta ementa.
+            existing_products = [prod.id for prod in ementa.produtos.all()]
 
-            for product in form.cleaned_data['produto']:
-                if not ProdutosEmenta.objects.filter(ementa=ementa, produto=product).exists():
-                    ProdutosEmenta.objects.create(
-                        ementa=ementa, produto=product)
+            # Adicione novos produtos e remova os desmarcados.
+            for product in selected_products:
+                if product.id not in existing_products:
+                    ementa.produtos.add(product)
                 else:
                     messages.error(
                         request,
-                        f"O produto {product.nome} já está na ementa {ementa.nome}."
+                        f"O produto {product} já existe na ementa {ementa}"
                     )
 
-            for product_id in current_products:
-                if product_id not in [
-                        product.id for product in selected_products]:
-                    ProdutosEmenta.objects.filter(
-                        ementa=ementa, produto_id=product_id).delete()
+            for product_id in existing_products:
+                if product_id not in [prod.id for prod in selected_products]:
+                    ementa.produtos.remove(Products.objects.get(id=product_id))
+
+            messages.success(
+                request,
+                f"Produtos adicionados à ementa {ementa}"
+            )
+
             return redirect('restau:povoar_ementa', ementa_id=ementa_id)
+
         else:
             print("O formulário não é válido.")
-            print(form.errors)
-
-        context = {
-            'produtos_na_ementa': produtos_na_ementa,
-            'form': form,
-            'form_action': form_action,
-            'ementa': ementa,
-            'produtos': produtos,
-            'categorias': categorias,
-            'subcategorias': subcategorias,
-        }
-        return render(request, 'restau/pages/povoar_ementa.html', context)
 
     else:
-        print("Não foi uma solicitação POST.")
-        form = ProdutosEmentaForm(ementa_id=ementa_id)
+        initial_products = ementa.produtos.all()  # Assume que este é o campo
+        # ManyToMany
+        form = ProdutosEmentaForm(ementa_id=ementa_id, initial={
+                                  'produto': initial_products})
+
+    produtos_na_ementa = [prod.id for prod in ementa.produtos.all()]
 
     context = {
         'produtos_na_ementa': produtos_na_ementa,
