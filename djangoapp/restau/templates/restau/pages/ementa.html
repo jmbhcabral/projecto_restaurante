@@ -4,15 +4,16 @@
 
 <div class="single-product">
   <h3 class="single-product">
-  {{ product.nome}}
+  {{ ementa.nome}}
   </h3>
-  <p><b>Nome:</b>{{ ementa.nome}}</p>
-  <p><b>Descrição:</b> {{ ementa.descricao }} </p>
-  <p><b>Preço</b>{{ ementa.nome_campo_preco_selecionado }}</p>
+  <p><b>Nome: </b>{{ ementa.nome}}</p>
+  <p><b>Descrição: </b> {{ ementa.descricao }} </p>
+  <p><b>Preço: </b>{{ ementa.get_nome_campo_preco_selecionado_display }}</p>
   
 
   <div class="product-links">
       <a class="btn btn-link" href="{% url 'restau:ementas_update' ementa.id %}">Atualizar</a>
+      <a class="btn btn-link" href="{% url 'restau:ementas_create' %}">Voltar</a>
 
       <form action="{% url 'restau:ementas_delete' ementa.id %}" method='POST'>
           {% csrf_token %}
@@ -27,4 +28,26 @@
   </div>
 
 </div>
+<div>
+    {% for categoria in categorias %}
+    <legend>{{ categoria.nome }}</legend>
+        
+        {% for subcategoria in subcategorias %}
+        {% if subcategoria.categoria == categoria %}
+        <h4>{{ subcategoria.nome }}</h4>
+
+        <!-- AQUI: Customizando a renderização do campo 'produto' do seu formulário -->
+        {% for produto in ementa_produtos %}
+        {% if produto.categoria == categoria and produto.subcategoria == subcategoria %}
+        <div class="form-group">
+            <p> {{ produto.nome }} </p>
+        </div>
+        {% endif %}
+        {% endfor %}
+        
+        {% endif %}
+        {% endfor %}
+    {% endfor %}
+</div>
+
 {% endblock content %}

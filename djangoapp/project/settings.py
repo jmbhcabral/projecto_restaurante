@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'perfil',
     'restau',
     'site_setup',
+    'fidelidade',
     'crispy_forms',
 
 
