@@ -6,7 +6,7 @@
  {% if fidelidade %}
  <ul>
     <li>
-        <a href="">Nome: {{ fidelidade.nome }} - </a>
+        <a href="{% url "fidelidade:fidelidade_individual" fidelidade.id %}">Nome: {{ fidelidade.nome }} - </a>
         <a href="">Adicionar ofertas - </a>
         <a href="">Ementa: {{ fidelidade.ementa }} - </a>
     </li>

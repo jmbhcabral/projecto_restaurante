@@ -1,0 +1,34 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+<h1>Ementa</h1>
+
+<div class="single-product">
+  <h3 class="single-product">
+  {{ fidelidade.nome}}
+  </h3>
+  <p><b>Nome: </b>{{ fidelidade.nome}}</p>
+  <p><b>Descrição: </b> {{ fidelidade.unidade }} </p>
+  <p><b>Ementa: </b>{{ fidelidade.ementa }}</p>
+
+  <div class="product-links">
+      <a class="btn btn-link" href="{% url 'fidelidade:editar_fidelidade' fidelidade.id %}">Atualizar</a>
+      <a class="btn btn-link" href="{% url 'fidelidade:criar_fidelidade' %}">Voltar</a>
+
+      <form action="{% url 'fidelidade:apagar_fidelidade' fidelidade.id %}" method='POST'>
+          {% csrf_token %}
+          {% if confirmation == 'no' %}
+              <input type="hidden" name="confirmation" value="yes">
+              <button class="btn btn-link btn-delete" type="submit">Confirma?</button>
+          {% else %}
+              <button class="btn btn-link btn-delete" type="submit">Apagar</button>
+          
+          {% endif %}
+      </form>
+  </div>
+
+</div>
+<div>
+    
+</div>
+
+{% endblock content %}
