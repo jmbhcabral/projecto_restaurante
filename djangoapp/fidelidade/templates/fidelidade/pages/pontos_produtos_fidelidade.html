@@ -1,0 +1,45 @@
+{% extends "restau/base.html" %}
+{% block content %}
+<h1>Pontos Produtos Fidelidade</h1>
+<div class="single-product">
+    <h3 class="single-product">
+    {{ ementa.nome}}
+    </h3>
+    <p><b>Nome:</b>{{ ementa.nome}}</p>
+    <p><b>Descrição:</b> {{ ementa.descricao }} </p>
+    <p><b>Preço</b>{{ ementa.nome_campo_preco_selecionado }}</p>
+  </div>
+  <div>
+    <form action="{{ form_action }}" method="POST">
+      {% csrf_token %}
+      {{ form.ementa }}
+      
+      {% for categoria in categorias %}
+      <fieldset>
+          <legend>{{ categoria.nome }}</legend>
+          
+          {% for subcategoria in subcategorias %}
+          {% if subcategoria.categoria == categoria %}
+          <h4>{{ subcategoria.nome }}</h4>
+  
+          <!-- AQUI: Customizando a renderização do campo 'produto' do seu formulário -->
+          {% for produto in produtos %}
+          {% if produto.categoria == categoria and produto.subcategoria == subcategoria %}
+          <div class="form-group">
+              <input type="checkbox" id="produto_{{ produto.id }}" name="{{ form.produto.name }}" value="{{ produto.id }}" {% if produto.id in produtos_na_ementa %}checked{% endif %}>
+              <label for="produto_{{ produto.id }}">{{ produto.nome }}</label>
+          </div>
+          {% endif %}
+          {% endfor %}
+          
+          {% endif %}
+          {% endfor %}
+          
+      </fieldset>
+      {% endfor %}
+      
+      <button type="submit">Adicionar à Ementa</button>
+  </form>
+  
+  </div>
+{% endblock %}

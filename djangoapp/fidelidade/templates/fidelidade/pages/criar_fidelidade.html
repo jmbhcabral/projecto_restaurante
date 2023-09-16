@@ -1,13 +1,13 @@
 {% extends 'restau/base.html' %}
 {% block content %}
- <h1>Criar Fidelidade</h1>
+ <h1>{{ action }} Fidelidade</h1>
  <div>
  {% for fidelidade in fidelidades %}
  {% if fidelidade %}
  <ul>
     <li>
         <a href="{% url "fidelidade:fidelidade_individual" fidelidade.id %}">Nome: {{ fidelidade.nome }} - </a>
-        <a href="">Adicionar ofertas - </a>
+        <a href="">{{ action }} ofertas - </a>
         <a href="">Ementa: {{ fidelidade.ementa }} - </a>
     </li>
  </ul>
@@ -15,7 +15,7 @@
  {% endfor %}
 </div>
 <div class="content form-wrapper"> 
-    <h3 class="center">Adicionar Fidelidade</h3>
+    <h3 class="center">{{ action }} Fidelidade</h3>
     <form 
     action="{{ form_action }}"
     method="POST"
@@ -46,7 +46,7 @@
       {% endif %}
       <div class="form-content">
         <div class="form-group">
-          <button class="btn" type="submit">Criar</button>
+          <button class="btn" type="submit">{{ action }}</button>
         </div>
       </div>  
     </form>
