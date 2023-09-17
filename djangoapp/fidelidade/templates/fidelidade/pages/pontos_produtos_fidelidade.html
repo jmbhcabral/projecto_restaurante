@@ -5,41 +5,59 @@
     <h3 class="single-product">
     {{ ementa.nome}}
     </h3>
-    <p><b>Nome:</b>{{ ementa.nome}}</p>
-    <p><b>Descrição:</b> {{ ementa.descricao }} </p>
-    <p><b>Preço</b>{{ ementa.nome_campo_preco_selecionado }}</p>
+    <p><b>Nome: </b>{{ fidelidade.nome}}</p>
+    <p><b>Pontos por Euro: </b> {{ fidelidade.unidade }} </p>
+    <p><b>Ementa: </b>{{ fidelidade.ementa }}</p>
   </div>
   <div>
     <form action="{{ form_action }}" method="POST">
       {% csrf_token %}
-      {{ form.ementa }}
-      
+      <table>
+          <tr>
+              <td>{{ form.ementa.label_tag }}</td>
+              <td>{{ form.ementa.value|default:"N/A" }} <input type="hidden" name="{{ form.ementa.name }}" value="{{ form.ementa.value }}"></td>
+          </tr>
+      </table>
+  
       {% for categoria in categorias %}
       <fieldset>
           <legend>{{ categoria.nome }}</legend>
-          
+          <table>
           {% for subcategoria in subcategorias %}
           {% if subcategoria.categoria == categoria %}
-          <h4>{{ subcategoria.nome }}</h4>
-  
-          <!-- AQUI: Customizando a renderização do campo 'produto' do seu formulário -->
+          <tr>
+              <td colspan="3"><h4>{{ subcategoria.nome }}</h4></td>
+          </tr>
+          
           {% for produto in produtos %}
           {% if produto.categoria == categoria and produto.subcategoria == subcategoria %}
-          <div class="form-group">
-              <input type="checkbox" id="produto_{{ produto.id }}" name="{{ form.produto.name }}" value="{{ produto.id }}" {% if produto.id in produtos_na_ementa %}checked{% endif %}>
-              <label for="produto_{{ produto.id }}">{{ produto.nome }}</label>
-          </div>
+          <tr>
+              <td>
+                  <label for="pontos_recompensa_{{ produto.id }}">Pontos Recompensa para {{ produto.nome }}</label>
+              </td>
+              <td>
+                  <input type="text" id="pontos_recompensa_{{ produto.id }}" name="pontos_recompensa_{{ produto.id }}">
+              </td>
+          </tr>
+          <tr>
+              <td>
+                  <label for="pontos_para_recompensa_{{ produto.id }}">Pontos para Recompensa para {{ produto.nome }}</label>
+              </td>
+              <td>
+                  <input type="text" id="pontos_para_recompensa_{{ produto.id }}" name="pontos_para_recompensa_{{ produto.id }}">
+              </td>
+          </tr>
           {% endif %}
           {% endfor %}
           
           {% endif %}
           {% endfor %}
-          
+          </table>
       </fieldset>
       {% endfor %}
-      
+  
       <button type="submit">Adicionar à Ementa</button>
   </form>
   
-  </div>
+</div>  
 {% endblock %}

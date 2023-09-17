@@ -129,7 +129,8 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
             instance.fidelidade = fidelidade
             instance.save()
 
-            return redirect('fidelidade:pontos_produtos_fidelidade', fidelidade_id=fidelidade_id)')
+            return redirect('fidelidade:pontos_produtos_fidelidade',
+                            fidelidade_id=fidelidade_id)
 
         context = {
             'fidelidade': fidelidade,
