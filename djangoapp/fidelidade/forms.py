@@ -1,5 +1,6 @@
 from django import forms
-from fidelidade.models import Fidelidade, ProdutoFidelidadeIndividual
+from fidelidade.models import (Fidelidade, Ementa,
+                               ProdutoFidelidadeIndividual, Products)
 from django.core.exceptions import ValidationError
 
 
@@ -51,3 +52,68 @@ class FidelidadeForm(forms.ModelForm):
             )
 
         return super().clean()
+
+
+class ProdutoFidelidadeIndividualForm(forms.ModelForm):
+    class Meta:
+        model = ProdutoFidelidadeIndividual
+        fields = [
+            'fidelidade', 'ementa', 'produto',
+            'pontos_recompensa', 'pontos_para_oferta',
+        ]
+
+    fidelidade = forms.ModelChoiceField(
+        queryset=Fidelidade.objects.all(),
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    ementa = forms.ModelChoiceField(
+        queryset=Ementa.objects.all(),
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    produto = forms.ModelChoiceField(
+        queryset=Products.objects.all(),
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    pontos_recompensa = forms.DecimalField(
+        widget=forms.NumberInput(
+            attrs={
+                'placeholder': 'digite aqui',
+            }
+        ),
+        label='Pontos Recompensa',
+        help_text='Pontos Recompensa.',
+        required=False,
+    )
+
+    pontos_para_oferta = forms.DecimalField(
+        widget=forms.NumberInput(
+            attrs={
+                'placeholder': 'digite aqui',
+            }
+        ),
+        label='Pontos para Oferta',
+        help_text='Pontos para Oferta.',
+        required=False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.fidelidade_id = kwargs.pop('fidelidade_id', None)
+        super().__init__(*args, **kwargs)
+
+        if hasattr(self.instance, 'fidelidade'):
+            self.fields['fidelidade'].initial = self.instance.fidelidade
+            self.fields['fidelidade'].disabled = True  # Campo não editável
+
+        if hasattr(self.instance, 'ementa'):
+            self.fields['ementa'].initial = self.instance.ementa
+            self.fields['ementa'].disabled = True  # Campo não editável
+
+        if hasattr(self.instance, 'produto'):
+            self.fields['produto'].initial = self.instance.produto
+            self.fields['produto'].disabled = True  # Campo não editável

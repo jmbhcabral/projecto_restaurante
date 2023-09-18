@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from fidelidade.models import Fidelidade
+from fidelidade.models import Fidelidade, ProdutoFidelidadeIndividual
 from restau.models import Products, Category, SubCategory, Ementa
-from fidelidade.forms import FidelidadeForm
+from fidelidade.forms import FidelidadeForm, ProdutoFidelidadeIndividualForm
 from django.contrib import messages
 
 
@@ -122,15 +122,43 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
         'fidelidade:pontos_produtos_fidelidade', args=(fidelidade_id,))
 
     if request.method == 'POST':
-        form = FidelidadeForm(request.POST, fidelidade_id=fidelidade_id)
+        form = ProdutoFidelidadeIndividualForm(
+            request.POST, fidelidade_id=fidelidade_id)
+
+        print('-------------------')
+        print('-------------------')
+        print('-------------------')
+        print('-------DEBUG-------')
+        print('-------DEBUG-------')
+        print('-------DEBUG-------')
+        print('-------------------')
+        print('-------------------')
+        print('-------------------')
+        print('is form valid?', form.is_valid())
+        print('fidelidade_id :', fidelidade_id)
+        print("request.POST data: ", request.POST)
 
         if form.is_valid():
+            print('recompensa: ', form.cleaned_data['pontos_recompensa'])
+            print('oferta: ', form.cleaned_data['pontos_para_oferta'])
             instance = form.save(commit=False)
             instance.fidelidade = fidelidade
             instance.save()
 
             return redirect('fidelidade:pontos_produtos_fidelidade',
                             fidelidade_id=fidelidade_id)
+
+        else:
+            for e in form.errors:
+                print('error', e)
+
+        print('-------------------')
+        print('-------------------')
+        print('-------DEBUG-------')
+        print('-------DEBUG-------')
+        print('-------DEBUG-------')
+        print('-------------------')
+        print('-------------------')
 
         context = {
             'fidelidade': fidelidade,

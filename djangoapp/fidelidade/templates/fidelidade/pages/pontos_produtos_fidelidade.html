@@ -11,53 +11,57 @@
   </div>
   <div>
     <form action="{{ form_action }}" method="POST">
-      {% csrf_token %}
-      <table>
-          <tr>
-              <td>{{ form.ementa.label_tag }}</td>
-              <td>{{ form.ementa.value|default:"N/A" }} <input type="hidden" name="{{ form.ementa.name }}" value="{{ form.ementa.value }}"></td>
-          </tr>
-      </table>
-  
-      {% for categoria in categorias %}
-      <fieldset>
-          <legend>{{ categoria.nome }}</legend>
-          <table>
-          {% for subcategoria in subcategorias %}
-          {% if subcategoria.categoria == categoria %}
-          <tr>
-              <td colspan="3"><h4>{{ subcategoria.nome }}</h4></td>
-          </tr>
-          
-          {% for produto in produtos %}
-          {% if produto.categoria == categoria and produto.subcategoria == subcategoria %}
-          <tr>
-              <td>
-                  <label for="pontos_recompensa_{{ produto.id }}">Pontos Recompensa para {{ produto.nome }}</label>
-              </td>
-              <td>
-                  <input type="text" id="pontos_recompensa_{{ produto.id }}" name="pontos_recompensa_{{ produto.id }}">
-              </td>
-          </tr>
-          <tr>
-              <td>
-                  <label for="pontos_para_recompensa_{{ produto.id }}">Pontos para Recompensa para {{ produto.nome }}</label>
-              </td>
-              <td>
-                  <input type="text" id="pontos_para_recompensa_{{ produto.id }}" name="pontos_para_recompensa_{{ produto.id }}">
-              </td>
-          </tr>
-          {% endif %}
-          {% endfor %}
-          
-          {% endif %}
-          {% endfor %}
-          </table>
-      </fieldset>
-      {% endfor %}
-  
-      <button type="submit">Adicionar à Ementa</button>
-  </form>
+        {% csrf_token %}
+        <table>
+            <!-- Exibição de Ementa e campo oculto para 'ementa' -->
+            <tr>
+                <td>{{ form.ementa.label_tag }}</td>
+                <td>{{ form.ementa.value|default:"N/A" }} <input type="hidden" name="{{ form.ementa.name }}" value="{{ form.ementa.value }}"></td>
+            </tr>
+            
+            <!-- Exibição de Fidelidade e campo oculto para 'fidelidade' -->
+            <tr>
+                <td>{{ form.fidelidade.label_tag }}</td>
+                <td>{{ form.fidelidade.value|default:"N/A" }} <input type="hidden" name="{{ form.fidelidade.name }}" value="{{ form.fidelidade.value }}"></td>
+            </tr>
+        </table>
+    
+        {% for categoria in categorias %}
+        <fieldset>
+            <legend>{{ categoria.nome }}</legend>
+            <table>
+                {% for subcategoria in subcategorias %}
+                {% if subcategoria.categoria == categoria %}
+                <tr>
+                    <td colspan="2"><h4>{{ subcategoria.nome }}</h4></td>
+                </tr>
+                
+                {% for produto in produtos %}
+                {% if produto.categoria == categoria and produto.subcategoria == subcategoria %}
+                <!-- Campo oculto para 'produto' -->
+                <input type="hidden" name="produto_{{ produto.id }}" value="{{ produto.id }}">
+    
+                <!-- Campos para 'pontos_recompensa' e 'pontos_para_recompensa' -->
+                <tr>
+                    <td><label for="pontos_recompensa_{{ produto.id }}">Pontos Recompensa para {{ produto.nome }}</label></td>
+                    <td><input type="text" id="pontos_recompensa_{{ produto.id }}" name="pontos_recompensa_{{ produto.id }}"></td>
+                </tr>
+                <tr>
+                    <td><label for="pontos_para_recompensa_{{ produto.id }}">Pontos para Recompensa para {{ produto.nome }}</label></td>
+                    <td><input type="text" id="pontos_para_recompensa_{{ produto.id }}" name="pontos_para_recompensa_{{ produto.id }}"></td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                
+                {% endif %}
+                {% endfor %}
+            </table>
+        </fieldset>
+        {% endfor %}
+    
+        <button type="submit">Adicionar à Ementa</button>
+    </form>
+    
   
 </div>  
 {% endblock %}
