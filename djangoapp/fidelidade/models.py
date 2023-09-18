@@ -21,10 +21,13 @@ class Fidelidade(models.Model):
 
 
 class ProdutoFidelidadeIndividual(models.Model):
-    produto = models.ForeignKey(Products, on_delete=models.CASCADE)
+    class Meta:
+        verbose_name = 'Produto Fidelidade Individual'
+        verbose_name_plural = 'Produtos Fidelidade Individual'
+
     fidelidade = models.ForeignKey(Fidelidade, on_delete=models.CASCADE)
-    ementa = models.ForeignKey(
-        Ementa, on_delete=models.CASCADE, related_name='produtos_fidelidade')
+    produto = models.ForeignKey(
+        Products, blank=True, null=True, on_delete=models.CASCADE)
     pontos_recompensa = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True,
         verbose_name='Pontos Recompensa',
@@ -33,15 +36,6 @@ class ProdutoFidelidadeIndividual(models.Model):
         max_digits=10, decimal_places=2, null=True, blank=True,
         verbose_name='Pontos para Oferta',
     )
-
-    def save(self, *args, **kwargs):
-        if self.fidelidade.ementa is None:
-            raise ValidationError("A fidelidade deve ter uma ementa associada.")
-        # Certifique-se de que o produto está na ementa associada à fidelidade
-        if self.produto not in self.fidelidade.ementa.produtos.all():
-            raise ValidationError(
-                "O produto deve pertencer à ementa da fidelidade.")
-        super(ProdutoFidelidadeIndividual, self).save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.produto} - {self.fidelidade} - "\

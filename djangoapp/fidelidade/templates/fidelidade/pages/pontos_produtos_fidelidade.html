@@ -15,14 +15,18 @@
         <table>
             <!-- Exibição de Ementa e campo oculto para 'ementa' -->
             <tr>
-                <td>{{ form.ementa.label_tag }}</td>
-                <td>{{ form.ementa.value|default:"N/A" }} <input type="hidden" name="{{ form.ementa.name }}" value="{{ form.ementa.value }}"></td>
+                <td><h3>Ementa: {{ fidelidade.ementa }}</td>
+                
             </tr>
             
             <!-- Exibição de Fidelidade e campo oculto para 'fidelidade' -->
             <tr>
                 <td>{{ form.fidelidade.label_tag }}</td>
                 <td>{{ form.fidelidade.value|default:"N/A" }} <input type="hidden" name="{{ form.fidelidade.name }}" value="{{ form.fidelidade.value }}"></td>
+                <tr><p>
+                    {{ form.fidelidade.errors }}
+                    {{ form.fidelidade.value }}
+                </tr>
             </tr>
         </table>
     

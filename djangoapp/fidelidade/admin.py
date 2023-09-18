@@ -12,11 +12,11 @@ class FidelidadeAdmin(admin.ModelAdmin):
 
 @admin.register(ProdutoFidelidadeIndividual)
 class ProdutoFidelidadeIndividualAdmin(admin.ModelAdmin):
-    list_display = ('produto', 'fidelidade', 'ementa',
+    list_display = ('produto', 'fidelidade',
                     'pontos_recompensa', 'pontos_para_oferta')
     search_fields = ('produto__nome', 'fidelidade__nome',
-                     'ementa__nome', 'pontos_recompensa', 'pontos_para_oferta')
+                     'pontos_recompensa', 'pontos_para_oferta')
     list_filter = ('produto__nome', 'fidelidade__nome',
-                   'ementa__nome', 'pontos_recompensa', 'pontos_para_oferta')
-    ordering = ('produto__nome', 'fidelidade__nome', 'ementa__nome',
+                   'pontos_recompensa', 'pontos_para_oferta')
+    ordering = ('produto__nome', 'fidelidade__nome',
                 'pontos_recompensa', 'pontos_para_oferta')

@@ -1,5 +1,5 @@
 from django import forms
-from fidelidade.models import (Fidelidade, Ementa,
+from fidelidade.models import (Fidelidade,
                                ProdutoFidelidadeIndividual, Products)
 from django.core.exceptions import ValidationError
 
@@ -58,18 +58,12 @@ class ProdutoFidelidadeIndividualForm(forms.ModelForm):
     class Meta:
         model = ProdutoFidelidadeIndividual
         fields = [
-            'fidelidade', 'ementa', 'produto',
+            'fidelidade', 'produto',
             'pontos_recompensa', 'pontos_para_oferta',
         ]
 
     fidelidade = forms.ModelChoiceField(
         queryset=Fidelidade.objects.all(),
-        widget=forms.HiddenInput(),
-        required=False,
-    )
-
-    ementa = forms.ModelChoiceField(
-        queryset=Ementa.objects.all(),
         widget=forms.HiddenInput(),
         required=False,
     )
@@ -106,13 +100,13 @@ class ProdutoFidelidadeIndividualForm(forms.ModelForm):
         self.fidelidade_id = kwargs.pop('fidelidade_id', None)
         super().__init__(*args, **kwargs)
 
+        if self.fidelidade_id:
+            fidelidade = Fidelidade.objects.get(pk=self.fidelidade_id)
+            self.fields['produto'].queryset = fidelidade.ementa.produtos.all()
+
         if hasattr(self.instance, 'fidelidade'):
             self.fields['fidelidade'].initial = self.instance.fidelidade
             self.fields['fidelidade'].disabled = True  # Campo não editável
-
-        if hasattr(self.instance, 'ementa'):
-            self.fields['ementa'].initial = self.instance.ementa
-            self.fields['ementa'].disabled = True  # Campo não editável
 
         if hasattr(self.instance, 'produto'):
             self.fields['produto'].initial = self.instance.produto
