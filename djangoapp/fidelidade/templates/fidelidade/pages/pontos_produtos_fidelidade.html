@@ -42,17 +42,25 @@
                 
                 {% for produto in produtos %}
                 {% if produto.categoria == categoria and produto.subcategoria == subcategoria %}
+                
                 <!-- Campo oculto para 'produto' -->
                 <input type="hidden" name="produto_{{ produto.id }}" value="{{ produto.id }}">
     
                 <!-- Campos para 'pontos_recompensa' e 'pontos_para_recompensa' -->
                 <tr>
                     <td><label for="pontos_recompensa_{{ produto.id }}">Pontos Recompensa para {{ produto.nome }}</label></td>
-                    <td><input type="text" id="pontos_recompensa_{{ produto.id }}" name="pontos_recompensa_{{ produto.id }}"></td>
+                    <td>
+                        <input type="text" id="pontos_recompensa_{{ produto.id }}" name="pontos_recompensa_{{ produto.id }}"
+                        value="{{ produto.pontos_recompensa }}"
+                        >
+                    </td>
                 </tr>
                 <tr>
-                    <td><label for="pontos_para_recompensa_{{ produto.id }}">Pontos para Recompensa para {{ produto.nome }}</label></td>
-                    <td><input type="text" id="pontos_para_recompensa_{{ produto.id }}" name="pontos_para_recompensa_{{ produto.id }}"></td>
+                    <td><label for="pontos_para_oferta_{{ produto.id }}">Pontos para Recompensa para {{ produto.nome }}</label></td>
+                    <td>
+                        <input type="text" id="pontos_para_oferta_{{ produto.id }}" name="pontos_para_oferta_{{ produto.id }}"
+                        valeu="{{ produto.pontos_para_oferta }}">
+                    </td>
                 </tr>
                 {% endif %}
                 {% endfor %}
