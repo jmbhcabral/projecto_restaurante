@@ -71,7 +71,6 @@ class ProdutoFidelidadeIndividualForm(forms.ModelForm):
     produto = forms.ModelChoiceField(
         queryset=Products.objects.all(),
         widget=forms.HiddenInput(),
-        required=False,
     )
 
     pontos_recompensa = forms.DecimalField(
@@ -97,17 +96,15 @@ class ProdutoFidelidadeIndividualForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs):
-        self.fidelidade_id = kwargs.pop('fidelidade_id', None)
-        super().__init__(*args, **kwargs)
+        fidelidade_id = kwargs.pop('fidelidade_id', None)
+        super(ProdutoFidelidadeIndividualForm, self).__init__(*args, **kwargs)
 
-        if self.fidelidade_id:
-            fidelidade = Fidelidade.objects.get(pk=self.fidelidade_id)
-            self.fields['produto'].queryset = fidelidade.ementa.produtos.all()
+        if fidelidade_id:
+            fidelidade_instance = Fidelidade.objects.get(pk=fidelidade_id)
+            self.fields['fidelidade'].queryset = Fidelidade.objects.filter(
+                pk=fidelidade_id)
+            self.fields['fidelidade'].initial = fidelidade_instance
 
-        if hasattr(self.instance, 'fidelidade'):
-            self.fields['fidelidade'].initial = self.instance.fidelidade
-            self.fields['fidelidade'].disabled = True  # Campo não editável
-
-        if hasattr(self.instance, 'produto'):
-            self.fields['produto'].initial = self.instance.produto
-            self.fields['produto'].disabled = True  # Campo não editável
+        # instance = getattr(self, 'instance', None)
+        # if instance and instance.pk:
+        #     self.fields['produto'].disabled = True

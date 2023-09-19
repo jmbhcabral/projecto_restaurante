@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseBadRequest
 from django.urls import reverse
 from fidelidade.models import Fidelidade, ProdutoFidelidadeIndividual
 from restau.models import Products, Category, SubCategory, Ementa
 from fidelidade.forms import FidelidadeForm, ProdutoFidelidadeIndividualForm
 from django.contrib import messages
+from decimal import Decimal
 
 
 def criar_fidelidade(request):
@@ -113,52 +115,45 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
         Fidelidade, pk=fidelidade_id
     )
 
-    ementa = Ementa.objects.all()
+    ementa = fidelidade.ementa
     categorias = Category.objects.all().order_by('ordem')
     subcategorias = SubCategory.objects.all().order_by('ordem')
-    produtos = Products.objects.all().order_by('ordem')
+    produtos = ementa.produtos.all().order_by('ordem')
 
     form_action = reverse(
         'fidelidade:pontos_produtos_fidelidade', args=(fidelidade_id,))
 
     if request.method == 'POST':
-        form = ProdutoFidelidadeIndividualForm(
-            request.POST, fidelidade_id=fidelidade_id)
+        bulk_list = []
+        for produto in produtos:
+            pontos_recompensa = request.POST.get(
+                f'pontos_recompensa_{produto.id}', None)
+            pontos_para_oferta = request.POST.get(
+                f'pontos_para_oferta_{produto.id}', None)
 
-        print('-------------------')
-        print('-------------------')
-        print('-------------------')
-        print('-------DEBUG-------')
-        print('-------DEBUG-------')
-        print('-------DEBUG-------')
-        print('-------------------')
-        print('-------------------')
-        print('-------------------')
-        print('is form valid?', form.is_valid())
-        print('fidelidade_id :', fidelidade_id)
-        print("request.POST data: ", request.POST)
+            if pontos_recompensa in [None, ""]:
+                pontos_recompensa = None
+            if pontos_para_oferta in [None, ""]:
+                pontos_para_oferta = None
 
-        if form.is_valid():
-            print('recompensa: ', form.cleaned_data['pontos_recompensa'])
-            print('oferta: ', form.cleaned_data['pontos_para_oferta'])
-            instance = form.save(commit=False)
-            instance.fidelidade = fidelidade
-            instance.save()
+            novo_objecto = ProdutoFidelidadeIndividual(
+                fidelidade=fidelidade,
+                produto=produto,
+                pontos_recompensa=pontos_recompensa,
+                pontos_para_oferta=pontos_para_oferta,
+            )
+            bulk_list.append(novo_objecto)
 
-            return redirect('fidelidade:pontos_produtos_fidelidade',
-                            fidelidade_id=fidelidade_id)
+        if not bulk_list:
+            return HttpResponseBadRequest('Nunhum dado para criar')
 
-        else:
-            for e in form.errors:
-                print('error', e)
+        ProdutoFidelidadeIndividual.objects.bulk_create(bulk_list)
 
-        print('-------------------')
-        print('-------------------')
-        print('-------DEBUG-------')
-        print('-------DEBUG-------')
-        print('-------DEBUG-------')
-        print('-------------------')
-        print('-------------------')
+        return redirect('fidelidade:pontos_produtos_fidelidade',
+                        fidelidade_id=fidelidade_id)
+
+    else:
+        form = ProdutoFidelidadeIndividualForm()
 
         context = {
             'fidelidade': fidelidade,
@@ -175,18 +170,3 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
             'fidelidade/pages/pontos_produtos_fidelidade.html',
             context
         )
-    context = {
-        'fidelidade': fidelidade,
-        'ementa': ementa,
-        'categorias': categorias,
-        'subcategorias': subcategorias,
-        'produtos': produtos,
-        'form': FidelidadeForm(instance=fidelidade),
-        'form_action': form_action
-    }
-
-    return render(
-        request,
-        'fidelidade/pages/pontos_produtos_fidelidade.html',
-        context
-    )
