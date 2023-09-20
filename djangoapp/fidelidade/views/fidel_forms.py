@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+from django.forms import formset_factory
 from fidelidade.models import Fidelidade, ProdutoFidelidadeIndividual
 from restau.models import Category, SubCategory
 from fidelidade.forms import FidelidadeForm, ProdutoFidelidadeIndividualForm
@@ -121,66 +122,72 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
     form_action = reverse(
         'fidelidade:pontos_produtos_fidelidade', args=(fidelidade_id,))
 
-    produtos_fidelidade_map = {}
+    ProdutoFidelidadeIndividualFormSet = formset_factory(
+        ProdutoFidelidadeIndividualForm, extra=0)
+
+    initial_data = []
     for produto in produtos:
         try:
             produto_fidelidade = ProdutoFidelidadeIndividual.objects.get(
-                produto=produto)
-            produtos_fidelidade_map[produto.id] = produto_fidelidade
-            print(produtos_fidelidade_map[produto.id])
+                produto=produto, fidelidade=fidelidade)
+            initial_data.append({
+                'fidelidade': produto_fidelidade.fidelidade,
+                'produto': produto_fidelidade.produto,
+                'pontos_recompensa': produto_fidelidade.pontos_recompensa,
+                'pontos_para_oferta': produto_fidelidade.pontos_para_oferta
+            })
         except ProdutoFidelidadeIndividual.DoesNotExist:
-            produtos_fidelidade_map[produto.id] = None
+            initial_data.append({
+                'pontos_recompensa': 0,
+                'pontos_para_oferta': 0
+            })
+
+    print(initial_data)
 
     if request.method == 'POST':
-        bulk_list = []
-        bulk_update_list = []
-        for produto in produtos:
-            pontos_recompensa = request.POST.get(
-                f'pontos_recompensa_{produto.id}', None)
-            pontos_para_oferta = request.POST.get(
-                f'pontos_para_oferta_{produto.id}', None)
+        print('request is post:', request.POST)
+        formset = ProdutoFidelidadeIndividualFormSet(
+            request.POST,)
 
-            if pontos_recompensa in [None, ""]:
-                pontos_recompensa = None
-            if pontos_para_oferta in [None, ""]:
-                pontos_para_oferta = None
+        if formset.is_valid():
+            print('formset is valid')
+            for form in formset:
+                print(form.cleaned_data)
+                if form.has_changed():
+                    instance = form.save(commit=False)
+                    print('instance to save:', instance)
+                    instance.fidelidade = fidelidade
+                    instance.save()
+                    print('instance saved:', instance)
+                else:
+                    print('form not changed')
 
-            try:
-                produto_fidelidade = ProdutoFidelidadeIndividual.objects.get(
-                    produto=produto)
-                produto.pontos_recompensa = produto_fidelidade.pontos_recompensa
+            messages.success(request, 'Pontos atualizados com sucesso.')
+            return redirect(
+                'fidelidade:pontos_produtos_fidelidade', fidelidade_id)
 
-                produto.pontos_para_oferta = produto_fidelidade.pontos_para_oferta
+        else:
+            for e in formset.errors:
+                print('ERRO:', e)
 
-                if pontos_recompensa is not None:
-                    produto_fidelidade.pontos_recompensa = pontos_recompensa
+            messages.error(request, 'Erro ao atualizar pontos.')
 
-                if pontos_para_oferta is not None:
-                    produto_fidelidade.pontos_para_oferta = pontos_para_oferta
-
-                bulk_update_list.append(produto_fidelidade)
-            except ProdutoFidelidadeIndividual.DoesNotExist:
-
-                novo_objecto = ProdutoFidelidadeIndividual(
-                    produto=produto,
-                    pontos_recompensa=pontos_recompensa,
-                    pontos_para_oferta=pontos_para_oferta,
-                    fidelidade=fidelidade,
-                )
-                bulk_list.append(novo_objecto)
-
-        if bulk_list:
-            ProdutoFidelidadeIndividual.objects.bulk_create(bulk_list)
-
-        if bulk_update_list:
-            ProdutoFidelidadeIndividual.objects.bulk_update(
-                bulk_update_list, ['pontos_recompensa', 'pontos_para_oferta'])
-
-        return redirect('fidelidade:pontos_produtos_fidelidade',
-                        fidelidade_id=fidelidade_id)
+            return render(
+                request,
+                'fidelidade/pages/pontos_produtos_fidelidade.html',
+                {
+                    'fidelidade': fidelidade,
+                    'ementa': ementa,
+                    'categorias': categorias,
+                    'subcategorias': subcategorias,
+                    'produtos': produtos,
+                    'formset': formset,
+                    'form_action': form_action,
+                }
+            )
 
     else:
-        form = ProdutoFidelidadeIndividualForm()
+        formset = ProdutoFidelidadeIndividualFormSet(initial=initial_data)
 
         context = {
             'fidelidade': fidelidade,
@@ -188,9 +195,8 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
             'categorias': categorias,
             'subcategorias': subcategorias,
             'produtos': produtos,
-            'form': form,
+            'formset': formset,
             'form_action': form_action,
-            'produtos_fidelidade_map': produtos_fidelidade_map
         }
 
         return render(

@@ -12,68 +12,65 @@
   <div>
     <form action="{{ form_action }}" method="POST">
         {% csrf_token %}
-        <table>
-            <!-- Exibição de Ementa e campo oculto para 'ementa' -->
-            <tr>
-                <td><h3>Ementa: {{ fidelidade.ementa }}</td>
-                
-            </tr>
-            
-            <!-- Exibição de Fidelidade e campo oculto para 'fidelidade' -->
-            <tr>
-                <td>{{ form.fidelidade.label_tag }}</td>
-                <td>{{ form.fidelidade.value|default:"N/A" }} <input type="hidden" name="{{ form.fidelidade.name }}" value="{{ form.fidelidade.value }}"></td>
-                <tr><p>
-                    {{ form.fidelidade.errors }}
-                    {{ form.fidelidade.value }}
-                </tr>
-            </tr>
-        </table>
-    
-        {% for categoria in categorias %}
+        {{ formset.management_form }}
         <fieldset>
-            <legend>{{ categoria.nome }}</legend>
             <table>
-                {% for subcategoria in subcategorias %}
-                {% if subcategoria.categoria == categoria %}
-                <tr>
-                    <td colspan="2"><h4>{{ subcategoria.nome }}</h4></td>
-                </tr>
+                {% for categoria in categorias %}
+                    <p>{{ categoria.nome }}</p>
+                    {% for subcategoria in subcategorias %}
+                        {% if subcategoria.categoria == categoria %}
+                            <p>{{  subcategoria.nome }}</p>
+                                {% for form in formset %}
+                                    {% for produto in produtos %}
+                                        {% if produto.categoria == categoria and produto.subcategoria == subcategoria %}
+                                            <tr>
+                                                <td>
+                                                    {{ form.produto.label_tag }} {{ form.produto }} {{ form.produto.errors }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    {{ form.pontos_recompensa.label_tag }} {{ form.pontos_recompensa }} {{ form.pontos_recompensa.errors }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    {{ form.pontos_para_oferta.label_tag }} {{ form.pontos_para_oferta }} {{ form.pontos_para_oferta.errors }}
+
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                        {% for form in formset %}
+                            {% for produto in produtos %}
+                                {% if produto.categoria == categoria and not produto.subcategoria == subcategoria %}
+                                    <tr>
+                                        <td>
+                                            {{ form.produto.label_tag }} {{ form.produto }} {{ form.produto.errors }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            {{ form.pontos_recompensa.label_tag }} {{ form.pontos_recompensa }} {{ form.pontos_recompensa.errors }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            {{ form.pontos_para_oferta.label_tag }} {{ form.pontos_para_oferta }} {{ form.pontos_para_oferta.errors }}
+
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
                 
-                {% for produto in produtos %}
-                {% if produto.categoria == categoria and produto.subcategoria == subcategoria %}
-                
-                <!-- Campo oculto para 'produto' -->
-                <input type="hidden" name="produto_{{ produto.id }}" value="{{ produto.id }}">
-    
-                <!-- Campos para 'pontos_recompensa' e 'pontos_para_recompensa' -->
-                <tr>
-                    <td><label for="pontos_recompensa_{{ produto.id }}">Pontos Recompensa para {{ produto.nome }}</label></td>
-                    <td>
-                        <input type="text" id="pontos_recompensa_{{ produto.id }}" name="pontos_recompensa_{{ produto.id }}"
-                        value="{{ produto.pontos_recompensa }}"
-                        >
-                    </td>
-                </tr>
-                <tr>
-                    <td><label for="pontos_para_oferta_{{ produto.id }}">Pontos para Recompensa para {{ produto.nome }}</label></td>
-                    <td>
-                        <input type="text" id="pontos_para_oferta_{{ produto.id }}" name="pontos_para_oferta_{{ produto.id }}"
-                        valeu="{{ produto.pontos_para_oferta }}">
-                    </td>
-                </tr>
-                {% endif %}
-                {% endfor %}
-                
-                {% endif %}
-                {% endfor %}
             </table>
         </fieldset>
-        {% endfor %}
-    
-        <button type="submit">Adicionar à Ementa</button>
+        <button type="submit">Adicionar Pontos</button>
     </form>
-    
-  
 </div>  
 {% endblock %}
