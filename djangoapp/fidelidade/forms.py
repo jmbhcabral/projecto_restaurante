@@ -95,3 +95,19 @@ class ProdutoFidelidadeIndividualForm(forms.ModelForm):
         help_text='Pontos para Oferta.',
         required=False,
     )
+
+    def __init__(self, *args, **kwargs):
+        fidelidade_id = kwargs.pop('fidelidade_id', None)
+        super(ProdutoFidelidadeIndividualForm, self).__init__(*args, **kwargs)
+        if fidelidade_id:
+            fidelidade_instance = Fidelidade.objects.get(pk=fidelidade_id)
+            print('Fidelidade_capturada_form: ', fidelidade_instance)
+            self.fields['fidelidade'].queryset = Fidelidade.objects.filter(
+                ementa__fidelidade__pk=fidelidade_id)
+
+            self.fields['fidelidade'].initial = fidelidade_instance
+        # ementa = kwargs.pop('ementa', None)
+        # super(ProdutoFidelidadeIndividualForm, self).__init__(*args, **kwargs)
+
+        # if ementa:
+        #     self.fields['produto'].queryset = ementa.produtos.all()

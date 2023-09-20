@@ -27,7 +27,11 @@ class ProdutoFidelidadeIndividual(models.Model):
 
     fidelidade = models.ForeignKey(Fidelidade, on_delete=models.CASCADE)
     produto = models.ForeignKey(
-        Products, blank=True, null=True, on_delete=models.CASCADE)
+        Products,
+        on_delete=models.CASCADE,
+        verbose_name='Produto',
+    )
+
     pontos_recompensa = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True,
         verbose_name='Pontos Recompensa',
@@ -38,6 +42,4 @@ class ProdutoFidelidadeIndividual(models.Model):
     )
 
     def __str__(self):
-        return f"{self.produto} - {self.fidelidade} - "\
-               f"{self.pontos_recompensa} pontos - "\
-               f"{self.pontos_para_oferta} pontos para oferta"
+        return f" {self.fidelidade} "

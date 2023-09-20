@@ -113,6 +113,8 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
     fidelidade = get_object_or_404(
         Fidelidade, pk=fidelidade_id
     )
+    print('fidelidade_id:', fidelidade_id)
+    print('Fidelidade_capturada: ', fidelidade)
 
     ementa = fidelidade.ementa
     categorias = Category.objects.all().order_by('ordem')
@@ -131,34 +133,42 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
             produto_fidelidade = ProdutoFidelidadeIndividual.objects.get(
                 produto=produto, fidelidade=fidelidade)
             initial_data.append({
-                'fidelidade': produto_fidelidade.fidelidade,
-                'produto': produto_fidelidade.produto,
+                'produto_nome': produto.nome,
+                'fidelidade': produto_fidelidade.fidelidade.pk,
+                'produto': produto_fidelidade.produto.pk,
                 'pontos_recompensa': produto_fidelidade.pontos_recompensa,
                 'pontos_para_oferta': produto_fidelidade.pontos_para_oferta
             })
         except ProdutoFidelidadeIndividual.DoesNotExist:
             initial_data.append({
+                'produto_nome': produto.nome,
+                'fidelidade': fidelidade,
+                # 'produto': produto_fidelidade.produto.pk,
                 'pontos_recompensa': 0,
                 'pontos_para_oferta': 0
             })
 
-    print(initial_data)
+    print('INITIAL_DATA: ', initial_data)
 
     if request.method == 'POST':
         print('request is post:', request.POST)
         formset = ProdutoFidelidadeIndividualFormSet(
-            request.POST,)
+            request.POST, )
 
         if formset.is_valid():
             print('formset is valid')
             for form in formset:
                 print(form.cleaned_data)
                 if form.has_changed():
+
+                    print('Fidelidade:', fidelidade)
+                    print('Fidelidade_id:', fidelidade_id)
                     instance = form.save(commit=False)
                     print('instance to save:', instance)
                     instance.fidelidade = fidelidade
                     instance.save()
                     print('instance saved:', instance)
+
                 else:
                     print('form not changed')
 
@@ -167,6 +177,7 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                 'fidelidade:pontos_produtos_fidelidade', fidelidade_id)
 
         else:
+            print('formset is not valid')
             for e in formset.errors:
                 print('ERRO:', e)
 
@@ -187,7 +198,10 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
             )
 
     else:
-        formset = ProdutoFidelidadeIndividualFormSet(initial=initial_data)
+        formset = ProdutoFidelidadeIndividualFormSet(
+            initial=initial_data,
+            # form_kwargs={'ementa': ementa, }
+        )
 
         context = {
             'fidelidade': fidelidade,

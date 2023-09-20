@@ -15,62 +15,46 @@
         {{ formset.management_form }}
         <fieldset>
             <table>
-                {% for categoria in categorias %}
-                    <p>{{ categoria.nome }}</p>
-                    {% for subcategoria in subcategorias %}
-                        {% if subcategoria.categoria == categoria %}
-                            <p>{{  subcategoria.nome }}</p>
-                                {% for form in formset %}
-                                    {% for produto in produtos %}
-                                        {% if produto.categoria == categoria and produto.subcategoria == subcategoria %}
-                                            <tr>
-                                                <td>
-                                                    {{ form.produto.label_tag }} {{ form.produto }} {{ form.produto.errors }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    {{ form.pontos_recompensa.label_tag }} {{ form.pontos_recompensa }} {{ form.pontos_recompensa.errors }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    {{ form.pontos_para_oferta.label_tag }} {{ form.pontos_para_oferta }} {{ form.pontos_para_oferta.errors }}
-
-                                                </td>
-                                            </tr>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endfor %}
-                            {% endif %}
-                        {% endfor %}
-                        {% for form in formset %}
-                            {% for produto in produtos %}
-                                {% if produto.categoria == categoria and not produto.subcategoria == subcategoria %}
-                                    <tr>
-                                        <td>
-                                            {{ form.produto.label_tag }} {{ form.produto }} {{ form.produto.errors }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            {{ form.pontos_recompensa.label_tag }} {{ form.pontos_recompensa }} {{ form.pontos_recompensa.errors }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            {{ form.pontos_para_oferta.label_tag }} {{ form.pontos_para_oferta }} {{ form.pontos_para_oferta.errors }}
-
-                                        </td>
-                                    </tr>
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                    {% endfor %}
-                
+                {% for form in formset %}
+                    <tr>
+                        <td>
+                            Produto: {{ form.initial.produto_nome }}
+                        </td>
+                        <td>
+                            {{ form.produto.label_tag }}
+                            {{ form.produto }}
+                            {{ form.produto.errors }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{ form.pontos_recompensa.label_tag }}
+                            {{ form.pontos_recompensa }}
+                            {{ form.pontos_recompensa.errors }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{ form.pontos_para_oferta.label_tag }}
+                            {{ form.pontos_para_oferta }}
+                            {{ form.pontos_para_oferta.errors }}
+                        </td>
+                    </tr>
+                {% endfor %}
             </table>
         </fieldset>
+    
         <button type="submit">Adicionar Pontos</button>
     </form>
+    
+    {% for categoria in categorias %}
+        <p>{{ categoria.nome }}</p>
+        {% for subcategoria in subcategorias %}
+            {% if subcategoria.categoria == categoria %}
+                <p>{{ subcategoria.nome }}</p>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+    
 </div>  
 {% endblock %}
