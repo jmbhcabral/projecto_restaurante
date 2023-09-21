@@ -129,9 +129,10 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
 
     initial_data = []
     for produto in produtos:
-        try:
-            produto_fidelidade = ProdutoFidelidadeIndividual.objects.get(
-                produto=produto, fidelidade=fidelidade)
+        produto_fidelidade = ProdutoFidelidadeIndividual.objects.filter(
+            produto=produto, fidelidade=fidelidade).first()
+
+        if produto_fidelidade:
             initial_data.append({
                 'produto_nome': produto.nome,
                 'fidelidade': produto_fidelidade.fidelidade.pk,
@@ -139,11 +140,11 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                 'pontos_recompensa': produto_fidelidade.pontos_recompensa,
                 'pontos_para_oferta': produto_fidelidade.pontos_para_oferta
             })
-        except ProdutoFidelidadeIndividual.DoesNotExist:
+        else:
             initial_data.append({
                 'produto_nome': produto.nome,
-                'fidelidade': fidelidade,
-                # 'produto': produto_fidelidade.produto.pk,
+                'fidelidade': fidelidade.pk,
+                'produto': produto.pk,
                 'pontos_recompensa': 0,
                 'pontos_para_oferta': 0
             })
@@ -158,19 +159,31 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
         if formset.is_valid():
             print('formset is valid')
             for form in formset:
-                print(form.cleaned_data)
+                print('Cleaned data: ', form.cleaned_data)
+                print('Form errors: ', form.errors)
+                print('Form is valid:', form.is_valid())
+
                 if form.has_changed():
+                    print('form changed')
+                    produto = form.cleaned_data['produto']
+                    fidelidade = form.cleaned_data['fidelidade']
+                    pontos_recompensa = form.cleaned_data['pontos_recompensa']
+                    pontos_para_oferta = form.cleaned_data['pontos_para_oferta']
 
-                    print('Fidelidade:', fidelidade)
-                    print('Fidelidade_id:', fidelidade_id)
-                    instance = form.save(commit=False)
-                    print('instance to save:', instance)
-                    instance.fidelidade = fidelidade
-                    instance.save()
-                    print('instance saved:', instance)
-
+                    ProdutoFidelidadeIndividual.objects.update_or_create(
+                        produto=produto,
+                        fidelidade=fidelidade,
+                        defaults={
+                            'pontos_recompensa': pontos_recompensa,
+                            'pontos_para_oferta': pontos_para_oferta
+                        }
+                    )
                 else:
                     print('form not changed')
+                    messages.info(
+                        request,
+                        'Nenhum ponto foi atualizado.'
+                    )
 
             messages.success(request, 'Pontos atualizados com sucesso.')
             return redirect(
