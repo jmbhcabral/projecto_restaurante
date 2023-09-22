@@ -34,7 +34,28 @@ class Perfil(models.Model):
     qr_code = models.ImageField(
         upload_to='assets/qrcodes/', blank=True, null=True)
 
+    numero_cliente = models.CharField(
+        max_length=10,
+        unique=True,
+        blank=True,
+        verbose_name="Número Cliente",
+    )
+
     def save(self, *args, **kwargs):
+        # Gera o número de cliente
+        if not self.numero_cliente:
+            ultimo_numero_cliente = Perfil.objects.all().order_by(
+                'id').last()
+            if ultimo_numero_cliente is not None:
+                ultimo_numero_cliente = int(
+                    ultimo_numero_cliente.numero_cliente.split('-')[1])
+                novo_numero = ultimo_numero_cliente + 1
+
+            else:
+                novo_numero = 1050  # número de cliente inicial
+
+            self.numero_cliente = f'CEW-{novo_numero}'
+
         super().save(*args, **kwargs)
 
         # Crie um QRCode com base nas informações do perfil

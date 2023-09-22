@@ -1,12 +1,19 @@
 from django.shortcuts import render, get_object_or_404
 from fidelidade.models import Fidelidade
+from perfil.models import Perfil
 
 
 def fidelidade(request):
+    utilizador = Perfil.objects.all()
+
+    context = {
+        'utilizador': utilizador
+    }
 
     return render(
         request,
         'fidelidade/pages/fidelidade.html',
+        context
     )
 
 
