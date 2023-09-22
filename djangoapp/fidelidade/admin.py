@@ -1,5 +1,7 @@
 from django.contrib import admin
-from fidelidade.models import Fidelidade, ProdutoFidelidadeIndividual
+from fidelidade.models import (
+    Fidelidade, ProdutoFidelidadeIndividual,
+    ComprasFidelidade, OfertasFidelidade)
 
 
 @admin.register(Fidelidade)
@@ -20,3 +22,25 @@ class ProdutoFidelidadeIndividualAdmin(admin.ModelAdmin):
                    'pontos_recompensa', 'pontos_para_oferta')
     ordering = ('id', 'produto__nome', 'fidelidade__nome',
                 'pontos_recompensa', 'pontos_para_oferta')
+
+
+@admin.register(ComprasFidelidade)
+class ComprasFidelidadeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'fidelidade', 'utilizador', 'pontos_adicionados')
+    search_fields = ('id', 'fidelidade__nome',
+                     'utilizador__username', 'pontos_adicionados')
+    list_filter = ('id', 'fidelidade__nome',
+                   'utilizador__username', 'pontos_adicionados')
+    ordering = ('id', 'fidelidade__nome',
+                'utilizador__username', 'pontos_adicionados')
+
+
+@admin.register(OfertasFidelidade)
+class OfertasFidelidadeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'fidelidade', 'utilizador', 'pontos_gastos')
+    search_fields = ('id', 'fidelidade__nome',
+                     'utilizador__username', 'pontos_gastos')
+    list_filter = ('id', 'fidelidade__nome',
+                   'utilizador__username', 'pontos_gastos')
+    ordering = ('id', 'fidelidade__nome',
+                'utilizador__username', 'pontos_gastos')

@@ -1,6 +1,7 @@
 from django import forms
-from fidelidade.models import (Fidelidade,
-                               ProdutoFidelidadeIndividual, Products)
+from fidelidade.models import (
+    Fidelidade, ProdutoFidelidadeIndividual, Products,
+    ComprasFidelidade, OfertasFidelidade)
 from django.core.exceptions import ValidationError
 
 
@@ -106,8 +107,89 @@ class ProdutoFidelidadeIndividualForm(forms.ModelForm):
                 ementa__fidelidade__pk=fidelidade_id)
 
             self.fields['fidelidade'].initial = fidelidade_instance
-        # ementa = kwargs.pop('ementa', None)
-        # super(ProdutoFidelidadeIndividualForm, self).__init__(*args, **kwargs)
 
-        # if ementa:
-        #     self.fields['produto'].queryset = ementa.produtos.all()
+
+class ComprasFidelidadeForm(forms.ModelForm):
+    class Meta:
+        model = ComprasFidelidade
+        fields = [
+            'fidelidade', 'utilizador',
+            'pontos_adicionados',
+        ]
+
+    fidelidade = forms.ModelChoiceField(
+        queryset=Fidelidade.objects.all(),
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    utilizador = forms.ModelChoiceField(
+        queryset=Products.objects.all(),
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    pontos_adicionados = forms.DecimalField(
+        widget=forms.NumberInput(
+            attrs={
+                'placeholder': 'digite aqui',
+            }
+        ),
+        label='Pontos Adicionados',
+        help_text='Pontos Adicionados.',
+        required=False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        fidelidade_id = kwargs.pop('fidelidade_id', None)
+        super(ComprasFidelidadeForm, self).__init__(*args, **kwargs)
+        if fidelidade_id:
+            fidelidade_instance = Fidelidade.objects.get(pk=fidelidade_id)
+            print('Fidelidade_capturada_form: ', fidelidade_instance)
+            self.fields['fidelidade'].queryset = Fidelidade.objects.filter(
+                ementa__fidelidade__pk=fidelidade_id)
+
+            self.fields['fidelidade'].initial = fidelidade_instance
+
+
+class OfertasFidelidadeForm(forms.ModelForm):
+    class Meta:
+        model = OfertasFidelidade
+        fields = [
+            'fidelidade', 'utilizador',
+            'pontos_gastos',
+        ]
+
+    fidelidade = forms.ModelChoiceField(
+        queryset=Fidelidade.objects.all(),
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    utilizador = forms.ModelChoiceField(
+        queryset=Products.objects.all(),
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    pontos_gastos = forms.DecimalField(
+        widget=forms.NumberInput(
+            attrs={
+                'placeholder': 'digite aqui',
+            }
+        ),
+        label='Pontos Gastos',
+        help_text='Pontos Gastos.',
+        required=False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        fidelidade_id = kwargs.pop('fidelidade_id', None)
+        super(OfertasFidelidadeForm, self).__init__(*args, **kwargs)
+        if fidelidade_id:
+            fidelidade_instance = Fidelidade.objects.get(pk=fidelidade_id)
+            print('Fidelidade_capturada_form: ', fidelidade_instance)
+            self.fields['fidelidade'].queryset = Fidelidade.objects.filter(
+                ementa__fidelidade__pk=fidelidade_id)
+
+            self.fields['fidelidade'].initial = fidelidade_instance

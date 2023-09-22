@@ -168,7 +168,8 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                     produto = form.cleaned_data['produto']
                     fidelidade = form.cleaned_data['fidelidade']
                     pontos_recompensa = form.cleaned_data['pontos_recompensa']
-                    pontos_para_oferta = form.cleaned_data['pontos_para_oferta']
+                    pontos_para_oferta = (
+                        form.cleaned_data['pontos_para_oferta'])
 
                     ProdutoFidelidadeIndividual.objects.update_or_create(
                         produto=produto,
