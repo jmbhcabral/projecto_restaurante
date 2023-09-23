@@ -7,7 +7,9 @@ class PerfilForm(forms.ModelForm):
     class Meta:
         model = models.Perfil
         fields = '__all__'
-        exclude = ('usuario', 'created_at', 'updated_at', 'nif', 'qr_code')
+        exclude = ('usuario', 'numero_cliente', 'created_at',
+                   'updated_at', 'nif', 'qr_code')
+
         widgets = {
             'data_nascimento': forms.DateInput(
                 attrs={'type': 'date'}

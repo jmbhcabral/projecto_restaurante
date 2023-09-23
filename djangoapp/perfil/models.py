@@ -19,7 +19,7 @@ class Perfil(models.Model):
         null=False,
         blank=False,
         default=None,
-        verbose_name="Usuário",
+        verbose_name="Utilizador",
     )
     data_nascimento = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
@@ -46,7 +46,8 @@ class Perfil(models.Model):
         if not self.numero_cliente:
             ultimo_numero_cliente = Perfil.objects.all().order_by(
                 'id').last()
-            if ultimo_numero_cliente is not None:
+            if ultimo_numero_cliente is not None and \
+                    ultimo_numero_cliente.numero_cliente.startswith('CEW-'):
                 ultimo_numero_cliente = int(
                     ultimo_numero_cliente.numero_cliente.split('-')[1])
                 novo_numero = ultimo_numero_cliente + 1

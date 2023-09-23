@@ -1,13 +1,15 @@
 from django.urls import path
 from fidelidade.views import (
     fidelidade, criar_fidelidade, editar_fidelidade, apagar_fidelidade,
-    fidelidade_individual, pontos_produtos_fidelidade)
+    fidelidade_individual, pontos_produtos_fidelidade, util_ind_fidelidade)
 
 
 app_name = 'fidelidade'
 
 urlpatterns = [
     path('fidelidade/', fidelidade, name='fidelidade'),
+    path('fidelidade/util_ind_fidelidade/<int:utilizador_pk>',
+         util_ind_fidelidade, name='util_ind_fidelidade'),
     path(
         'fidelidade/criar_fidelidade',
         criar_fidelidade,
