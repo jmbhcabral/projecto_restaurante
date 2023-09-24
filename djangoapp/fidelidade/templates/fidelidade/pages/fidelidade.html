@@ -1,16 +1,8 @@
 {% extends 'restau/base.html' %}
 {% block content %}
-{% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
-
  <h1>Fidelidade</h1>
  <a href=" {% url "fidelidade:criar_fidelidade" %} ">Criar</a>
- <form action="{% url "fidelidade:util_ind_fidelidade/<int:utilizador_pk>" %}" method="get">
+ <form action="{% url "fidelidade:fidelidade" %}" method="get">
     <label for="query">CEW-</label>
     <input type="text" name="query" id="query" pattern="\d+" required>
     <input type="submit" value="Procurar">

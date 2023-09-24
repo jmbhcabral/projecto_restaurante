@@ -1,4 +1,11 @@
 {% extends "restau/base.html" %}
 {% block content %}
 <h1>Utilizador Fidelidade</h1>
+<p>Nome: {{utilizador.first_name}} {{utilizador.last_name}}</p>
+<p>id: {{perfil.id}}</p>
+<p>pontos: {{total_pontos}}</p>
+<p>telefone: {{perfil.telemovel}}</p>
+<p>Numero Cliente: {{ perfil.numero_cliente }}</p>
+
+
 {% endblock content %}
