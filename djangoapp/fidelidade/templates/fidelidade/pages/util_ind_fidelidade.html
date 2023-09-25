@@ -6,6 +6,8 @@
 <p>pontos: {{total_pontos}}</p>
 <p>telefone: {{perfil.telemovel}}</p>
 <p>Numero Cliente: {{ perfil.numero_cliente }}</p>
+<p>Fidelidade: {{ perfil.tipo_fidelidade.id }}</p>
+<p>utilizador: {{ perfil.usuario.id }}</p>
 <div>
     <form 
     action="#" 
@@ -14,7 +16,7 @@
     >
         {% csrf_token %}
         {{compras_form}}
-        
+
         <input type="submit" value="Submeter">
     </form>
 </div>

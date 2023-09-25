@@ -56,7 +56,7 @@ class ComprasFidelidade(models.Model):
         Fidelidade,
         on_delete=models.CASCADE)
 
-    utilizador = models.OneToOneField(
+    utilizador = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,

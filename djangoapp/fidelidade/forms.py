@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.models import User
 from fidelidade.models import (
     Fidelidade, ProdutoFidelidadeIndividual, Products,
     ComprasFidelidade, OfertasFidelidade)
@@ -124,7 +125,7 @@ class ComprasFidelidadeForm(forms.ModelForm):
     )
 
     utilizador = forms.ModelChoiceField(
-        queryset=Products.objects.all(),
+        queryset=User.objects.all(),
         widget=forms.HiddenInput(),
         required=False,
     )
@@ -142,6 +143,7 @@ class ComprasFidelidadeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         fidelidade_id = kwargs.pop('fidelidade_id', None)
+        utilizador_pk = kwargs.pop('utilizador_pk', None)
         super(ComprasFidelidadeForm, self).__init__(*args, **kwargs)
         if fidelidade_id:
             fidelidade_instance = Fidelidade.objects.get(pk=fidelidade_id)
@@ -150,6 +152,13 @@ class ComprasFidelidadeForm(forms.ModelForm):
                 ementa__fidelidade__pk=fidelidade_id)
 
             self.fields['fidelidade'].initial = fidelidade_instance
+        if utilizador_pk:
+            utilizador_instance = User.objects.get(pk=utilizador_pk)
+            print('Utilizador_capturado_form: ', utilizador_instance)
+            self.fields['utilizador'].queryset = User.objects.filter(
+                perfil__pk=utilizador_pk)
+
+            self.fields['utilizador'].initial = utilizador_instance
 
 
 class OfertasFidelidadeForm(forms.ModelForm):
