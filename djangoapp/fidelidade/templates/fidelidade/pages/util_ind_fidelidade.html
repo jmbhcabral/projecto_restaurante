@@ -6,6 +6,17 @@
 <p>pontos: {{total_pontos}}</p>
 <p>telefone: {{perfil.telemovel}}</p>
 <p>Numero Cliente: {{ perfil.numero_cliente }}</p>
-
+<div>
+    <form 
+    action="#" 
+    method="POST"
+    enctype="multipart/form-data"
+    >
+        {% csrf_token %}
+        {{compras_form}}
+        
+        <input type="submit" value="Submeter">
+    </form>
+</div>
 
 {% endblock content %}

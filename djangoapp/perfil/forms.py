@@ -8,7 +8,7 @@ class PerfilForm(forms.ModelForm):
         model = models.Perfil
         fields = '__all__'
         exclude = ('usuario', 'numero_cliente', 'created_at',
-                   'updated_at', 'nif', 'qr_code')
+                   'updated_at', 'nif', 'qr_code', 'tipo_fidelidade')
 
         widgets = {
             'data_nascimento': forms.DateInput(
@@ -35,6 +35,9 @@ class UserForm(forms.ModelForm):
     def __init__(self, usuario=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.usuario = usuario
+
+        if usuario:
+            self.fields['username'].widget.attrs['readonly'] = True
 
     class Meta:
         model = User
@@ -109,3 +112,7 @@ class UserForm(forms.ModelForm):
 
         if validation_error_msgs:
             raise (forms.ValidationError(validation_error_msgs))
+
+        if self.usuario and 'username' in self.changed_data:
+            validation_error_msgs['username'] = 'O utilizador não pode \
+            ser alterado.'

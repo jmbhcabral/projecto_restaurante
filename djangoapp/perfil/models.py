@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from fidelidade.models import Fidelidade
 from django.utils import timezone
 from django.forms import ValidationError
 from utils.model_validators import validar_nif
@@ -39,6 +40,13 @@ class Perfil(models.Model):
         unique=True,
         blank=True,
         verbose_name="Número Cliente",
+    )
+    tipo_fidelidade = models.ForeignKey(
+        Fidelidade,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Tipo Fidelidade",
     )
 
     def save(self, *args, **kwargs):

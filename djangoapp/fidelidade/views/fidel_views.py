@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from fidelidade.models import Fidelidade, ComprasFidelidade, OfertasFidelidade
+from fidelidade.forms import ComprasFidelidadeForm, OfertasFidelidadeForm
 from perfil.models import Perfil
 from django.contrib import messages
 from django.db import models
@@ -46,6 +47,7 @@ def util_ind_fidelidade(request, utilizador_pk):
     user = get_object_or_404(
         User, perfil__pk=utilizador_pk
     )
+
     pontos_ganhos = ComprasFidelidade.objects.filter(
         utilizador=user).aggregate(
         total_pontos_ganhos=models.Sum('pontos_adicionados'))
@@ -58,10 +60,50 @@ def util_ind_fidelidade(request, utilizador_pk):
 
     total_pontos = pontos_ganhos_decimal - pontos_gastos_decimal
 
-    # total_pontos = (pontos_ganhos['total_pontos_ganhos'] -
-    #                 pontos_gastos['total_pontos_gastos'])
+    if request.method == 'POST':
+        print(request.POST)
+        if 'adicionar_pontos' in request.POST:
+            compras_form = ComprasFidelidadeForm(
+                request.POST,  utilizador_pk=utilizador_pk)
+            if compras_form.is_valid():
+                print(compras_form.is_valid)
+                print(compras_form.cleaned_data['pontos_adicionados'])
+                compras_form.save()
+                messages.success(
+                    request,
+                    f'Pontos adicionados com sucesso a {user.username}')
+                return redirect(
+                    'fidelidade:util_ind_fidelidade',
+                    utilizador_pk=utilizador_pk)
+            else:
+                messages.error(
+                    request,
+                    'Erro ao adicionar pontos')
+                return redirect(
+                    'fidelidade:util_ind_fidelidade',
+                    utilizador_pk=utilizador_pk)
+        elif 'ofertar_pontos' in request.POST:
+            ofertas_form = OfertasFidelidadeForm(
+                request.POST, utilizador_pk=utilizador_pk)
+            if ofertas_form.is_valid():
+                ofertas_form.save()
+                messages.success(
+                    request,
+                    f'Pontos ofertados com sucesso a {user.username}')
+                return redirect(
+                    'fidelidade:util_ind_fidelidade',
+                    utilizador_pk=utilizador_pk)
+            else:
+                messages.error(
+                    request,
+                    'Erro ao ofertar pontos')
+                return redirect(
+                    'fidelidade:util_ind_fidelidade',
+                    utilizador_pk=utilizador_pk)
 
     context = {
+        'compras_form': ComprasFidelidadeForm(),
+        'ofertas_form': OfertasFidelidadeForm(),
         'total_pontos': total_pontos,
         'utilizador': user,
         'perfil': user.perfil,
