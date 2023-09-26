@@ -15,7 +15,19 @@
     enctype="multipart/form-data"
     >
         {% csrf_token %}
+        <input type="hidden" name="form_type" value="compras">
         {{compras_form}}
+
+        <input type="submit" value="Submeter">
+    </form>
+    <form 
+    action="#" 
+    method="POST"
+    enctype="multipart/form-data"
+    >
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="ofertas">
+        {{ofertas_form}}
 
         <input type="submit" value="Submeter">
     </form>

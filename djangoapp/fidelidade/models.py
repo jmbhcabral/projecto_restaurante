@@ -1,8 +1,6 @@
 from django.db import models
 from restau.models import Products, Ementa
 from django.contrib.auth.models import User
-from django.db.models import Sum
-from django.core.exceptions import ValidationError
 
 
 class Fidelidade(models.Model):
@@ -84,7 +82,7 @@ class OfertasFidelidade(models.Model):
         Fidelidade,
         on_delete=models.CASCADE)
 
-    utilizador = models.OneToOneField(
+    utilizador = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
@@ -99,22 +97,22 @@ class OfertasFidelidade(models.Model):
 
     criado_em = models.DateTimeField(auto_now_add=True)
 
-    def clean(self):
-        total_pontos_adicionados = ComprasFidelidade.objects.filter(
-            utilizador=self.utilizador) \
-            .aggregate(Sum('pontos_adicionados'))['pontos_adicionados__sum'] or 0
+    # def clean(self):
+    #     total_pontos_adicionados = ComprasFidelidade.objects.filter(
+    #         utilizador=self.utilizador) \
+    #         .aggregate(Sum('pontos_adicionados'))['pontos_adicionados__sum'] or 0
 
-        total_pontos_gastos = OfertasFidelidade.objects.filter(
-            utilizador=self.utilizador) \
-            .aggregate(Sum('pontos_gastos'))['pontos_gastos__sum'] or 0
+    #     total_pontos_gastos = OfertasFidelidade.objects.filter(
+    #         utilizador=self.utilizador) \
+    #         .aggregate(Sum('pontos_gastos'))['pontos_gastos__sum'] or 0
 
-        if self.pontos_gastos:
-            total_pontos_gastos += self.pontos_gastos
+    #     if self.pontos_gastos:
+    #         total_pontos_gastos += self.pontos_gastos
 
-        if total_pontos_gastos > total_pontos_adicionados:
-            raise ValidationError(
-                f'O {self.utilizador} tem pontos suficientes para realizar esta oferta.'
-            )
+    #     if total_pontos_gastos > total_pontos_adicionados:
+    #         raise ValidationError(
+    #             f'O {self.utilizador} tem pontos suficientes para realizar esta oferta.'
+    #         )
 
     def __str__(self):
         return f" {self.fidelidade} - {self.utilizador} "

@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.db import models
 from django.contrib.auth.models import User
 from django.http import QueryDict
+from decimal import Decimal
 
 
 def fidelidade(request):
@@ -78,40 +79,67 @@ def util_ind_fidelidade(request, utilizador_pk):
     total_pontos = pontos_ganhos_decimal - pontos_gastos_decimal
 
     if request.method == 'POST':
-        print('REQUEST.POST', request.POST)
-        print('UTILIZADOR_ID: ', utilizador_pk)
-        print('FIDELIDADE_ID: ', user.perfil.tipo_fidelidade.id)
+        form_type = request.POST.get('form_type', None)
+        if form_type == 'compras':
+            initial_data_compras = {
+                'fidelidade': user.perfil.tipo_fidelidade.id,
+                'utilizador': utilizador_pk,
+            }
+            compras_form = ComprasFidelidadeForm(
+                request.POST, initial=initial_data_compras)
 
-        initial_data = {
-            'fidelidade': user.perfil.tipo_fidelidade.id,
-            'utilizador': utilizador_pk,
-        }
-        print('INITIAL_DATA: ', initial_data)
+            if compras_form.is_valid():
+                compras = compras_form.save(commit=False)
+                compras.fidelidade_id = user.perfil.tipo_fidelidade.id
+                compras.utilizador_id = utilizador_pk
+                compras.save()
+                return redirect(
+                    'fidelidade:util_ind_fidelidade',
+                    utilizador_pk=utilizador_pk
+                )
+            else:
 
-        compras_form = ComprasFidelidadeForm(
-            request.POST, initial=initial_data)
-        print('VALIDO: ', compras_form.is_valid())
-        cleaned_data = compras_form.cleaned_data
-        print('CLEANED_DATA: ', cleaned_data)
-        if compras_form.is_valid():
-            print('compras_form.is_valid()')
-            compras = compras_form.save(commit=False)
-            compras.fidelidade_id = user.perfil.tipo_fidelidade.id
-            print('FIDELIDADE_ID: ', compras.fidelidade_id)
-            compras.utilizador_id = utilizador_pk
-            print('UTILIZADOR_ID: ', compras.utilizador_id)
-            cleaned_data = compras_form.cleaned_data
-            print('Cleaned data after: ', compras_form.cleaned_data)
-            compras.save()
-            return redirect(
-                'fidelidade:util_ind_fidelidade',
-                utilizador_pk=utilizador_pk
-            )
-        else:
-            print('compras_form.errors: ', compras_form.errors)
+                print('compras_form.errors: ', compras_form.errors)
+        elif form_type == 'ofertas':
+            initial_data_ofertas = {
+                'fidelidade': user.perfil.tipo_fidelidade.id,
+                'utilizador': utilizador_pk,
+            }
+            ofertas_form = OfertasFidelidadeForm(
+                request.POST, initial=initial_data_ofertas)
+            print('ofertas_form: ', ofertas_form.is_valid())
+            cleaned_data = ofertas_form.cleaned_data
+            print('ofertas cleaned_data: ', cleaned_data)
+
+            if ofertas_form.is_valid():
+                print('ofertas_form.is_valid')
+                ofertas = ofertas_form.save(commit=False)
+                print('total pontos: ', total_pontos)
+                print('ofertas.pontos_gastos: ', ofertas.pontos_gastos)
+                if ofertas.pontos_gastos is not None and \
+                        total_pontos >= ofertas.pontos_gastos:
+                    ofertas.fidelidade_id = user.perfil.tipo_fidelidade.id
+                    ofertas.utilizador_id = utilizador_pk
+                    ofertas.save()
+
+                    return redirect(
+                        'fidelidade:util_ind_fidelidade',
+                        utilizador_pk=utilizador_pk
+                    )
+                else:
+                    print('ofertas_form.errors: ', ofertas_form.errors)
+                    messages.error(
+                        request,
+                        'Preencha o campo pontos gastos com um valor válido')
+                    # return redirect(
+                    #     'fidelidade:util_ind_fidelidade',
+                    #     utilizador_pk=utilizador_pk
+                    # )
+            else:
+                print('ofertas_form.errors: ', ofertas_form.errors)
     context = {
         'compras_form': ComprasFidelidadeForm(),
-        # 'ofertas_form': OfertasFidelidadeForm(),
+        'ofertas_form': OfertasFidelidadeForm(),
         'total_pontos': total_pontos,
         'utilizador': user,
         'perfil': user.perfil,
