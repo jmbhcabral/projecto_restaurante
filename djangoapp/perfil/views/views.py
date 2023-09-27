@@ -1,10 +1,6 @@
 from django.contrib import messages
-# from typing import Any
-# from django import http
 from django.shortcuts import render, get_object_or_404, redirect
-# from django.views.generic import ListView
 from django.views import View
-# from django.http import HttpResponse
 from perfil import models
 from perfil import forms
 from restau.models import FrontendSetup

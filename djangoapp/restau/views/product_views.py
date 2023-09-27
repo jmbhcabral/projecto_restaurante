@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from restau.models import Products, FrontendSetup, Category, SubCategory
-
+from django.db.models import Prefetch
 
 PER_PAGE = 9
 
@@ -39,29 +39,31 @@ def encomendas(request):
         .order_by('-id') \
         .first()
 
-    produtos = Products.objects \
-        .all() \
-        .order_by('categoria', 'subcategoria', 'ordem')
-
     categorias = Category.objects \
         .all() \
         .order_by('ordem')
-
     subcategorias = SubCategory.objects \
         .all() \
         .order_by('ordem')
 
+    produtos_queryset = Products.objects.all().order_by(
+        'categoria', 'subcategoria', 'ordem')
+    produtos = produtos_queryset.prefetch_related(
+        Prefetch('categoria', queryset=categorias),
+        Prefetch('subcategoria', queryset=subcategorias)
+    )
+    context = {
+        'main_logo': main_logo,
+        'main_image': main_image,
+        'default_image': default_image,
+        'produtos': produtos,
+        'categorias': categorias,
+        'subcategorias': subcategorias,
+    }
     return render(
         request,
         'restau/pages/encomendas.html',
-        {
-            'main_logo': main_logo,
-            'main_image': main_image,
-            'default_image': default_image,
-            'produtos': produtos,
-            'categorias': categorias,
-            'subcategorias': subcategorias,
-        },
+        context,
     )
 
 
@@ -73,10 +75,12 @@ def produtos(request):
         .all() \
         .order_by('ordem')
 
-    produtos = Products.objects \
-        .all() \
-        .order_by('categoria', 'subcategoria', 'ordem')
-
+    produtos_queryset = Products.objects.all().order_by(
+        'categoria', 'subcategoria', 'ordem')
+    produtos = produtos_queryset.prefetch_related(
+        Prefetch('categoria', queryset=categorias),
+        Prefetch('subcategoria', queryset=subcategorias)
+    )
     return render(
         request,
         'restau/pages/produtos.html', {
