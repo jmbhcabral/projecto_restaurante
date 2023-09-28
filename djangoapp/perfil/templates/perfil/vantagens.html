@@ -8,10 +8,23 @@
                 <p><a href="{% url 'perfil:atualizar' %}" class="">Atualizar dados</a></p>
                 <p><a href="" class="">Alterar Password</a></p>
                 <p><a href="" class="">Cartão cliente</a></p>
-                <p><a href="" class="">Vantagens</a></p>
+                <p><a href="{% url "perfil:vantagens" %}" class="">Vantagens</a></p>
             </div>
             <div>
+                <h4>Vantagens</h4>
+                <p>Lorem ipsum dolor sit amet.</p>
 
+            </div>
+            <div>
+                {% for item in lista_fidelidade %}
+                    <p>fidelidade: {{ item.fidelidade.nome }}</p>
+                    <p>Categoria: {{ item.produto.categoria }}</p>
+                    <p>Subcategoria: {{ item.produto.subcategoria }}</p>
+                    <p>Ordem: {{ item.produto.ordem }}</p>
+                    <p>Produto: {{ item.produto }}</p>
+                    <p>Pontos Recompensa: {{ item.pontos_recompensa }}</p>
+                    <p>Pontos para oferta: {{ item.pontos_para_oferta }}</p>
+                {% endfor %}
             </div>
         </div>
     </section>

@@ -3,6 +3,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 from perfil import models
 from perfil import forms
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from fidelidade.models import ProdutoFidelidadeIndividual
 from restau.models import FrontendSetup
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -74,41 +77,8 @@ class Criar(BasePerfil):
         if not self.userform.is_valid() or not self.perfilform.is_valid():
             return self.renderizar
 
-        # username = self.userform.cleaned_data.get('username')
         password = self.userform.cleaned_data.get('password')
-        # email = self.userform.cleaned_data.get('email')
-        # first_name = self.userform.cleaned_data.get('first_name')
-        # last_name = self.userform.cleaned_data.get('last_name')
 
-        # Usuários logados
-        # if self.request.user.is_authenticated:
-        #     usuario = get_object_or_404(
-        #         User, username=self.request.user.username)
-        #     print(usuario.username)
-
-        #     usuario.username = username
-
-        #     if password:
-        #         usuario.set_password(password)
-
-        #     usuario.email = email
-        #     usuario.first_name = first_name
-        #     usuario.last_name = last_name
-        #     usuario.save()
-
-        #     if not self.perfil:
-        #         self.perfilform.cleaned_data['usuario'] = usuario
-        #         print(self.perfilform.cleaned_data)
-        #         perfil = models.Perfil(**self.perfilform.cleaned_data)
-        #         perfil.save()
-
-        #     else:
-        #         perfil = self.perfilform.save(commit=False)
-        #         perfil.usuario = usuario
-        #         perfil.save()
-
-        # Usuários não logados (criação)
-        # else:
         usuario = self.userform.save(commit=False)
         usuario.set_password(password)
         usuario.save()
@@ -248,4 +218,62 @@ class Conta(BasePerfil):
         if not self.request.user.is_authenticated:
             return redirect('perfil:criar')
 
+        return render(self.request, self.template_name, self.context)
+
+# class Deletar(View):
+#     def get(self, *args, **kwargs):
+#         if not self.request.user.is_authenticated:
+#             return redirect('perfil:criar')
+
+#         usuario = get_object_or_404(
+#             User, username=self.request.user.username)
+
+#         usuario.delete()
+
+#         messages.success(
+#             self.request,
+#             'Conta deletada com sucesso!'
+#         )
+#         return redirect('restau:index')
+
+
+@method_decorator(login_required, name='dispatch')
+class Vantagens(View):
+    template_name = 'perfil/vantagens.html'
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+
+        main_image = FrontendSetup.objects \
+            .filter(imagem_topo__isnull=False) \
+            .order_by('-id') \
+            .first()
+
+        main_logo = FrontendSetup.objects \
+            .filter(imagem_logo__isnull=False) \
+            .order_by('-id') \
+            .first()
+
+        user = self.request.user
+
+        if not user.is_authenticated:
+            return redirect('perfil:criar')
+
+        perfil = user.perfil
+        tipo_fidelidade = perfil.tipo_fidelidade
+
+        lista_fidelidade = ProdutoFidelidadeIndividual.objects \
+            .filter(fidelidade=tipo_fidelidade) \
+            .select_related('produto') \
+            .order_by(
+                'produto__categoria', 'produto__subcategoria', 'produto__ordem'
+            )
+
+        self.context = {
+            'main_logo': main_logo,
+            'main_image': main_image,
+            'lista_fidelidade': lista_fidelidade,
+        }
+
+    def get(self, *args, **kwargs):
         return render(self.request, self.template_name, self.context)
