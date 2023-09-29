@@ -9,7 +9,7 @@ class Fidelidade(models.Model):
         verbose_name_plural = 'Fidelidades'
 
     nome = models.CharField(max_length=200, verbose_name='Nome')
-    unidade = models.FloatField(default=0.00, verbose_name='Unidade por Euro')
+    desconto = models.IntegerField(default=0, verbose_name='Desconto')
     ementa = models.ForeignKey(
         Ementa,
         on_delete=models.CASCADE,
@@ -40,6 +40,21 @@ class ProdutoFidelidadeIndividual(models.Model):
         max_digits=10, decimal_places=2, null=True, blank=True,
         verbose_name='Pontos para Oferta',
     )
+
+    def save(self, *args, **kwargs):
+        ementa = self.fidelidade.ementa
+        preco_field = ementa.nome_campo_preco_selecionado
+        preco = getattr(self.produto, preco_field)
+
+        preco_int = int(preco * 100)
+
+        desconto = self.fidelidade.desconto
+        pontos_necessarios = int((1 / (desconto * 100)) * preco_int) * 100
+
+        self.pontos_recompensa = preco_int
+        self.pontos_para_oferta = pontos_necessarios
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f" {self.fidelidade} "

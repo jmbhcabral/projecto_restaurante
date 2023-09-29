@@ -79,7 +79,8 @@ class ProdutoFidelidadeIndividualForm(forms.ModelForm):
     pontos_recompensa = forms.DecimalField(
         widget=forms.NumberInput(
             attrs={
-                'placeholder': 'digite aqui',
+                # 'placeholder': 'digite aqui',
+                'readonly': 'readonly',
             }
         ),
         label='Pontos Recompensa',
@@ -90,7 +91,8 @@ class ProdutoFidelidadeIndividualForm(forms.ModelForm):
     pontos_para_oferta = forms.DecimalField(
         widget=forms.NumberInput(
             attrs={
-                'placeholder': 'digite aqui',
+                # 'placeholder': 'digite aqui',
+                'readonly': 'readonly',
             }
         ),
         label='Pontos para Oferta',
@@ -108,6 +110,18 @@ class ProdutoFidelidadeIndividualForm(forms.ModelForm):
                 ementa__fidelidade__pk=fidelidade_id)
 
             self.fields['fidelidade'].initial = fidelidade_instance
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if instance.pk:
+            original_instance = ProdutoFidelidadeIndividual.objects.get(
+                pk=instance.pk)
+            instance.pontos_recompensa = original_instance.pontos_recompensa
+            instance.pontos_para_oferta = original_instance.pontos_para_oferta
+
+        if commit:
+            instance.save()
+        return instance
 
 
 class ComprasFidelidadeForm(forms.ModelForm):

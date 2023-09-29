@@ -6,10 +6,10 @@ from fidelidade.models import (
 
 @admin.register(Fidelidade)
 class FidelidadeAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'unidade', 'ementa')
-    search_fields = ('nome', 'unidade', 'ementa__nome')
-    list_filter = ('nome', 'unidade', 'ementa__nome')
-    ordering = ('nome', 'unidade', 'ementa__nome')
+    list_display = ('nome', 'desconto', 'ementa')
+    search_fields = ('nome', 'desconto', 'ementa__nome')
+    list_filter = ('nome', 'desconto', 'ementa__nome')
+    ordering = ('nome', 'desconto', 'ementa__nome')
 
 
 @admin.register(ProdutoFidelidadeIndividual)
