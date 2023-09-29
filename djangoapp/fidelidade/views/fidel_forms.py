@@ -113,10 +113,19 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
     fidelidade = get_object_or_404(
         Fidelidade, pk=fidelidade_id
     )
-    print('fidelidade_id:', fidelidade_id)
-    print('Fidelidade_capturada: ', fidelidade)
 
     ementa = fidelidade.ementa
+    preco_field = ementa.nome_campo_preco_selecionado
+
+    if preco_field is None:
+        messages.error(
+            request,
+            f'A ementa { ementa } não tem um'
+            f' preço definido no campo {preco_field}'
+        )
+        return redirect(
+            'fidelidade:fidelidade')
+
     categorias = Category.objects.all().order_by('ordem')
     subcategorias = SubCategory.objects.all().order_by('ordem')
     produtos = ementa.produtos.all().order_by('ordem')
@@ -131,9 +140,28 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
     for produto in produtos:
         produto_fidelidade = ProdutoFidelidadeIndividual.objects.filter(
             produto=produto, fidelidade=fidelidade).first()
+        print(produto_fidelidade)
+        print(fidelidade.pk)
+        # print(produto_fidelidade.pk)
+        print(produto_fidelidade)
+        preco = getattr(produto, preco_field, None)
 
         if produto_fidelidade:
-            produto_fidelidade.save()
+            print('produto_fidelidade:', produto_fidelidade)
+            preco = getattr(produto_fidelidade.produto, preco_field, None)
+            # produto_fidelidade.save()
+            print('preco:', preco)
+
+            if preco_field is None:
+
+                messages.error(
+                    request,
+                    f'O produto { produto_fidelidade.produto } não tem um'
+                    f' preço definido no campo {preco_field}'
+                )
+                return redirect(
+                    'fidelidade:fidelidade')
+
             initial_data.append({
                 'produto_nome': produto.nome,
                 'fidelidade': produto_fidelidade.fidelidade.pk,
@@ -142,6 +170,16 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                 'pontos_para_oferta': produto_fidelidade.pontos_para_oferta,
                 'visibilidade': produto_fidelidade.visibilidade,
             })
+        elif preco is None:
+
+            messages.error(
+                request,
+                f'O produto { produto } não tem um'
+                f' preço definido no campo {preco_field}'
+            )
+
+            return redirect(
+                'fidelidade:fidelidade')
         else:
             initial_data.append({
                 'produto_nome': produto.nome,
@@ -152,19 +190,13 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                 'visibilidade': False,
             })
 
-    print('INITIAL_DATA: ', initial_data)
-
     if request.method == 'POST':
         print('request is post:', request.POST)
         formset = ProdutoFidelidadeIndividualFormSet(
             request.POST, )
 
         if formset.is_valid():
-            print('formset is valid')
             for form in formset:
-                print('Cleaned data: ', form.cleaned_data)
-                print('Form errors: ', form.errors)
-                print('Form is valid:', form.is_valid())
 
                 if form.has_changed():
                     print('form changed')

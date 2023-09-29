@@ -1,6 +1,7 @@
 from django.db import models
 from restau.models import Products, Ementa
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 
 class Fidelidade(models.Model):
@@ -50,8 +51,12 @@ class ProdutoFidelidadeIndividual(models.Model):
         ementa = self.fidelidade.ementa
         preco_field = ementa.nome_campo_preco_selecionado
         preco = getattr(self.produto, preco_field)
-
         preco_int = int(preco * 100)
+        # if preco is not None:
+        #     preco_int = int(preco * 100)
+        # else:
+        #     raise ValidationError(
+        #         'Algum produto não tem um preço definido')
 
         desconto = self.fidelidade.desconto
         pontos_necessarios = int(preco_int / (desconto / 100))
