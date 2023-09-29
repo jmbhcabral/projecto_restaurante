@@ -17,14 +17,14 @@ class FidelidadeForm(forms.ModelForm):
         help_text='Nome da fidelidade.'
     )
 
-    unidade = forms.DecimalField(
+    desconto = forms.IntegerField(
         widget=forms.NumberInput(
             attrs={
                 'placeholder': 'digite aqui',
             }
         ),
-        label='Unidade',
-        help_text='Unidade por Euro.'
+        label='Desconto',
+        help_text='Desconto a aplicar.'
     )
 
     def __init__(self, *args, **kwargs):
@@ -33,12 +33,13 @@ class FidelidadeForm(forms.ModelForm):
     class Meta:
         model = Fidelidade
         fields = (
-            'nome', 'unidade', 'ementa',
+            'nome', 'desconto', 'ementa',
         )
 
     def clean(self):
         cleaned_data = self.cleaned_data
         nome = cleaned_data.get('nome')
+        desconto = cleaned_data.get('desconto')
         instance = self.instance
 
         if instance and instance.nome == nome:
@@ -49,6 +50,18 @@ class FidelidadeForm(forms.ModelForm):
                 'nome',
                 ValidationError(
                     'A fidelidade já existe.',
+                    code='invalid'
+                )
+            )
+
+        if Fidelidade.objects.filter(desconto=desconto) is not None:
+            return cleaned_data
+
+        else:
+            self.add_error(
+                'desconto',
+                ValidationError(
+                    'Tem de ter um desconto.',
                     code='invalid'
                 )
             )
@@ -76,7 +89,7 @@ class ProdutoFidelidadeIndividualForm(forms.ModelForm):
         required=False,
     )
 
-    pontos_recompensa = forms.DecimalField(
+    pontos_recompensa = forms.IntegerField(
         widget=forms.NumberInput(
             attrs={
                 # 'placeholder': 'digite aqui',
@@ -88,7 +101,7 @@ class ProdutoFidelidadeIndividualForm(forms.ModelForm):
         required=False,
     )
 
-    pontos_para_oferta = forms.DecimalField(
+    pontos_para_oferta = forms.IntegerField(
         widget=forms.NumberInput(
             attrs={
                 # 'placeholder': 'digite aqui',
@@ -97,6 +110,12 @@ class ProdutoFidelidadeIndividualForm(forms.ModelForm):
         ),
         label='Pontos para Oferta',
         help_text='Pontos para Oferta.',
+        required=False,
+    )
+    visibilidade = forms.BooleanField(
+        widget=forms.CheckboxInput(),
+        label='Visibilidade',
+        help_text='Visibilidade.',
         required=False,
     )
 

@@ -133,12 +133,14 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
             produto=produto, fidelidade=fidelidade).first()
 
         if produto_fidelidade:
+            produto_fidelidade.save()
             initial_data.append({
                 'produto_nome': produto.nome,
                 'fidelidade': produto_fidelidade.fidelidade.pk,
                 'produto': produto_fidelidade.produto.pk,
                 'pontos_recompensa': produto_fidelidade.pontos_recompensa,
-                'pontos_para_oferta': produto_fidelidade.pontos_para_oferta
+                'pontos_para_oferta': produto_fidelidade.pontos_para_oferta,
+                'visibilidade': produto_fidelidade.visibilidade,
             })
         else:
             initial_data.append({
@@ -146,7 +148,8 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                 'fidelidade': fidelidade.pk,
                 'produto': produto.pk,
                 'pontos_recompensa': 0,
-                'pontos_para_oferta': 0
+                'pontos_para_oferta': 0,
+                'visibilidade': False,
             })
 
     print('INITIAL_DATA: ', initial_data)
@@ -170,13 +173,15 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                     pontos_recompensa = form.cleaned_data['pontos_recompensa']
                     pontos_para_oferta = (
                         form.cleaned_data['pontos_para_oferta'])
+                    visibilidade = form.cleaned_data['visibilidade']
 
                     ProdutoFidelidadeIndividual.objects.update_or_create(
                         produto=produto,
                         fidelidade=fidelidade,
                         defaults={
                             'pontos_recompensa': pontos_recompensa,
-                            'pontos_para_oferta': pontos_para_oferta
+                            'pontos_para_oferta': pontos_para_oferta,
+                            'visibilidade': visibilidade
                         }
                     )
                 else:

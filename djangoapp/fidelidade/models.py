@@ -9,7 +9,8 @@ class Fidelidade(models.Model):
         verbose_name_plural = 'Fidelidades'
 
     nome = models.CharField(max_length=200, verbose_name='Nome')
-    desconto = models.IntegerField(default=0, verbose_name='Desconto')
+    desconto = models.IntegerField(
+        null=False, blank=False, verbose_name='Desconto')
     ementa = models.ForeignKey(
         Ementa,
         on_delete=models.CASCADE,
@@ -32,13 +33,17 @@ class ProdutoFidelidadeIndividual(models.Model):
         verbose_name='Produto',
     )
 
-    pontos_recompensa = models.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True,
+    pontos_recompensa = models.IntegerField(
+        null=False, blank=False,
         verbose_name='Pontos Recompensa',
     )
-    pontos_para_oferta = models.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True,
+    pontos_para_oferta = models.IntegerField(
+        null=False, blank=False,
         verbose_name='Pontos para Oferta',
+    )
+    visibilidade = models.BooleanField(
+        verbose_name='Visibilidade',
+        default=False,
     )
 
     def save(self, *args, **kwargs):
@@ -49,7 +54,7 @@ class ProdutoFidelidadeIndividual(models.Model):
         preco_int = int(preco * 100)
 
         desconto = self.fidelidade.desconto
-        pontos_necessarios = int((1 / (desconto * 100)) * preco_int) * 100
+        pontos_necessarios = int(preco_int / (desconto / 100))
 
         self.pontos_recompensa = preco_int
         self.pontos_para_oferta = pontos_necessarios

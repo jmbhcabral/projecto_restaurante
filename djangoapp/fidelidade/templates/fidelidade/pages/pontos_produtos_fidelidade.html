@@ -45,6 +45,13 @@
                             {{ form.pontos_para_oferta.errors }}
                         </td>
                     </tr>
+                    <tr>
+                        <td>
+                            {{ form.visibilidade.label_tag }}
+                            {{ form.visibilidade }}
+                            {{ form.visibilidade.errors }}
+                        </td>
+                    </tr>
                 {% endfor %}
             </table>
         </fieldset>
@@ -52,14 +59,14 @@
         <button type="submit">Adicionar Pontos</button>
     </form>
     
-    {% for categoria in categorias %}
+    {% comment %} {% for categoria in categorias %}
         <p>{{ categoria.nome }}</p>
         {% for subcategoria in subcategorias %}
             {% if subcategoria.categoria == categoria %}
                 <p>{{ subcategoria.nome }}</p>
             {% endif %}
         {% endfor %}
-    {% endfor %}
+    {% endfor %} {% endcomment %}
     
 </div>  
 {% endblock %}
