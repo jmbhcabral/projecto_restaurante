@@ -128,12 +128,15 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
         return redirect(
             'fidelidade:fidelidade')
 
-    categorias = (Category
-                  .objects
-                  .all()
-                  .order_by('ordem'))
-    subcategorias = SubCategory.objects.all().order_by('ordem')
-    produtos = ementa.produtos.all().order_by('ordem')
+    # categorias = (Category
+    #               .objects
+    #               .all()
+    #               .order_by('ordem'))
+    # subcategorias = SubCategory.objects.all().order_by('ordem')
+    produtos = (ementa.produtos
+                .select_related('categoria', 'subcategoria')
+                .all()
+                .order_by('ordem'))
 
     form_action = reverse(
         'fidelidade:pontos_produtos_fidelidade', args=(fidelidade_id,))
@@ -182,11 +185,13 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                 'pontos_para_oferta': pontos_para_oferta,
                 'visibilidade': False,
             })
+    print('aqui-get')
 
     if request.method == 'POST':
         print('request is post:', request.POST)
         formset = ProdutoFidelidadeIndividualFormSet(
             request.POST, )
+        print('aqui-post')
 
         if formset.is_valid():
             for form in formset:
@@ -222,6 +227,7 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                 'fidelidade:pontos_produtos_fidelidade', fidelidade_id)
 
         else:
+            print('AQUI')
             print('formset is not valid')
             for e in formset.errors:
                 print('ERRO:', e)
@@ -232,10 +238,11 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                 request,
                 'fidelidade/pages/pontos_produtos_fidelidade.html',
                 {
+                    # 'agrupado': dict(agrupado),
                     'fidelidade': fidelidade,
                     'ementa': ementa,
-                    'categorias': categorias,
-                    'subcategorias': subcategorias,
+                    # 'categorias': categorias,
+                    # 'subcategorias': subcategorias,
                     'produtos': produtos,
                     'formset': formset,
                     'form_action': form_action,
@@ -245,14 +252,21 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
     else:
         formset = ProdutoFidelidadeIndividualFormSet(
             initial=initial_data,
-            # form_kwargs={'ementa': ementa, }
         )
 
+        agrupado = defaultdict(lambda: defaultdict(list))
+        for i, (form, produto) in enumerate(zip(formset, produtos)):
+            form_data = {
+                'form': form,
+                'produto': produto,
+            }
+            agrupado[produto.categoria.nome][produto.subcategoria.nome].append(
+                form_data)
+
         context = {
+            # 'agrupado': agrupado,
             'fidelidade': fidelidade,
             'ementa': ementa,
-            'categorias': categorias,
-            'subcategorias': subcategorias,
             'produtos': produtos,
             'formset': formset,
             'form_action': form_action,

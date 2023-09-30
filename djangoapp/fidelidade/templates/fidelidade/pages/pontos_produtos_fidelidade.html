@@ -12,47 +12,21 @@
   <div>
     <form action="{{ form_action }}" method="POST">
         {% csrf_token %}
-        {{ formset.management_form }}
         <fieldset>
-            <table>
-                {% for form in formset %}
-                {% for categoria in categorias %}
-                <h1>{{ categoria.nome }}</h1>
-                    <tr>
-                        <td>
-                            Produto: {{ form.initial.produto_nome }}
-                        </td>
-                        <td>
-                            {{ form.fidelidade }}
-                        </td>
-                        <td>
-                            {{ form.produto }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            {{ form.pontos_recompensa.label_tag }}
-                            {{ form.pontos_recompensa }}
-                            {{ form.pontos_recompensa.errors }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            {{ form.pontos_para_oferta.label_tag }}
-                            {{ form.pontos_para_oferta }}
-                            {{ form.pontos_para_oferta.errors }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            {{ form.visibilidade.label_tag }}
-                            {{ form.visibilidade }}
-                            {{ form.visibilidade.errors }}
-                        </td>
-                    </tr>
-                {% endfor %} 
-                {% endfor %}
-            </table>
+            <legend>Adicionar visíveis</legend>        
+            {{ formset_managment_form }}
+                
+            {% for field in formset %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {{ field.errors }}
+                {% if field.help_text %}
+                <p class="help-text">{{ field.help_text }}</p>
+                {% endif %}
+              </div>
+            {% endfor %}
+            
         </fieldset>
     
         <button type="submit">Adicionar visíveis</button>
