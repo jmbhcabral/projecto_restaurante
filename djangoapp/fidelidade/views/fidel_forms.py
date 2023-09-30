@@ -3,8 +3,10 @@ from django.urls import reverse
 from django.forms import formset_factory
 from fidelidade.models import Fidelidade, ProdutoFidelidadeIndividual
 from restau.models import Category, SubCategory
+from utils.model_validators import calcular_pontos
 from fidelidade.forms import FidelidadeForm, ProdutoFidelidadeIndividualForm
 from django.contrib import messages
+from collections import defaultdict
 
 
 def criar_fidelidade(request):
@@ -126,7 +128,10 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
         return redirect(
             'fidelidade:fidelidade')
 
-    categorias = Category.objects.all().order_by('ordem')
+    categorias = (Category
+                  .objects
+                  .all()
+                  .order_by('ordem'))
     subcategorias = SubCategory.objects.all().order_by('ordem')
     produtos = ementa.produtos.all().order_by('ordem')
 
@@ -135,41 +140,25 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
 
     ProdutoFidelidadeIndividualFormSet = formset_factory(
         ProdutoFidelidadeIndividualForm, extra=0)
-
     initial_data = []
     for produto in produtos:
         produto_fidelidade = ProdutoFidelidadeIndividual.objects.filter(
             produto=produto, fidelidade=fidelidade).first()
-        print(produto_fidelidade)
-        print(fidelidade.pk)
-        # print(produto_fidelidade.pk)
-        print(produto_fidelidade)
+
         preco = getattr(produto, preco_field, None)
 
         if produto_fidelidade:
-            print('produto_fidelidade:', produto_fidelidade)
-            preco = getattr(produto_fidelidade.produto, preco_field, None)
-            # produto_fidelidade.save()
-            print('preco:', preco)
-
-            if preco_field is None:
-
-                messages.error(
-                    request,
-                    f'O produto { produto_fidelidade.produto } não tem um'
-                    f' preço definido no campo {preco_field}'
-                )
-                return redirect(
-                    'fidelidade:fidelidade')
 
             initial_data.append({
                 'produto_nome': produto.nome,
+                'categoria': produto.categoria.nome,
                 'fidelidade': produto_fidelidade.fidelidade.pk,
                 'produto': produto_fidelidade.produto.pk,
                 'pontos_recompensa': produto_fidelidade.pontos_recompensa,
                 'pontos_para_oferta': produto_fidelidade.pontos_para_oferta,
                 'visibilidade': produto_fidelidade.visibilidade,
             })
+
         elif preco is None:
 
             messages.error(
@@ -181,12 +170,16 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
             return redirect(
                 'fidelidade:fidelidade')
         else:
+
+            pontos_recompensa, pontos_para_oferta = calcular_pontos(
+                produto, fidelidade)
             initial_data.append({
                 'produto_nome': produto.nome,
+                'categoria': produto.categoria.nome,
                 'fidelidade': fidelidade.pk,
                 'produto': produto.pk,
-                'pontos_recompensa': 0,
-                'pontos_para_oferta': 0,
+                'pontos_recompensa': pontos_recompensa,
+                'pontos_para_oferta': pontos_para_oferta,
                 'visibilidade': False,
             })
 
@@ -201,6 +194,7 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                 if form.has_changed():
                     print('form changed')
                     produto = form.cleaned_data['produto']
+                    print('produto:', produto)
                     fidelidade = form.cleaned_data['fidelidade']
                     pontos_recompensa = form.cleaned_data['pontos_recompensa']
                     pontos_para_oferta = (

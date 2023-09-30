@@ -31,3 +31,15 @@ def validar_nif(nif):
     digito_controlo_calculado = 11 - resto if resto != 0 and resto != 1 else 0
 
     return digito_controlo_calculado == nif_digitos[8]
+
+
+# Model ProdutoFidelidadeIndividual
+
+def calcular_pontos(produto, fidelidade):
+    ementa = fidelidade.ementa
+    preco_field = ementa.nome_campo_preco_selecionado
+    preco = getattr(produto, preco_field)
+    preco_int = int(preco * 100)
+    desconto = fidelidade.desconto
+    pontos_necessarios = int(preco_int / (desconto / 100))
+    return preco_int, pontos_necessarios
