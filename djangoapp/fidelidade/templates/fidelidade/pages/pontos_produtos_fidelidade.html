@@ -14,17 +14,28 @@
         {% csrf_token %}
         <fieldset>
             <legend>Adicionar visíveis</legend>        
-            {{ formset_managment_form }}
+            {{ formset.management_form }}
+
+            {% for form in formset %}
+              
                 
-            {% for field in formset %}
-            <div class="form-group">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-                {{ field.errors }}
-                {% if field.help_text %}
-                <p class="help-text">{{ field.help_text }}</p>
+                {% for field in form %}
+                {% if field.name == 'produto' %}
+                {% for product in produtos %}
+                    {% if product.id == field.value %}
+                        <p>{{ field.label_tag }}: {{ product.nome }}</p>
+                        <p>{{ field }}</p>
+                        <p>{{ field.errors }}</p>
+     
+                    {% endif %}
+                {% endfor %}
+                {% else %}
+                    <p>{{ field.label_tag }}</p>
+                    <p>{{ field }}</p>
+                    <p>{{ field.errors }}</p>
                 {% endif %}
-              </div>
+                {% endfor %}
+
             {% endfor %}
             
         </fieldset>

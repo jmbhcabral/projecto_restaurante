@@ -6,7 +6,6 @@ from restau.models import Category, SubCategory
 from utils.model_validators import calcular_pontos
 from fidelidade.forms import FidelidadeForm, ProdutoFidelidadeIndividualForm
 from django.contrib import messages
-from collections import defaultdict
 
 
 def criar_fidelidade(request):
@@ -128,11 +127,11 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
         return redirect(
             'fidelidade:fidelidade')
 
-    # categorias = (Category
-    #               .objects
-    #               .all()
-    #               .order_by('ordem'))
-    # subcategorias = SubCategory.objects.all().order_by('ordem')
+    categorias = (Category
+                  .objects
+                  .all()
+                  .order_by('ordem'))
+    subcategorias = SubCategory.objects.all().order_by('ordem')
     produtos = (ementa.produtos
                 .select_related('categoria', 'subcategoria')
                 .all()
@@ -155,6 +154,7 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
             initial_data.append({
                 'produto_nome': produto.nome,
                 'categoria': produto.categoria.nome,
+                'subcategoria': produto.subcategoria.nome,
                 'fidelidade': produto_fidelidade.fidelidade.pk,
                 'produto': produto_fidelidade.produto.pk,
                 'pontos_recompensa': produto_fidelidade.pontos_recompensa,
@@ -179,22 +179,30 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
             initial_data.append({
                 'produto_nome': produto.nome,
                 'categoria': produto.categoria.nome,
+                'subcategoria': produto.subcategoria.nome,
                 'fidelidade': fidelidade.pk,
                 'produto': produto.pk,
                 'pontos_recompensa': pontos_recompensa,
                 'pontos_para_oferta': pontos_para_oferta,
                 'visibilidade': False,
             })
+    print('initial data: ', initial_data)
+
     print('aqui-get')
 
     if request.method == 'POST':
         print('request is post:', request.POST)
         formset = ProdutoFidelidadeIndividualFormSet(
-            request.POST, )
+            request.POST,)
         print('aqui-post')
+        print('post formset: ', formset)
 
         if formset.is_valid():
             for form in formset:
+
+                produto_atual = form.cleaned_data['produto']
+                if produto_atual:
+                    print('produto atual: ', produto_atual.nome)
 
                 if form.has_changed():
                     print('form changed')
@@ -227,6 +235,7 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                 'fidelidade:pontos_produtos_fidelidade', fidelidade_id)
 
         else:
+            print('formset: ', formset)
             print('AQUI')
             print('formset is not valid')
             for e in formset.errors:
@@ -238,11 +247,11 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                 request,
                 'fidelidade/pages/pontos_produtos_fidelidade.html',
                 {
-                    # 'agrupado': dict(agrupado),
                     'fidelidade': fidelidade,
+                    'categorias': categorias,
+                    'subcategorias': subcategorias,
                     'ementa': ementa,
-                    # 'categorias': categorias,
-                    # 'subcategorias': subcategorias,
+                    'produto': produto,
                     'produtos': produtos,
                     'formset': formset,
                     'form_action': form_action,
@@ -252,22 +261,16 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
     else:
         formset = ProdutoFidelidadeIndividualFormSet(
             initial=initial_data,
+
         )
 
-        agrupado = defaultdict(lambda: defaultdict(list))
-        for i, (form, produto) in enumerate(zip(formset, produtos)):
-            form_data = {
-                'form': form,
-                'produto': produto,
-            }
-            agrupado[produto.categoria.nome][produto.subcategoria.nome].append(
-                form_data)
-
         context = {
-            # 'agrupado': agrupado,
             'fidelidade': fidelidade,
+            'categorias': categorias,
+            'subcategorias': subcategorias,
             'ementa': ementa,
             'produtos': produtos,
+            'produto': produto,
             'formset': formset,
             'form_action': form_action,
         }
