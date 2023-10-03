@@ -251,7 +251,7 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                     'categorias': categorias,
                     'subcategorias': subcategorias,
                     'ementa': ementa,
-                    'produto': produto,
+                    # 'produto': produto,
                     'produtos': produtos,
                     'formset': formset,
                     'form_action': form_action,
@@ -261,7 +261,6 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
     else:
         formset = ProdutoFidelidadeIndividualFormSet(
             initial=initial_data,
-
         )
 
         context = {
@@ -270,7 +269,7 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
             'subcategorias': subcategorias,
             'ementa': ementa,
             'produtos': produtos,
-            'produto': produto,
+            # 'produto': produto,
             'formset': formset,
             'form_action': form_action,
         }
