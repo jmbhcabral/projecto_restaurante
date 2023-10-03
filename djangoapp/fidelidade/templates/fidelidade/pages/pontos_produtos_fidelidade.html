@@ -15,31 +15,38 @@
         <fieldset>
             <legend>Adicionar visíveis</legend>        
             {{ formset.management_form }}
-
-            {% for form in formset %}
-              
-                
-                {% for field in form %}
-                {% if field.name == 'produto' %}
-                {% for product in produtos %}
-                    {% if product.id == field.value %}
-                        <p>{{ field.label_tag }}: {{ product.nome }}</p>
-                        <p>{{ field }}</p>
-                        <p>{{ field.errors }}</p>
-     
+            {% for cat in categorias %}
+                <h2>{{ cat }}</h2>
+                {% for sub in subcategorias %}
+                    {% if sub.categoria == cat %}
+                        <h4>{{ sub }}</h4>
+                        {% for form in formset %}
+                            {% for field in form %}
+                                {% if field.name == 'produto' %}
+                                    <p>{{ field.name }}  - {{ field.value}} - {{ produto.nome }}</p>
+                                    {% for product in produtos %}
+                                        {% if product.id == field.value %}
+                                            {% if product.categoria == cat and product.subcategoria == sub %}
+                                                <p>{{ field.label_tag }} {{ product.nome }}</p>
+                                                <p>{{ field }}</p>
+                                                <p>{{ field.errors }}</p>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif field.name == 'fidelidade' %}
+                                    <p>{{ field }}</p>
+                                    <p>{{ field.errors }}</p>
+                                {% else %}
+                                    <p>{{ field.label_tag }}</p>
+                                    <p>{{ field }}</p>
+                                    <p>{{ field.errors }}</p>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}  
                     {% endif %}
-                {% endfor %}
-                {% else %}
-                    <p>{{ field.label_tag }}</p>
-                    <p>{{ field }}</p>
-                    <p>{{ field.errors }}</p>
-                {% endif %}
-                {% endfor %}
-
-            {% endfor %}
-            
+                {% endfor %}  
+            {% endfor %}  
         </fieldset>
-    
         <button type="submit">Adicionar visíveis</button>
     </form>
 </div>  
