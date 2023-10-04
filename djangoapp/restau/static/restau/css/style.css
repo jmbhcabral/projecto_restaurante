@@ -1,6 +1,6 @@
 @font-face {
-  font-family: 'frontendfont';
-  src: url("../fonts/frontendfont.TTF") format('truetype');
+  font-family: 'PlayfairDisplay-VariableFont_wght';
+  src: url("../fonts/PlayfairDisplay-VariableFont_wght.TTF") format('truetype');
 }
 
 :root {
@@ -38,7 +38,7 @@
   --clr-amber: hsl(35, 70%, 67%);
 
   /* Frontend font-family */
-  --ff-frontend: 'frontendfont', sans-serif;
+  --ff-frontend: 'PlayfairDisplay-VariableFont_wght', sans-serif;
 
   /* Font-family */
   --ff-regular: Georgia, 'Times New Roman', Times, serif;
