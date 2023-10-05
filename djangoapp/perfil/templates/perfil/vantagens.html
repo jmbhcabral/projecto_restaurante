@@ -1,18 +1,17 @@
 {% extends 'restau/base_front.html' %}
-{% load crispy_forms_tags %}
 {% block content %}
-
-        <div class="">
+    <section class="conta">
+        <div class="conta-menu">
+            <a href="{% url "perfil:conta" %}">Conta</a>
+            <a href="{% url 'perfil:atualizar' %}" class="">Atualizar dados</a>
+            <a href="" class="">Alterar Password</a>
+            <a href="{% url "perfil:cartao_cliente" %}" class="">Cartão cliente</a>
+            <a href="{% url "perfil:vantagens" %}" class=""><strong>Vantagens</strong></a>
+        </div>
+        <div class="conta-content">
             <div>
-                <h3>Conta</h3>
-                <p><a href="{% url 'perfil:atualizar' %}" class="">Atualizar dados</a></p>
-                <p><a href="" class="">Alterar Password</a></p>
-                <p><a href="" class="">Cartão cliente</a></p>
-                <p><a href="{% url "perfil:vantagens" %}" class="">Vantagens</a></p>
-            </div>
-            <div>
-                <h4>Vantagens</h4>
-                <p>Lorem ipsum dolor sit amet.</p>
+            <h4>Vantagens</h4>
+            <p>Lorem ipsum dolor sit amet.</p>
 
             </div>
             <div>

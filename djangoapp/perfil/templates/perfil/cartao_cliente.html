@@ -1,0 +1,23 @@
+{% extends 'restau/base_front.html' %}
+{% block content %}
+    <section class="conta">
+        <div class="conta-menu">
+            <a href="{% url 'perfil:conta' %}">Conta</a>
+            <a href="{% url 'perfil:atualizar' %}" class="">Atualizar dados</a>
+            <a href="" class="">Alterar Password</a>
+            <a href="{% url 'perfil:cartao_cliente' %}" class=""><strong>Cartão cliente</strong></a>
+            <a href="{% url 'perfil:vantagens' %}" class="">Vantagens</a>
+        </div>
+        <div class="conta-content">
+            <p>{{ user.username }}</p>
+            <p>{{ user.first_name }}</p>
+            <p>{{ user.last_name }}</p>
+            <p>{{ user.email }}</p>
+            <p>{{ perfil.telemovel }}</p>
+            <p><img src="{{ perfil.qr_code.url }}" alt="Qrcode"></p>
+        </div>
+        
+    </section>
+</main>
+    
+{% endblock content %}

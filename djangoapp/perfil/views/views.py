@@ -1,11 +1,13 @@
 from django.contrib import messages
+from django.db import models
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
-from perfil import models
-from perfil import forms
+from perfil import models as perfil_models
+from perfil import forms as perfil_forms
+from fidelidade import models as fidelidade_models
+from fidelidade import forms as fidelidade_forms
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from fidelidade.models import ProdutoFidelidadeIndividual
 from restau.models import FrontendSetup
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -30,19 +32,19 @@ class BasePerfil(View):
         self.perfil = None
 
         if self.request.user.is_authenticated:
-            self.perfil = models.Perfil.objects.filter(
+            self.perfil = perfil_models.Perfil.objects.filter(
                 usuario=self.request.user
             ).first()
 
             self.context = {
                 'main_logo': main_logo,
                 'main_image': main_image,
-                'userform': forms.UserForm(
+                'userform': perfil_forms.UserForm(
                     data=self.request.POST or None,
                     usuario=self.request.user,
                     instance=self.request.user,
                 ),
-                'perfilform': forms.PerfilForm(
+                'perfilform': perfil_forms.PerfilForm(
                     data=self.request.POST or None,
                     instance=self.perfil
                 )
@@ -51,10 +53,10 @@ class BasePerfil(View):
             self.context = {
                 'main_logo': main_logo,
                 'main_image': main_image,
-                'userform': forms.UserForm(
+                'userform': perfil_forms.UserForm(
                     data=self.request.POST or None
                 ),
-                'perfilform': forms.PerfilForm(
+                'perfilform': perfil_forms.PerfilForm(
                     data=self.request.POST or None,
                 )
             }
@@ -104,6 +106,7 @@ class Criar(BasePerfil):
         return redirect('perfil:conta')
 
 
+@method_decorator(login_required, name='dispatch')
 class Atualizar(BasePerfil):
     template_name = 'perfil/atualizar.html'
 
@@ -142,7 +145,7 @@ class Atualizar(BasePerfil):
             if not self.perfil:
                 self.perfilform.cleaned_data['usuario'] = usuario
                 print(self.perfilform.cleaned_data)
-                perfil = models.Perfil(**self.perfilform.cleaned_data)
+                perfil = perfil_models.Perfil(**self.perfilform.cleaned_data)
                 perfil.save()
 
             else:
@@ -205,12 +208,14 @@ class Login(View):
         return redirect('perfil:conta')
 
 
+@method_decorator(login_required, name='dispatch')
 class Logout(View):
     def get(self, *args, **kwargs):
         logout(self.request)
         return redirect('restau:index')
 
 
+# @method_decorator(login_required, name='dispatch')
 class Conta(BasePerfil):
     template_name = 'perfil/conta.html'
 
@@ -218,7 +223,28 @@ class Conta(BasePerfil):
         if not self.request.user.is_authenticated:
             return redirect('perfil:criar')
 
+        total_recompensas = fidelidade_models.ComprasFidelidade.objects.filter(
+            utilizador=self.request.user).aggregate(
+            total_pontos_ganhos=models.Sum('pontos_adicionados'))
+
+        total_ofertas = fidelidade_models.OfertasFidelidade.objects.filter(
+            utilizador=self.request.user).aggregate(
+            total_pontos_gastos=models.Sum('pontos_gastos'))
+
+        total_recompensas_decimal = (
+            total_recompensas['total_pontos_ganhos'] or 0)
+        total_ofertas_decimal = total_ofertas['total_pontos_gastos'] or 0
+
+        total_pontos = total_recompensas_decimal - total_ofertas_decimal
+
+        self.context = {
+            'total_pontos': total_pontos,
+            'total_recompensas': total_recompensas_decimal,
+            'total_ofertas': total_ofertas_decimal,
+        }
+
         return render(self.request, self.template_name, self.context)
+
 
 # class Deletar(View):
 #     def get(self, *args, **kwargs):
@@ -237,7 +263,57 @@ class Conta(BasePerfil):
 #         return redirect('restau:index')
 
 
-@method_decorator(login_required, name='dispatch')
+class CartaoCliente(View):
+    template_name = 'perfil/cartao_cliente.html'
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+
+        main_image = FrontendSetup.objects \
+            .filter(imagem_topo__isnull=False) \
+            .order_by('-id') \
+            .first()
+
+        main_logo = FrontendSetup.objects \
+            .filter(imagem_logo__isnull=False) \
+            .order_by('-id') \
+            .first()
+
+        # user = self.request.user
+
+        # if not user.is_authenticated:
+        #     return redirect('perfil:criar')
+
+        # perfil = user.perfil
+        # tipo_fidelidade = perfil.tipo_fidelidade
+
+        # lista_fidelidade = ProdutoFidelidadeIndividual.objects \
+        #     .filter(fidelidade=tipo_fidelidade) \
+        #     .select_related('produto') \
+        #     .order_by(
+        #         'produto__categoria', 'produto__subcategoria', 'produto__ordem'
+        #     )
+
+        # self.context = {
+        #     'main_logo': main_logo,
+        #     'main_image': main_image,
+        #     'lista_fidelidade': lista_fidelidade,
+        # }
+        perfil = perfil_models.Perfil.objects.filter(
+            usuario=self.request.user).first()
+
+        self.context = {
+            'main_logo': main_logo,
+            'main_image': main_image,
+            'perfil': perfil,
+        }
+
+    def get(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('perfil:criar')
+        return render(self.request, self.template_name, self.context)
+
+
 class Vantagens(View):
     template_name = 'perfil/vantagens.html'
 
@@ -262,7 +338,8 @@ class Vantagens(View):
         perfil = user.perfil
         tipo_fidelidade = perfil.tipo_fidelidade
 
-        lista_fidelidade = ProdutoFidelidadeIndividual.objects \
+        lista_fidelidade = fidelidade_models.ProdutoFidelidadeIndividual\
+            .objects \
             .filter(fidelidade=tipo_fidelidade) \
             .select_related('produto') \
             .order_by(
@@ -276,4 +353,6 @@ class Vantagens(View):
         }
 
     def get(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('perfil:criar')
         return render(self.request, self.template_name, self.context)

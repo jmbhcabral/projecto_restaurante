@@ -1,30 +1,27 @@
 {% extends 'restau/base_front.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-
-        <div class="">
-            <div>
-                <h3>Conta</h3>
-                <p><a href="{% url "perfil:atualizar" %}" class="">Atualizar dados</a></p>
-                <p><a href="" class="">Alterar Password</a></p>
-                <p><a href="" class="">Cartão cliente</a></p>
-                <p><a href="{% url "perfil:vantagens" %}" class="">Vantagens</a></p>
-            </div>
-            <div>
-                <h4>Atualizar</h4>
-                <p>Atualize os campos abaixo.</p>
-                <form action="" method="POST">
-                    {% csrf_token %}
-                    {{ userform|crispy }}
-                    {{ perfilform|crispy }}
-                    <div class="row">
-                        <div class="col">
-                            <button type="submit" class="btn btn-primary">Atualizar</button>
-                        </div>
+    <section class="conta">
+        <div class="conta-menu"> 
+            <a href="{% url "perfil:conta" %}">Conta</a>
+            <a href="{% url "perfil:atualizar" %}"><strong>Atualizar dados</strong></a>
+            <a href="" class="">Alterar Password</a>
+            <a href="{% url "perfil:cartao_cliente" %}" class="">Cartão cliente</a>
+            <a href="{% url "perfil:vantagens" %}" class="">Vantagens</a>
+        </div>
+        <div class="conta-content">
+            <p>Atualize os campos abaixo.</p>
+            <form action="" method="POST">
+                {% csrf_token %}
+                {{ userform|crispy }}
+                {{ perfilform|crispy }}
+                <div class="row">
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary">Atualizar</button>
                     </div>
-                </form>
+                </div>
+            </form>
 
-            </div>
         </div>
     </section>
 </main>
