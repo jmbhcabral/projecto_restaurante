@@ -1,15 +1,16 @@
 {% extends 'restau/base.html' %}
 {% block content %}
-<h1>Ementas</h1>
-<div>
-    <ul>
+<div class="section-content-wide content">
+<h1 class="center">Ementas</h1>
+<div >
+    <ul class="menu-items">
     {% for ementa in ementas %}
     {% if ementa %}
-        <li>
-          <a href="{% url 'restau:ementa' ementa.id %} ">{{ ementa.nome }}</a> - 
-          <a href="{% url 'restau:povoar_ementa' ementa.id %}">Povoar ementa</a> - 
-          <a href="{% url 'restau:povoar_ementa' ementa.id %}">Modificar</a> - 
-          <a href="{% url 'restau:povoar_ementa' ementa.id %}">Apagar</a> - 
+        <li class="menu-item">
+          <a  href="{% url 'restau:ementa' ementa.id %} " class="table-link">{{ ementa.nome }}</a> - 
+          <a href="{% url 'restau:povoar_ementa' ementa.id %}" class="table-link">Povoar ementa</a> - 
+          <a href="{% url 'restau:povoar_ementa' ementa.id %}" class="table-link">Modificar</a> - 
+          <a href="{% url 'restau:povoar_ementa' ementa.id %}" class="table-link">Apagar</a> - 
         </li>
     {% else %}
     <li><em>Não existem ementas.</em></li>
@@ -53,5 +54,6 @@
         </div>
       </div>  
     </form>
-  </div> 
+  </div>
+</div>
 {% endblock content %}

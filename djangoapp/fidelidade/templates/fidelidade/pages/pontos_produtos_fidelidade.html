@@ -9,7 +9,7 @@
     <p><b>Desconto: </b> {{ fidelidade.desconto }}% </p>
     <p><b>Ementa: </b>{{ fidelidade.ementa }}</p>
   </div>
-  <div>
+  <div class="section-content-wide content">
     <form action="{{ form_action }}" method="POST">
         {% csrf_token %}
         <fieldset>

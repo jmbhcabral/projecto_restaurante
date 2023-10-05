@@ -1,6 +1,7 @@
 {% extends 'restau/base.html' %}
 {% block content %}
-<h1>Ementa</h1>
+<div class="section-content-narrow content">
+<h2 class="center">Ementa</h2>
 
 <div class="single-product">
   <h3 class="single-product">
@@ -28,7 +29,7 @@
   </div>
 
 </div>
-<div>
+{% comment %} <div>
     {% for categoria in categorias %}
     <legend>{{ categoria.nome }}</legend>
         
@@ -48,6 +49,7 @@
         {% endif %}
         {% endfor %}
     {% endfor %}
+</div> {% endcomment %}
 </div>
 
 {% endblock content %}

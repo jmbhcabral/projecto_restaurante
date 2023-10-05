@@ -17,6 +17,7 @@ def create_category(request):
                                .all()
                                .order_by('ordem')
                                )
+    categorias = Category.objects.all().order_by('ordem')
 
     form_action = reverse('restau:create_category')
 
@@ -26,6 +27,7 @@ def create_category(request):
 
         form = CategoryForm(request.POST, request.FILES)
         context = {
+            'categorias': categorias,
             'formset': formset,
             'form': form,
             'form_action': form_action,
@@ -54,6 +56,7 @@ def create_category(request):
         )
 
     context = {
+        'categorias': categorias,
         'formset': formset,
         'form': CategoryForm(),
         'form_action': form_action,

@@ -135,6 +135,7 @@ h6 {
 
 h1 {
   font-size: 44px; /* Fallback value */
+  text-transform: uppercase;
   font-size: var(--fs-h1);
 }
 
@@ -339,8 +340,8 @@ img {
 
 .table-cel,
 .table-header {
-  padding: var(--spacing-smlr);
-  text-align: left;
+  padding: var(--spacing-base);
+  text-align: center;
 }
 
 .table-link {

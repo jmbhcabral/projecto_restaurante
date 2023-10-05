@@ -9,16 +9,16 @@
     
     <div class="form-group">
       {% for cat in categorias %}
-      <p>{{ cat.nome }}</p>
+      <h2>{{ cat.nome }}</h2>
       {% for sub in subcategorias %}
       {% if sub.categoria == cat %}
-      <p>{{ sub.nome }}</p>
+      <h4>{{ sub.nome }}<h4>
       {% for field in formset %}
       {% if field.instance.categoria == cat and field.instance.subcategoria == sub %}
       <div class="ordenar">
-        <div> {{ field.id}} </div>
-        <div> {{ field.nome }} </div>
-        <div> {{ field.ordem }} </div>
+        <p> {{ field.id}} </p>
+        <p> {{ field.nome }} </p>
+        <p> {{ field.ordem }} </p>
       </div>
       {% endif %}
       {% endfor %}

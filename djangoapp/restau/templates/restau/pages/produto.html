@@ -1,21 +1,21 @@
 {% extends 'restau/base.html' %}
 {% block content %}
-    <div class="single-product">
-        <h3 class="single-product">
+    <div class="section-content-narrow content">
+        <h3 class="">
         {{ product.nome}}
         </h3>
-        <p><b>Produto:</b>{{ product.nome}}</p>
-        <p><b>Imagem:</b>{% if product.imagem %}<img src="{{ product.imagem.url}}" alt="">{% endif %}</p>
-        <p><b>Categoria:</b>{{ product.categoria }}</p>
-        <p><b>Subcategoria:</b>{{ product.subcategoria }}</p>
-        <p><b>Preço 1:</b>{{ product.preco_1 }}</p>
-        <p><b>Preço 2:</b>{{ product.preco_2 }}</p>
-        <p><b>Preço 3:</b>{{ product.preco_3 }}</p>
-        <p><b>Preço 4:</b>{{ product.preco_4 }}</p>
-        <p><b>Preço 5:</b>{{ product.preco_5 }}</p>
-        <p><b>Preço 6:</b>{{ product.preco_6 }}</p>
-        <p><b>Preço Promo:</b>{{  product.preco_promo }}</p>
-        <p><b>Visib:</b>{{ product.visibilidade }}</p>
+        <p><b>Produto: </b>{{ product.nome}}</p>
+        <p><b>Imagem: </b>{% if product.imagem %}<img src="{{ product.imagem.url}}" alt="">{% endif %}</p>
+        <p><b>Categoria: </b>{{ product.categoria }}</p>
+        <p><b>Subcategoria: </b>{{ product.subcategoria }}</p>
+        <p><b>Preço 1: </b>{{ product.preco_1 }}</p>
+        <p><b>Preço 2: </b>{{ product.preco_2 }}</p>
+        <p><b>Preço 3: </b>{{ product.preco_3 }}</p>
+        <p><b>Preço 4: </b>{{ product.preco_4 }}</p>
+        <p><b>Preço 5: </b>{{ product.preco_5 }}</p>
+        <p><b>Preço 6: </b>{{ product.preco_6 }}</p>
+        <p><b>Preço Promo: </b>{{  product.preco_promo }}</p>
+        <p><b>Visib: </b>{{ product.visibilidade }}</p>
 
         <div class="product-links">
             <a class="btn btn-link" href="{% url 'restau:update' product.id %}">Update</a>

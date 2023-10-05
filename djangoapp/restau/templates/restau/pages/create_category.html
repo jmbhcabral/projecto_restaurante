@@ -1,6 +1,16 @@
 {% extends 'restau/base.html' %}
 {% block content %}
-<div class="section-content-wide formset-update">
+<div class="section-content-wide formset-update content">
+  <div>
+    <h2 class="center">Atualizar Categorias</h2>
+    <p class="center">
+      Atualize as categorias do seu restaurante, adicione novas categorias
+      ou exclua categorias que não são mais necessárias.
+    </p>
+    {% for cat in categorias %}
+    <p><a href="{% url 'restau:category'  cat.id %}">{{ cat }}</a></p>
+    {% endfor %}
+  </div>
   {% if formset %}
   <div class="content">
     <form action="{% url 'restau:create_category' %}" method="post">
@@ -43,6 +53,7 @@
       </table>
     </form>
   </div>
+
   {% else %}
   <div class="not-found center">
     <h1>Nada encontrado</h1>
@@ -89,6 +100,7 @@
       </div>
     </div>  
   </form>
+  </div>
 </div> 
 {% endblock content %}
   
