@@ -41,6 +41,20 @@ class Perfil(models.Model):
         blank=True,
         verbose_name="Número Cliente",
     )
+    estudante = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        verbose_name="Estudante",
+
+        choices=(
+            ('escola_sec_ramada', 'Sim, na Esc. Sec. Ramada'),
+            ('agrup_vasco_santana', 'Sim no Agrup. Vasco Santana'),
+            ('outra_escola', 'Sim, noutra escola'),
+            ('nao', 'Não'),
+        ),
+        help_text='Se estudante, indique a escola onde estuda.',
+    )
     tipo_fidelidade = models.ForeignKey(
         Fidelidade,
         on_delete=models.SET_NULL,
@@ -65,7 +79,7 @@ class Perfil(models.Model):
 
             self.numero_cliente = f'CEW-{novo_numero}'
 
-        super().save(*args, **kwargs)
+        # super().save(*args, **kwargs)
 
         # Crie um QRCode com base nas informações do perfil
         dados_perfil = f"Username: {self.usuario}"
@@ -89,9 +103,19 @@ class Perfil(models.Model):
         self.qr_code.save(
             f'qrcode_{self.usuario}.png', File(img_io), save=False)
 
+        if self.estudante == 'escola_sec_ramada' or \
+                self.estudante == 'agrup_vasco_santana':
+            fidelidade_obj = Fidelidade.objects.get(nome='Estudante')
+            self.tipo_fidelidade = fidelidade_obj
+
+        else:
+            fidelidade_obj = Fidelidade.objects.get(nome='Artesanal')
+            self.tipo_fidelidade = fidelidade_obj
+
         super().save(*args, **kwargs)
 
     def clean(self):
+
         error_messages = {}
 
         if not self.data_nascimento:

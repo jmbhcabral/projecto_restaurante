@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from perfil.models import Perfil
 from . import models
 
 
@@ -15,6 +16,29 @@ class PerfilForm(forms.ModelForm):
                 attrs={'type': 'date'}
             ),
         }
+
+    def clean(self, *args, **kwargs):
+        data = self.data
+        cleaned = self.cleaned_data
+        validation_error_msgs = {}
+
+        data_nascimento_data = cleaned.get('data_nascimento')
+        telemovel_data = cleaned.get('telemovel')
+
+        error_msg_data_nascimento = 'Data de nascimento inválida.'
+        error_msg_telemovel = 'Número de telemóvel inválido.'
+
+        if data_nascimento_data:
+            if data_nascimento_data > timezone.now().date():
+                validation_error_msgs['data_nascimento'] = \
+                    error_msg_data_nascimento
+
+        if telemovel_data:
+            if len(telemovel_data) != 9:
+                validation_error_msgs['telemovel'] = error_msg_telemovel
+
+        if validation_error_msgs:
+            raise (forms.ValidationError(validation_error_msgs))
 
 
 class UserForm(forms.ModelForm):
