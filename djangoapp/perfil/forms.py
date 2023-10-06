@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from perfil.models import Perfil
 from . import models
+from django.utils import timezone
 
 
 class PerfilForm(forms.ModelForm):
@@ -9,7 +10,8 @@ class PerfilForm(forms.ModelForm):
         model = models.Perfil
         fields = '__all__'
         exclude = ('usuario', 'numero_cliente', 'created_at',
-                   'updated_at', 'nif', 'qr_code', 'tipo_fidelidade')
+                   'updated_at', 'nif', 'qr_code', 'tipo_fidelidade',
+                   'ultima_atualizacao_data_nascimento')
 
         widgets = {
             'data_nascimento': forms.DateInput(
@@ -26,7 +28,8 @@ class PerfilForm(forms.ModelForm):
         telemovel_data = cleaned.get('telemovel')
 
         error_msg_data_nascimento = 'Data de nascimento inválida.'
-        error_msg_telemovel = 'Número de telemóvel inválido.'
+        error_msg_telemovel = 'Número de telemóvel tem de ter 9 digitos.'
+        error_msg_telemovel_existe = 'Este número de telemóvel já existe.'
 
         if data_nascimento_data:
             if data_nascimento_data > timezone.now().date():
@@ -37,6 +40,17 @@ class PerfilForm(forms.ModelForm):
             if len(telemovel_data) != 9:
                 validation_error_msgs['telemovel'] = error_msg_telemovel
 
+            # verificação se estamos a atualizar uma instância exixtente
+            if self.instance.id is not None:
+                telemovel_db = Perfil.objects.filter(
+                    telemovel=telemovel_data).exclude(
+                        id=self.instance.id).first()
+            else:
+                telemovel_db = Perfil.objects.filter(
+                    telemovel=telemovel_data).first()
+            if telemovel_db:
+                validation_error_msgs['telemovel'] = \
+                    error_msg_telemovel_existe
         if validation_error_msgs:
             raise (forms.ValidationError(validation_error_msgs))
 

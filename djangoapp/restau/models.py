@@ -84,6 +84,13 @@ class FrontendSetup(models.Model):
         verbose_name='Imagem Padrão',
         # validators=[validate_png]
     )
+    ementa = models.ForeignKey(
+        'Ementa',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        default=None,
+    )
 
     def save(self, *args, **kwargs):
         current_imagem_logo_name = str(self.imagem_logo.name)

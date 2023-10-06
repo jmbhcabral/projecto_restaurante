@@ -63,7 +63,16 @@ class Perfil(models.Model):
         verbose_name="Tipo Fidelidade",
     )
 
+    ultima_atualizacao_data_nascimento = models.DateTimeField(
+        null=True, blank=True)
+
     def save(self, *args, **kwargs):
+        # Atualiza a data da última atualização da data de nascimento
+        if self.pk:
+            original = Perfil.objects.get(pk=self.pk)
+            if original.data_nascimento != self.data_nascimento:
+                agora = timezone.now()
+
         # Gera o número de cliente
         if not self.numero_cliente:
             ultimo_numero_cliente = Perfil.objects.all().order_by(
@@ -79,10 +88,23 @@ class Perfil(models.Model):
 
             self.numero_cliente = f'CEW-{novo_numero}'
 
-        # super().save(*args, **kwargs)
+        if self.estudante == 'escola_sec_ramada' or \
+                self.estudante == 'agrup_vasco_santana':
+            fidelidade_obj = Fidelidade.objects.get(nome='Estudante')
+            self.tipo_fidelidade = fidelidade_obj
+
+        else:
+            fidelidade_obj = Fidelidade.objects.get(nome='Artesanal')
+            self.tipo_fidelidade = fidelidade_obj
 
         # Crie um QRCode com base nas informações do perfil
-        dados_perfil = f"Username: {self.usuario}"
+        dados_perfil = (
+            f"Username: {self.usuario}",
+            f"Email: {self.usuario.email}",
+            f"Numero Cliente: {self.numero_cliente}",
+            f"Data Nascimento: {self.data_nascimento}",
+            f"Telemovel: {self.telemovel}",
+        )
 
         qr = qrcode.QRCode(
             version=1,
@@ -103,15 +125,6 @@ class Perfil(models.Model):
         self.qr_code.save(
             f'qrcode_{self.usuario}.png', File(img_io), save=False)
 
-        if self.estudante == 'escola_sec_ramada' or \
-                self.estudante == 'agrup_vasco_santana':
-            fidelidade_obj = Fidelidade.objects.get(nome='Estudante')
-            self.tipo_fidelidade = fidelidade_obj
-
-        else:
-            fidelidade_obj = Fidelidade.objects.get(nome='Artesanal')
-            self.tipo_fidelidade = fidelidade_obj
-
         super().save(*args, **kwargs)
 
     def clean(self):
@@ -122,9 +135,20 @@ class Perfil(models.Model):
             error_messages['data_nascimento'] = 'Data de Nascimento \
             é obrigatória.'
 
-        if not self.telemovel or len(self.telemovel) != 9:
-            error_messages['telemovel'] = 'Telemóvel é obrigatório e tem de \
-                ter 9 digitos.'
+        # Atualiza a data da última atualização da data de nascimento
+        if self.pk:
+            original = Perfil.objects.get(pk=self.pk)
+            if original.data_nascimento != self.data_nascimento:
+                agora = timezone.now()
+                if self.ultima_atualizacao_data_nascimento:
+                    # 6 meses = aproximadamente 182.5 dias
+                    periodo_minimo = self.ultima_atualizacao_data_nascimento + \
+                        timezone.timedelta(days=182.5)
+                    if agora < periodo_minimo:
+                        error_messages['data_nascimento'] = (
+                            'A data de nascimento só pode ser alterada \
+                            passados 6 meses da última alteração.')
+                self.ultima_atualizacao_data_nascimento = agora
 
         if self.nif and not validar_nif(self.nif):
             error_messages['nif'] = 'NIF inválido.'

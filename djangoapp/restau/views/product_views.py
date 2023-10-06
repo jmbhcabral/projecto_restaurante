@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
-from restau.models import Products, FrontendSetup, Category, SubCategory
+from restau.models import (
+    Products, FrontendSetup, Category, SubCategory, Ementa)
 from django.db.models import Prefetch
 
 PER_PAGE = 9
@@ -46,17 +47,34 @@ def encomendas(request):
         .all() \
         .order_by('ordem')
 
-    produtos_queryset = Products.objects.all().order_by(
-        'categoria', 'subcategoria', 'ordem')
-    produtos = produtos_queryset.prefetch_related(
+    frontend_setup = FrontendSetup.objects \
+        .order_by('-id') \
+        .first()
+
+    if frontend_setup and frontend_setup.ementa:
+        produtos_ementa = frontend_setup.ementa.produtos \
+            .all() \
+            .order_by('categoria', 'subcategoria', 'ordem')
+
+    else:
+        produtos_ementa = Products.objects.none()
+
+    produtos_ementa = produtos_ementa.prefetch_related(
         Prefetch('categoria', queryset=categorias),
         Prefetch('subcategoria', queryset=subcategorias)
     )
+
+    # produtos_queryset = Products.objects.all().order_by(
+    #     'categoria', 'subcategoria', 'ordem')
+    # produtos = produtos_queryset.prefetch_related(
+    #     Prefetch('categoria', queryset=categorias),
+    #     Prefetch('subcategoria', queryset=subcategorias)
+    # )
     context = {
         'main_logo': main_logo,
         'main_image': main_image,
         'default_image': default_image,
-        'produtos': produtos,
+        'produtos': produtos_ementa,
         'categorias': categorias,
         'subcategorias': subcategorias,
     }

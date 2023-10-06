@@ -44,9 +44,9 @@ class ProductsAdmin(admin.ModelAdmin):
 @admin.register(FrontendSetup)
 class FrontendSetupAdmin(admin.ModelAdmin):
     list_display = ('id', 'nome', 'imagem_logo',
-                    'imagem_topo', 'imagem_padrao',)
+                    'imagem_topo', 'imagem_padrao', 'ementa')
     list_display_links = ('id', 'nome', 'imagem_logo', 'imagem_topo',
-                          'imagem_padrao',)
+                          'imagem_padrao', 'ementa')
 
 
 @admin.register(Ementa)
