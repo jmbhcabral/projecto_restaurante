@@ -611,6 +611,42 @@ body.frontend {
   background-color: var(--clr-creamy-white);
 }
 
+.frase-inspiradora {
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  justify-content: space-evenly;
+  height: 100vh;
+}
+.frase-imagens {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  /* align-items: center; */
+  height: 100%;
+}
+
+.frase {
+  display: flex;
+  font-style: italic;
+  height: 25%;
+  align-items: center;
+
+}
+
+.frase-img-topo {
+  width: 25%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left;
+  overflow: hidden;
+  /* top: 0; */
+  /* left: 0; */
+  /* z-index: -1; */
+  /* box-shadow: 2px 2px 5px hsl(var(--clr-gray-dkr)); */
+  /* border-radius: var(--br-base); */
+}
+
 .header-front h1 {
   font-family: var(--ff-frontend);
   color: var(--clr-amber)
@@ -648,7 +684,11 @@ body.frontend {
   display: flex;
   justify-content: center;
   flex-direction: column;
-  padding: var(--spacing-bgst);
+  padding: var(--spacing-bgr);
+}
+.morada h6 {
+  /* font-size: var(--fs-h6); */
+  margin-bottom: 0;
 }
 
 .product-frame {
