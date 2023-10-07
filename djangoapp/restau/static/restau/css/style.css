@@ -907,6 +907,10 @@ body.frontend {
   .alert-dark .alert-link {
     color: #040505; }
 
+.asteriskField {
+  color: red;
+}
+
 
 
 

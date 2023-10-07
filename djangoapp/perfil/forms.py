@@ -19,6 +19,41 @@ class PerfilForm(forms.ModelForm):
             ),
         }
 
+    data_nascimento = forms.DateField(
+        required=True,
+        label='Data de Nascimento',
+        help_text='Importante! A data de nascimento é necessária para a \
+            atribuição de pontos de fidelidade. Só é possível alterar \
+                a data de nascimento uma vez por ano.',
+        widget=forms.DateInput(
+            attrs={'type': 'date'}
+        ),
+    )
+
+    telemovel = forms.CharField(
+        required=True,
+        label='Telemóvel',
+        help_text='Número de telemóvel para contacto.',
+    )
+
+    estudante = forms.ChoiceField(
+        choices=(
+            ('escola_sec_ramada', 'Sim, na Esc. Sec. Ramada'),
+            ('agrup_vasco_santana', 'Sim no Agrup. Vasco Santana'),
+            ('outra_escola', 'Sim, noutra escola'),
+            ('nao', 'Não'),
+        ),
+        required=True,
+        label='É estudante?',
+        help_text='Se estudante, indique a escola onde estuda.',
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            if field.required:
+                field.label_suffix = ' <span class="label-asterisk">**</span>'
+
     def clean(self, *args, **kwargs):
         data = self.data
         cleaned = self.cleaned_data
@@ -56,6 +91,36 @@ class PerfilForm(forms.ModelForm):
 
 
 class UserForm(forms.ModelForm):
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'username',
+                  'password', 'password2', 'email')
+
+    username = forms.CharField(
+        required=True,
+        label='Utilizador',
+        help_text='Importante! O utilizador não pode ser alterado.'
+    )
+
+    first_name = forms.CharField(
+        required=True,
+        label='Nome',
+        help_text='Seu nome.'
+    )
+
+    last_name = forms.CharField(
+        required=True,
+        label='Apelido',
+        help_text='Seu apelido.'
+    )
+
+    email = forms.EmailField(
+        required=True,
+        label='Endereço de email',
+        help_text='Seu endereço de email.'
+    )
+
     password = forms.CharField(
         required=False,
         widget=forms.PasswordInput(),
@@ -76,11 +141,6 @@ class UserForm(forms.ModelForm):
 
         if usuario:
             self.fields['username'].widget.attrs['readonly'] = True
-
-    class Meta:
-        model = User
-        fields = ('first_name', 'last_name', 'username',
-                  'password', 'password2', 'email')
 
     def clean(self, *args, **kwargs):
         data = self.data
