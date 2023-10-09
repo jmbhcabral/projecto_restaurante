@@ -614,38 +614,89 @@ body.frontend {
 .frase-inspiradora {
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
-  justify-content: space-evenly;
-  height: 100vh;
-}
-.frase-imagens {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  /* align-items: center; */
+  align-items: center;
+  justify-content: space-around;
   height: 100%;
+  /* border: #040505 solid 1px; */
+  margin: 0 auto;
+}
+.frase-imagens-cima {
+  display: flex;
+  flex-direction: row ;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0 auto;
+  /* border: #ed9006 solid 1px; */
+}
+
+.frase-imagens-baixo {
+  display: flex;
+  flex-direction: row ;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 0 auto;
+  /* border: #de6305 solid 1px; */
+}
+
+.frase-imagens-baixo div p {
+  font-family: var(--ff-frontend);
+  font-size: var(--fs-h4);
+  margin: 0;
+  padding: 1rem;
+  color: var(--clr-charcoal);
+  text-shadow: 2px 2px 5px hsl(var(--clr-gray-dkr));
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  /* border:hsl(35, 70%, 67%) solid 1px; */
+}
+
+.frase-imagens-cima div p {
+  font-family: var(--ff-frontend);
+  font-size: var(--fs-h4);
+  margin: 0;
+  padding: 1rem;
+  color: var(--clr-charcoal);
+  text-shadow: 2px 2px 5px hsl(var(--clr-gray-dkr));
+  text-align: center;
+  width: 100%;
+  height: 100%;
+
+  /* border:hsl(35, 70%, 67%) solid 1px; */
 }
 
 .frase {
   display: flex;
+  flex-direction: row;
   font-style: italic;
-  height: 25%;
+  height: 50%;
   align-items: center;
-
+  /* border: #040505 solid 1px; */
+  padding: 1rem;
 }
 
 .frase-img-topo {
-  width: 25%;
+  width: 50%;
   height: 100%;
   object-fit: cover;
-  object-position: left;
+  object-position: right;
   overflow: hidden;
-  /* top: 0; */
-  /* left: 0; */
-  /* z-index: -1; */
-  /* box-shadow: 2px 2px 5px hsl(var(--clr-gray-dkr)); */
-  /* border-radius: var(--br-base); */
+  padding: 1rem;
+  margin: 0 auto;
+  /* border:#491217 solid 1px; */
 }
+.frase-img-baixo {
+  width: 50%;
+  height: 100%;
+  object-fit:fill;
+  object-position: right;
+  overflow: hidden;
+  padding: 1rem;
+  margin: 0 auto; 
+  align-items: flex-end;
+  /* border:#491217 solid 1px; */
+
+}  
 
 .header-front h1 {
   font-family: var(--ff-frontend);
