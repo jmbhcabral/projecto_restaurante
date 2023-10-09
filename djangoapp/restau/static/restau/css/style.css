@@ -601,6 +601,42 @@ body.frontend {
   margin: 0;
 }
 
+.intro-section {
+  border:#155724 solid 1px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items:flex-start;
+  /* height: 100vh; */
+}
+
+.texto-intro {
+  border:#155724 solid 1px;
+  padding: 1rem;
+}
+
+.imagens-ambiente {
+  padding: 1rem;
+  border:#155724 solid 1px;
+  display: flex;
+  flex-direction: row;
+  justify-content:space-evenly;
+  align-items: center;
+  height: 100%;
+  width: 100%;  
+ }
+
+.imagem-ambiente {
+  border:#155724 solid 1px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  overflow: hidden;
+  padding: 1rem;
+  margin: 0 auto;
+}
+
 .top-background p {
   font-family: var(--ff-frontend);
   font-weight: bold;
