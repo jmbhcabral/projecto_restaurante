@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from restau.models import (
     Category, SubCategory, Percentage, Products, FrontendSetup, Ementa,
-    ProdutosEmenta, Fotos
+    ProdutosEmenta, Fotos, ActiveSetup
 )
 
 
@@ -44,10 +44,26 @@ class ProductsAdmin(admin.ModelAdmin):
 
 @admin.register(FrontendSetup)
 class FrontendSetupAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nome', 'imagem_logo',
-                    'imagem_topo', 'imagem_padrao', 'ementa')
+    list_display = ('id', 'nome', 'imagem_logo', 'imagem_topo', 'intro',
+                    'intro_imagem', 'frase_inspiradora', 'imagem_frase_cima',
+                    'frase_cima', 'frase_baixo',
+                    'imagem_frase_baixo', 'imagem_padrao', 'ementa')
     list_display_links = ('id', 'nome', 'imagem_logo', 'imagem_topo',
                           'imagem_padrao', 'ementa')
+
+
+@admin.register(ActiveSetup)
+class ActiveSetupAdmin(admin.ModelAdmin):
+    list_display = ('id', 'active_imagem_logo', 'active_imagem_topo',
+                    'active_intro', 'active_intro_imagem',
+                    'active_frase_inspiradora', 'active_imagem_frase_cima',
+                    'active_frase_cima', 'active_frase_baixo',
+                    'active_imagem_frase_baixo', 'active_imagem_padrao',
+                    'active_ementa')
+    list_display_links = ('id',)
+
+    def has_add_permission(self, request):
+        return not FrontendSetup.objects.exists()
 
 
 @admin.register(Fotos)

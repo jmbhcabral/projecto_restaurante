@@ -139,6 +139,13 @@ class FrontendSetup(models.Model):
         null=True,
         default=None,
     )
+    frase_cima = models.TextField(
+        max_length=250,
+        verbose_name='Frase cima',
+        blank=True,
+        null=True,
+        default=None,
+    )
 
     imagem_frase_cima = models.ImageField(
         upload_to='assets/frontend/forntendsetup/',
@@ -146,6 +153,14 @@ class FrontendSetup(models.Model):
         null=True,
         verbose_name='Imagem frase cima',
         default='',
+    )
+
+    frase_baixo = models.TextField(
+        max_length=250,
+        verbose_name='Frase baixo',
+        blank=True,
+        null=True,
+        default=None,
     )
 
     imagem_frase_baixo = models.ImageField(
@@ -208,6 +223,88 @@ class FrontendSetup(models.Model):
 
     def __str__(self):
         return self.nome
+
+
+class ActiveSetup(models.Model):
+    active_imagem_logo = models.ForeignKey(
+        'FrontendSetup',
+        related_name='active_imagem_logo_set',
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+
+    active_imagem_topo = models.ForeignKey(
+        'FrontendSetup',
+        related_name='active_imagem_topo_set',
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+
+    active_intro = models.ForeignKey(
+        'FrontendSetup',
+        related_name='active_intro_set',
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+
+    active_intro_imagem = models.ForeignKey(
+        'FrontendSetup',
+        related_name='active_intro_imagem_set',
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+
+    active_frase_inspiradora = models.ForeignKey(
+        'FrontendSetup',
+        related_name='active_frase_inspiradora_set',
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+
+    active_ementa = models.ForeignKey(
+        'FrontendSetup',
+        related_name='active_ementa_set',
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+
+    active_frase_cima = models.ForeignKey(
+        'FrontendSetup',
+        related_name='active_frase_cima_set',
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+
+    active_imagem_frase_cima = models.ForeignKey(
+        'FrontendSetup',
+        related_name='active_imagem_frase_cima_set',
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+
+    active_frase_baixo = models.ForeignKey(
+        'FrontendSetup',
+        related_name='active_frase_baixo_set',
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+
+    active_imagem_frase_baixo = models.ForeignKey(
+        'FrontendSetup',
+        related_name='active_imagem_frase_baixo_set',
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+
+    active_imagem_padrao = models.ForeignKey(
+        'FrontendSetup',
+        related_name='active_imagem_padrao_set',
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+
+    def __str__(self):
+        return 'Configurações ativas'
 
 
 class Products(models.Model):

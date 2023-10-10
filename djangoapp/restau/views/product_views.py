@@ -1,27 +1,9 @@
 from django.shortcuts import render, get_object_or_404
 from restau.models import (
-    Products, FrontendSetup, Category, SubCategory, Ementa)
+    Products, FrontendSetup, Category, SubCategory, )
 from django.db.models import Prefetch
 
 PER_PAGE = 9
-
-
-def index(request):
-    main_logo = FrontendSetup.objects \
-        .filter(imagem_logo__isnull=False) \
-        .order_by('-id') \
-        .first()
-
-    main_image = FrontendSetup.objects \
-        .filter(imagem_topo__isnull=False) \
-        .order_by('-id') \
-        .first()
-    return render(
-        request,
-        'restau/pages/index.html',
-        {'main_logo': main_logo,
-         'main_image': main_image},
-    )
 
 
 def encomendas(request):
