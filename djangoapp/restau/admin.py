@@ -1,7 +1,8 @@
 from django.contrib import admin
+from django.utils.html import format_html
 from restau.models import (
     Category, SubCategory, Percentage, Products, FrontendSetup, Ementa,
-    ProdutosEmenta
+    ProdutosEmenta, Fotos
 )
 
 
@@ -47,6 +48,26 @@ class FrontendSetupAdmin(admin.ModelAdmin):
                     'imagem_topo', 'imagem_padrao', 'ementa')
     list_display_links = ('id', 'nome', 'imagem_logo', 'imagem_topo',
                           'imagem_padrao', 'ementa')
+
+
+@admin.register(Fotos)
+class FotosAdmin(admin.ModelAdmin):
+    list_display = ('id', 'nome', 'imagem', 'image_thumb', 'is_visible',)
+    list_display_links = ('id', 'nome', 'imagem',)
+    list_editable = ('is_visible',)
+
+    def image_thumb(self, obj):
+        if obj.imagem:
+            return format_html(
+                '<img src="{}" width="50" height="50" />'.format(
+                    obj.imagem.url)
+            )
+        return 'Sem Imagem'
+
+    image_thumb.short_description = 'Miniatura'  # type: ignore
+
+    # outra opção:
+    # setattr(image_thumb, 'short_description', 'Miniatura')
 
 
 @admin.register(Ementa)

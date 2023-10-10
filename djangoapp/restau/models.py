@@ -52,6 +52,47 @@ class Percentage(models.Model):
         return str(self.valor)
 
 
+class Fotos(models.Model):
+    class Meta:
+        verbose_name = 'Foto'
+        verbose_name_plural = 'Fotos'
+
+    nome = models.CharField(
+        max_length=200,
+        verbose_name='Nome',
+        help_text='Nome da foto'
+    )
+
+    imagem = models.ImageField(
+        upload_to='assets/frontend/galeria',
+        blank=True,
+        null=True,
+        verbose_name='Imagem',
+        default='',
+    )
+
+    is_visible = models.BooleanField(
+        default=False,
+        verbose_name='Visibilidade',
+        help_text='Visibilidade da foto'
+    )
+
+    def save(self, *args, **kwargs):
+        current_imagem_name = str(self.imagem.name)
+        super().save(*args, **kwargs)
+        imagem_changed = False
+
+        if self.imagem:
+            imagem_changed = current_imagem_name != self.imagem.name
+
+        if imagem_changed:
+            print('resizing')
+            resize_image(self.imagem, 300)
+
+    def __str__(self):
+        return self.nome
+
+
 class FrontendSetup(models.Model):
     nome = models.CharField(
         max_length=200,
@@ -74,6 +115,45 @@ class FrontendSetup(models.Model):
         verbose_name='Imagem',
         default='',
         # validators=[validate_png]
+    )
+    intro = models.TextField(
+        max_length=1500,
+        verbose_name='Introdução',
+        blank=True,
+        null=True,
+        default=None,
+    )
+
+    intro_imagem = models.ImageField(
+        upload_to='assets/frontend/forntendsetup/',
+        blank=True,
+        null=True,
+        verbose_name='Imagem intro',
+        default='',
+    )
+
+    frase_inspiradora = models.TextField(
+        max_length=250,
+        verbose_name='Frase inspiradora',
+        blank=True,
+        null=True,
+        default=None,
+    )
+
+    imagem_frase_cima = models.ImageField(
+        upload_to='assets/frontend/forntendsetup/',
+        blank=True,
+        null=True,
+        verbose_name='Imagem frase cima',
+        default='',
+    )
+
+    imagem_frase_baixo = models.ImageField(
+        upload_to='assets/frontend/forntendsetup/',
+        blank=True,
+        null=True,
+        verbose_name='Imagem frase baixo',
+        default='',
     )
 
     imagem_padrao = models.ImageField(
