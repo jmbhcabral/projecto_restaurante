@@ -1,23 +1,48 @@
 from django.shortcuts import render, get_object_or_404
 from restau.models import SubCategory
 from django.contrib.auth.decorators import login_required, user_passes_test
+from itertools import zip_longest
 
 
 @login_required
 @user_passes_test(lambda user: user.groups.filter(
     name='acesso_restrito').exists())
-def subcategory(request, subcategory_id):
-    single_subcategory = get_object_or_404(
-        SubCategory.objects
-        .filter(pk=subcategory_id,))
+def Subcategorias(request):
+
+    def grouper(iterable, n, fillvalue=None):
+        # "Coleta dados em grupos fixos"
+        args = [iter(iterable)] * n
+        return zip_longest(*args, fillvalue=fillvalue)
+
+    subcategorias = SubCategory.objects.all().order_by('ordem')
+    subcategorias_grouped = list(grouper(subcategorias, 5))
 
     context = {
-        'subcategory': single_subcategory,
+        'subcategorias_grouped': subcategorias_grouped,
+        'subcategorias': subcategorias,
+    }
+    return render(
+        request,
+        'restau/pages/subcategorias.html',
+        context
+    )
+
+
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
+def subcategoria(request, subcategoria_id):
+    subcategoria = get_object_or_404(
+        SubCategory.objects
+        .filter(pk=subcategoria_id,))
+
+    context = {
+        'subcategoria': subcategoria,
     }
 
     return render(
         request,
-        'restau/pages/subcategory.html',
+        'restau/pages/subcategoria.html',
         context,
 
     )

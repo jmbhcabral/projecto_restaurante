@@ -1,0 +1,36 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+<div class="section-content-wide formset-update content">
+    {% include "restau/partials/_conf_menu.html" %}
+        <div class="conta-content">
+            <h2 class="center">Subcategorias</h2>
+            <p class="center">
+                Atualize as subcategorias do seu restaurante, adicione novas categorias
+                ou exclua subcategorias que não são mais necessárias.
+            </p>
+            <h3 class="center">Subcategorias criadas</h3>
+            {% if subcategorias %}
+            <p class="center">Clique na Subcategoria que deseja editar.</p>
+            <div class="sub-links">
+            {% for group in subcategorias_grouped %}
+            <div class="sub-link">
+                {% for subcategoria in group %}
+                    {% if subcategoria %}
+                        <a href="{% url 'restau:subcategoria' subcategoria.id %}" class="sub-link">{{ subcategoria.nome }}</a><br>
+                    {% endif %}
+                    {% endfor %}
+                    </div>
+
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="center">Você ainda não criou nenhuma subcategoria.</p>
+                {% endif %}
+                <div class="sub-menu">
+                    <a href="{% url "restau:criar_subcategoria" %}" class="menu-btn">Criar</a>
+                    <a href="{% url "restau:ordenar_subcategorias" %}" class="menu-btn">Ordenar</a>
+                </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

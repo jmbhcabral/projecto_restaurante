@@ -1,20 +1,7 @@
 {% extends 'restau/base.html' %}
 {% block content %}
 <div class="section-content-wide content">
-  <div>
-      <h3>Configuração</h3>
-      <p>Configurações do sistema</p>
-  </div>
-  <div class="conta">
-      <div class="conta-menu">
-          <a href="" class="menu-btn">Home Page</a>
-          <a href="" class="menu-btn">Categorias</a>
-          <a href="" class="menu-btn">Subcategorias</a>
-          <a href="" class="menu-btn">Produtos</a>
-          <a href="" class="menu-btn">Fidelidade</a>
-          <a href="" class="menu-btn">Galeria</a>
-          <a href="" class="menu-btn">Utilizadores</a>
-      </div>
+    {% include "restau/partials/_conf_menu.html" %}
       <div class="conta-content">
         <div>
           <h2 class="center">Atualizar Categorias</h2>

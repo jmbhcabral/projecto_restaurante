@@ -732,7 +732,33 @@ body.frontend {
   align-items: flex-end;
   /* border:#491217 solid 1px; */
 
-}  
+}
+
+.sub-menu {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.sub-links {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  height: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+  border: #040505 solid 1px;
+}
+
+.sub-link {
+  margin: 1rem;
+}
+
+.sub-link:hover {
+  text-decoration: none;
+}
 
 .header-front h1 {
   font-family: var(--ff-frontend);

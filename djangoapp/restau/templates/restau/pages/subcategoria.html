@@ -2,15 +2,15 @@
 {% block content %}
     <div class="single-product">
         <h3 class="single-product">
-        {{ subcategory.nome}}
+        {{ subcategoria.nome}}
         </h3>
-        <p><b>Nome:</b>{{ subcategory.nome}}</p>
-        <p><b>Ordem:</b>{{ subcategory.ordem }}</p>
+        <p><b>Nome:</b>{{ subcategoria.nome}}</p>
+        <p><b>Ordem:</b>{{ subcategoria.ordem }}</p>
 
         <div class="product-links">
-            <a class="btn btn-link" href="{% url 'restau:update_subcategories' subcategory.id %}">Update</a>
+            <a class="btn btn-link" href="{% url 'restau:atualizar_subcategoria' subcategoria.id %}">Update</a>
 
-            <form action="{% url 'restau:delete_subcategory' subcategory.id %}" method='POST'>
+            <form action="{% url 'restau:apagar_subcategoria' subcategoria.id %}" method='POST'>
                 {% csrf_token %}
                 {% if confirmation == 'no' %}
                     <input type="hidden" name="confirmation" value="yes">

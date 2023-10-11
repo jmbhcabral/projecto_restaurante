@@ -2,9 +2,9 @@ from django.urls import path
 from restau.views import (                      # type: ignore
     index, admin_home, produtos, product, create_product, update, delete,
     encomendas, category, create_category, update_categories, delete_category,
-    subcategory, create_subcategory, update_subcategories, delete_subcategory,
+    subcategoria, criar_subcategoria, atualizar_subcategoria, apagar_subcategoria,
     ordenar_produtos, ementas_create, ementas_update, ementas_delete, ementa,
-    povoar_ementa, configuracao
+    povoar_ementa, configuracao, Subcategorias, ordenar_subcategorias
 )
 
 # namespace
@@ -32,15 +32,18 @@ urlpatterns = [
          update_categories, name='update_categories'),
     path('restau/pages/<int:category_id>/delete_category/',
          delete_category, name='delete_category'),
-    # subcategory
-    path('restau/pages/subcategory/<int:subcategory_id>/',
-         subcategory, name='subcategory'),
-    path('restau/pages/create_subcategory/',
-         create_subcategory, name='create_subcategory'),
-    path('restau/pages/<int:subcategory_id>/update_subcategory/',
-         update_subcategories, name='update_subcategories'),
-    path('restau/pages/<int:subcategory_id>/delete_subcategory/',
-         delete_subcategory, name='delete_subcategory'),
+    # subcategoria
+    path('restau/pages/subcategorias/', Subcategorias, name='subcategorias'),
+    path('restau/pages/subcategoria/<int:subcategoria_id>/',
+         subcategoria, name='subcategoria'),
+    path('restau/pages/criar_subcategoria/',
+         criar_subcategoria, name='criar_subcategoria'),
+    path('restau/pages/<int:subcategoria_id>/atualizar_subcategoria/',
+         atualizar_subcategoria, name='atualizar_subcategoria'),
+    path('restau/pages/<int:subcategoria_id>/apagar_subcategoria/',
+         apagar_subcategoria, name='apagar_subcategoria'),
+    path('restau/pages/ordenar_subcategorias/',
+         ordenar_subcategorias, name='ordenar_subcategorias'),
     # Ementas
     path('restau/pages/ementas/', ementas_create, name='ementas_create'),
     path('restau/pages/<int:ementa_id>/ementas_update/',
