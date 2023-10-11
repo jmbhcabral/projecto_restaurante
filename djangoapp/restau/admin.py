@@ -63,7 +63,7 @@ class ActiveSetupAdmin(admin.ModelAdmin):
     list_display_links = ('id',)
 
     def has_add_permission(self, request):
-        return not FrontendSetup.objects.exists()
+        return not ActiveSetup.objects.exists()
 
 
 @admin.register(Fotos)

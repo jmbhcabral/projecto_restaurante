@@ -1,107 +1,123 @@
 {% extends 'restau/base.html' %}
 {% block content %}
-<div class="section-content-wide formset-update content">
+<div class="section-content-wide content">
   <div>
-    <h2 class="center">Atualizar Categorias</h2>
-    <p class="center">
-      Atualize as categorias do seu restaurante, adicione novas categorias
-      ou exclua categorias que não são mais necessárias.
-    </p>
-    {% for cat in categorias %}
-    <p><a href="{% url 'restau:category'  cat.id %}">{{ cat }}</a></p>
-    {% endfor %}
+      <h3>Configuração</h3>
+      <p>Configurações do sistema</p>
   </div>
-  {% if formset %}
-  <div class="content">
-    <form action="{% url 'restau:create_category' %}" method="post">
-      {% csrf_token %}
-      {{ formset.management_form }}
-      <table class="">
-        <h3 class="center">Categorias</h3>
-        <thead>
-          <tr class="">
-            <th class=""></th>
-            <th class="">Categoria</th>
-            <th class="">Ordem</th>
-          </tr>
-        </thead>
-      
-        <tbody>
-          {% for f in formset %}
-          <tr class="">
-            <td class="">
-              {{ f.id }}
-            </td>
-            <td class="">
-              <a href="{% url 'restau:category' f.instance.id %}">
-                {{ f.nome }}
-              </a>
-            </td>
-            <td class="">
-              {{ f.ordem }}
-            </td>
-          </tr>
+  <div class="conta">
+      <div class="conta-menu">
+          <a href="" class="menu-btn">Home Page</a>
+          <a href="" class="menu-btn">Categorias</a>
+          <a href="" class="menu-btn">Subcategorias</a>
+          <a href="" class="menu-btn">Produtos</a>
+          <a href="" class="menu-btn">Fidelidade</a>
+          <a href="" class="menu-btn">Galeria</a>
+          <a href="" class="menu-btn">Utilizadores</a>
+      </div>
+      <div class="conta-content">
+        <div>
+          <h2 class="center">Atualizar Categorias</h2>
+          <p class="center">
+            Atualize as categorias do seu restaurante, adicione novas categorias
+            ou exclua categorias que não são mais necessárias.
+          </p>
+          {% for cat in categorias %}
+          <a href="{% url 'restau:category'  cat.id %}">{{ cat }}</a><br>
           {% endfor %}
-          <tr>
-            <td></td>
-            <td> </td>
-            <td>
-              <button class="btn" type="submit">Update</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </form>
-  </div>
-
-  {% else %}
-  <div class="not-found center">
-    <h1>Nada encontrado</h1>
-    <p>
-      Não encontrei nada nesse link, clique em outro
-      link do nosso admin ou vá para a
-      <a href="{% url 'restau:index' %}">Home</a>
-    </p>
-  </div>
-  {% endif %}
-<div class="content form-wrapper"> 
-  <h3 class="center">Adicionar Categoria</h3>
-  <form 
-  action="{{ form_action }}"
-  method="POST"
-  enctype="multipart/form-data"
-  >
-    {% csrf_token %}
-    <div class="form-content">
-      {% for field in form %}
-      
-      <div class="form-group">
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {{ field.errors }}
-        {% if field.help_text %}
-        <p class="help-text">{{ field.help_text }}</p>
-        {% endif %}
-      </div>
-      {% endfor %}
-    </div>
-    {% if form.non_field_errors %}
-    <div class="form-content">
-      <div class="">
-        <div class="message error">
-          {{ form.non_field_errors }}
         </div>
-      </div>
-    </div>
-    {% endif %}
-    <div class="form-content">
-      <div class="form-group">
-        <button class="btn" type="submit">Enviar</button>
-      </div>
-    </div>  
-  </form>
-  </div>
-</div> 
+        {% if formset %}
+        <div class="content">
+          <form action="{% url 'restau:create_category' %}" method="post">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            <table class="">
+              <h3 class="center">Categorias</h3>
+              <thead>
+                <tr class="">
+                  <th class=""></th>
+                  <th class="">Categoria</th>
+                  <th class="">Ordem</th>
+                </tr>
+              </thead>
+            
+              <tbody>
+                {% for f in formset %}
+                <tr class="">
+                  <td class="">
+                    {{ f.id }}
+                  </td>
+                  <td class="">
+                    <a href="{% url 'restau:category' f.instance.id %}">
+                      {{ f.nome }}
+                    </a>
+                  </td>
+                  <td class="">
+                    {{ f.ordem }}
+                  </td>
+                </tr>
+                {% endfor %}
+                <tr>
+                  <td></td>
+                  <td> </td>
+                  <td>
+                    <button class="btn" type="submit">Update</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+        </div>
+        {% else %}
+        <div class="not-found center">
+          <h1>Nada encontrado</h1>
+          <p>
+            Não encontrei nada nesse link, clique em outro
+            link do nosso admin ou vá para a
+            <a href="{% url 'restau:index' %}">Home</a>
+          </p>
+        </div>
+        {% endif %}
+        <div class="content form-wrapper"> 
+          <h3 class="center">Adicionar Categoria</h3>
+          <form 
+          action="{{ form_action }}"
+          method="POST"
+          enctype="multipart/form-data"
+          >
+          {% csrf_token %}
+            <div class="form-content">
+              {% for field in form %}
+              
+              <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {{ field.errors }}
+                {% if field.help_text %}
+                <p class="help-text">{{ field.help_text }}</p>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+            {% if form.non_field_errors %}
+            <div class="form-content">
+              <div class="">
+                <div class="message error">
+                  {{ form.non_field_errors }}
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            <div class="form-content">
+              <div class="form-group">
+                <button class="btn" type="submit">Enviar</button>
+              </div>
+            </div>  
+          </form>
+        </div>
+      </div>  
+  </div> 
+</div>
 {% endblock content %}
   
   

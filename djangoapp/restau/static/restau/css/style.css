@@ -875,6 +875,7 @@ body.frontend {
 }
 
 .conta {
+  border:#040505 solid 1px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -909,7 +910,31 @@ body.frontend {
   margin: 0;
   padding: var(--spacing-smlst);
   height: auto;
-  width: 75%;
+  width: 100%;
+}
+
+.menu-btn {
+  background-color: hsl(var(--clr-gray-dk));
+  color: hsl(var(--clr-white));
+  font-weight: bold;
+  border: none;
+  margin: 0.5rem;
+  padding: 1rem 2rem;
+  border-radius: var(--br-base);
+  cursor: pointer;
+  transition: filter var(--transition-fast) ease-in-out;
+}
+
+.menu-btn:hover {
+  filter: brightness(90%);
+  text-decoration: none;
+}
+
+
+.menu-btn:focus,
+.menu-btn:active {
+  filter: brightness(80%);
+  box-shadow: 0 0 5px hsl(var(--clr-gray-dk));
 }
 
 

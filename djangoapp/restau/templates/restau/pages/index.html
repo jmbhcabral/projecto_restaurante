@@ -4,36 +4,7 @@
         <div class="intro-section">
             <div class="texto-intro">    
                 <p>
-                    Bem-vindo ao nosso encantador restaurante! 
-                 </p>
-                 <p>   
-                    Aqui, você encontrará um ambiente acolhedor e familiar, 
-                    onde cada detalhe foi pensado para proporcionar uma 
-                    experiência única aos nossos clientes. Ao entrar no espaço, 
-                    será recebido por uma atmosfera nostálgica e charmosa, 
-                    criando uma sensação acolhedora e convidativa. A decoração é 
-                    inspirada no estilo rústico, com o uso predominante de 
-                    madeiras que trazem uma sensação de conforto e 
-                    familiaridade. As mesas são dispostas de forma a garantir 
-                    uma experiência íntima e acolhedora para casais, famílias 
-                    e grupos de amigos.
-                </p>
-                <p>A nossa Carta é elaborada na perfeição, oferecendo 
-                    hambúrgueres saborosos que combinam ingredientes frescos e 
-                    locais. A nossa cozinha equilibra a tradição dos 
-                    hambúrgueres clássicos com as inovadoras e deliciosas 
-                    criações do nosso talentoso Chef, todas meticulosamente 
-                    preparadas pela nossa dedicada equipa.
-                </p>
-                <p>
-                    Seja para um almoço em família, um jantar romântico ou um 
-                    encontro descontraído com amigos, o nosso restaurante é o 
-                    lugar perfeito para desfrutar de momentos especiais em uma 
-                    atmosfera única e cativante.
-                </p>
-                <p>
-                    Esperamos recebê-lo em breve para uma experiência 
-                    gastronômica memorável no nosso restaurante!
+                    {{ active_setup.active_intro.intro|linebreaks }}
                 </p>
             </div>
             <div class="imagens-ambiente">
@@ -59,17 +30,17 @@
                 </div>
                 <div>
                     <p>
-                        Pão brioche feito no nosso restaurante todos os dias, com o balanço perfeito entre a crocância da casca e a maciez do miolo.
+                        {{ active_setup.active_frase_cima.frase_cima|linebreaks }}
                     </p>
                 </div>
             </div>
             <div class="frase">
-                <h3>"Os hambúrgueres meticulosamente preparados não são apenas refeições, mas jornadas culinárias que transportam os sentidos para um mundo de texturas suculentas e sabores intensos."</h3>
+                <h3>{{ active_setup.active_frase_inspiradora.frase_inspiradora|linebreaks }}</h3>
             </div>
             <div class="frase-imagens-baixo">
                 <div>
                     <p>
-                        Carne 100% de vaca de origem local, vinda todos os dias do talho, sempre fresca e suculenta.
+                        {{ active_setup.active_frase_baixo.frase_baixo|linebreaks }}
                     </p>
                 </div>
             

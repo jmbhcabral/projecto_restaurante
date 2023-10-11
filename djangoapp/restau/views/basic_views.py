@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, user_passes_test
-from restau.models import FrontendSetup, ActiveSetup
+from restau.models import ActiveSetup
 
 
 @login_required
@@ -17,19 +17,17 @@ def admin_home(request):
 
 
 def index(request):
-    main_logo = FrontendSetup.objects \
-        .filter(imagem_logo__isnull=False) \
-        .order_by('-id') \
-        .first()
 
-    main_image = FrontendSetup.objects \
-        .filter(imagem_topo__isnull=False) \
-        .order_by('-id') \
+    active_setup = ActiveSetup.objects \
+        .select_related(
+            'active_imagem_logo', 'active_imagem_topo',
+            'active_intro', 'active_frase_inspiradora', 'active_frase_cima',
+            'active_frase_baixo') \
+        .all() \
         .first()
 
     return render(
         request,
         'restau/pages/index.html',
-        {'main_logo': main_logo,
-         'main_image': main_image},
+        {'active_setup': active_setup, },
     )

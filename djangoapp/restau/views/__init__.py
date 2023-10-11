@@ -9,3 +9,4 @@ from .subcategory_forms import *
 from .subcategory_views import *
 from .ementa_forms import *
 from .ementa_views import *
+from .configuracao_views import *

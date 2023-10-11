@@ -1,8 +1,8 @@
 <header class="header-front">
-    {% if main_logo %}
+    {% if active_setup %}
     <div>
-        {% if main_logo.imagem_logo %}
-        <img src="{{ main_logo.imagem_logo.url }}" alt="Logo">
+        {% if active_setup.active_imagem_logo %}
+        <img src="{{ active_setup.active_imagem_logo.imagem_logo.url }}" alt="{{ active_setup.active_imagem_logo.imagem_logo.nome }}">
         {% else %}
         <h1>Extreme Way</h1>
         {% endif %}

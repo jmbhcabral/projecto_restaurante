@@ -191,10 +191,16 @@ class FrontendSetup(models.Model):
         current_imagem_logo_name = str(self.imagem_logo.name)
         current_imagem_topo_name = str(self.imagem_topo.name)
         current_imagem_padrao_name = str(self.imagem_padrao.name)
+        current_intro_imagem_name = str(self.intro_imagem.name)
+        current_imagem_frase_cima_name = str(self.imagem_frase_cima.name)
+        current_imagem_frase_baixo_name = str(self.imagem_frase_baixo.name)
         super().save(*args, **kwargs)
         imagem_logo_changed = False
         imagem_topo_changed = False
         imagem_padrao_changed = False
+        intro_imagem_changed = False
+        imagem_frase_cima_changed = False
+        imagem_frase_baixo_changed = False
 
         if self.imagem_logo:
             imagem_logo_changed = current_imagem_logo_name != \
@@ -208,6 +214,18 @@ class FrontendSetup(models.Model):
             imagem_padrao_changed = current_imagem_padrao_name != \
                 self.imagem_padrao.name
 
+        if self.intro_imagem:
+            intro_imagem_changed = current_intro_imagem_name != \
+                self.intro_imagem.name
+
+        if self.imagem_frase_cima:
+            imagem_frase_cima_changed = current_imagem_frase_cima_name != \
+                self.imagem_frase_cima.name
+
+        if self.imagem_frase_baixo:
+            imagem_frase_baixo_changed = current_imagem_frase_baixo_name != \
+                self.imagem_frase_baixo.name
+
         if imagem_logo_changed:
             print('Resizing logo')
             resize_image(self.imagem_logo, 200)
@@ -220,6 +238,18 @@ class FrontendSetup(models.Model):
         if imagem_padrao_changed:
             print('resizing')
             resize_image(self.imagem_padrao, 500)
+
+        if intro_imagem_changed:
+            print('resizing')
+            resize_image(self.intro_imagem, 1200)
+
+        if imagem_frase_cima_changed:
+            print('resizing')
+            resize_image(self.imagem_frase_cima, 300)
+
+        if imagem_frase_baixo_changed:
+            print('resizing')
+            resize_image(self.imagem_frase_baixo, 300)
 
     def __str__(self):
         return self.nome
