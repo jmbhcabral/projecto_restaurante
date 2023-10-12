@@ -1,0 +1,36 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+<div class="section-content-wide formset-update content">
+    {% include "restau/partials/_conf_menu.html" %}
+        <div class="conta-content">
+            <h2 class="center">Categorias</h2>
+            <p class="center">
+                Atualize as Categorias do seu restaurante, adicione novas categorias
+                ou exclua Categorias que não são mais necessárias.
+            </p>
+            <h3 class="center">Categorias criadas</h3>
+            {% if categorias %}
+            <p class="center">Clique na Categoria que deseja editar.</p>
+            <div class="sub-links">
+            {% for group in categorias_grouped %}
+            <div class="sub-link">
+                {% for categoria in group %}
+                    {% if categoria %}
+                        <a href="{% url 'restau:categoria' categoria.id %}" class="sub-link">{{ categoria.nome }}</a><br>
+                    {% endif %}
+                    {% endfor %}
+                    </div>
+
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="center">Você ainda não criou nenhuma Categoria.</p>
+                {% endif %}
+                <div class="sub-menu">
+                    <a href="{% url "restau:criar_categoria" %}" class="menu-btn">Criar</a>
+                    <a href="{% url "restau:ordenar_categorias" %}" class="menu-btn">Ordenar</a>
+                </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+<div class="section-content-wide formset-update content">
+    {% include "restau/partials/_conf_menu.html" %}
+        <div class="conta-content">
+            <h2 class="center">Ordenar Categorias</h2>
+            <p class="center">
+                Ordene as Categorias de acordo com a ordem que deseja que elas apareçam no site.
+            </p>
+            {% if formset %}
+            <div class="content">
+                <form action="{% url 'restau:ordenar_categorias' %}" method="post">
+                    {% csrf_token %}
+                    {{ formset.management_form }}
+                    <table class="">
+                        <h3 class="center">Ordenar Categorias</h3>
+                        <thead>
+                            <tr class="">
+                                <th class=""></th>
+                                <th class="">Categoria</th>
+                                <th class="">Ordem</th>
+                            </tr>
+                        </thead> 
+                        <tbody>
+                            {% for f in formset %}
+                            <tr class="">
+                                <td class="">
+                                    {{ f.id }}
+                                </td>
+                                <td class="">
+                                    <a href="{% url 'restau:categoria' f.instance.id %}">
+                                    {{ f.nome }}
+                                    </a>
+                                </td>
+                                <td class="">
+                                    {{ f.ordem }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <button class="btn" type="submit">Ordenar</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+            {% else %}
+            <div class="not-found center">
+                <h1>Nada encontrado</h1>
+                <p>
+                    Não encontrei nada nesse link, clique em outro
+                    link do nosso admin ou vá para a
+                    <a href="{% url 'restau:index' %}">Home</a>
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    </div>
+{% endblock %}

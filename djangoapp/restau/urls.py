@@ -1,10 +1,11 @@
 from django.urls import path
 from restau.views import (                      # type: ignore
     index, admin_home, produtos, product, create_product, update, delete,
-    encomendas, category, create_category, update_categories, delete_category,
-    subcategoria, criar_subcategoria, atualizar_subcategoria, apagar_subcategoria,
-    ordenar_produtos, ementas_create, ementas_update, ementas_delete, ementa,
-    povoar_ementa, configuracao, Subcategorias, ordenar_subcategorias
+    encomendas, categoria, criar_categoria, atualizar_categoria,
+    apagar_categoria, subcategoria, criar_subcategoria, atualizar_subcategoria,
+    apagar_subcategoria, ordenar_produtos, ementas_create, ementas_update,
+    ementas_delete, ementa, povoar_ementa, configuracao, Subcategorias,
+    ordenar_subcategorias, categorias, ordenar_categorias
 )
 
 # namespace
@@ -24,14 +25,17 @@ urlpatterns = [
     path('restau/pages/<int:product_id>/update/', update, name='update'),
     path('restau/pages/<int:product_id>/delete/', delete, name='delete'),
     # category
-    path('restau/pages/category/<int:category_id>/',
-         category, name='category'),
-    path('restau/pages/create_category/',
-         create_category, name='create_category'),
-    path('restau/pages/<int:category_id>/update_category/',
-         update_categories, name='update_categories'),
-    path('restau/pages/<int:category_id>/delete_category/',
-         delete_category, name='delete_category'),
+    path('restau/pages/categorias/', categorias, name='categorias'),
+    path('restau/pages/categoria/<int:categoria_id>/',
+         categoria, name='categoria'),
+    path('restau/pages/criar_categoria/',
+         criar_categoria, name='criar_categoria'),
+    path('restau/pages/<int:categoria_id>/atualizar_categoria/',
+         atualizar_categoria, name='atualizar_categoria'),
+    path('restau/pages/<int:categoria_id>/apagar_categoria/',
+         apagar_categoria, name='apagar_categoria'),
+    path('restau/pages/ordenar_categorias/',
+         ordenar_categorias, name='ordenar_categorias'),
     # subcategoria
     path('restau/pages/subcategorias/', Subcategorias, name='subcategorias'),
     path('restau/pages/subcategoria/<int:subcategoria_id>/',

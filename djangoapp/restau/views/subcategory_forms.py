@@ -23,7 +23,7 @@ def criar_subcategoria(request):
             print(f'form is valid: {form.is_valid()}')
             subcategoria = form.save()
             print('form saved')
-            return redirect('restau:criar_subcategoria',
+            return redirect('restau:atualizar_subcategoria',
                             subcategoria_id=subcategoria.id)
 
         else:
@@ -58,6 +58,7 @@ def atualizar_subcategoria(request, subcategoria_id):
         form = SubCategoryForm(
             request.POST, request.FILES, instance=subcategoria)
         context = {
+            'subcategoria': subcategoria,
             'form': form,
             'form_action': form_action,
         }
@@ -75,6 +76,7 @@ def atualizar_subcategoria(request, subcategoria_id):
     context = {
         'form': SubCategoryForm(instance=subcategoria),
         'form_action': form_action,
+        'subcategoria': subcategoria,
     }
     return render(
         request,
@@ -100,7 +102,7 @@ def apagar_subcategoria(request, subcategoria_id):
         request,
         'restau/pages/subcategoria.html',
         {
-            'subcategory': subcategoria,
+            'subcategoria': subcategoria,
             'confirmation': confirmation,
         }
     )

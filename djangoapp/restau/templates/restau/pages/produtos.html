@@ -1,47 +1,28 @@
 {% extends 'restau/base.html' %}
 {% block content %}
-<div>
-  <nav class="menu">
-    <ul class="menu-items">
-      <li class="menu-item">
-        <a href="{% url 'restau:create_product' %}" class="menu-link">Criar Produto</a>
-      </li>
-      <li class="menu-item">
-        <a href="{% url 'restau:ordenar_produtos' %}" class="menu-link">Ordenar Produtos</a>
-      </li>
-      <li class="menu-item">
-        <a href="{% url 'restau:create_category' %}" class="menu-link">Categorias</a> 
-      </li>
-      <li class="menu-item">
-        <a href="{% url 'restau:create_subcategory' %}" class="menu-link">Subcategorias</a>
-      </li>
-    </ul>
-
-  </nav>
-</div>
-  {% if produtos %}
-    <div class="main-content content responsive-table">
-      <table class="products-table">
-        <h3>Produtos</h3>
-        <thead>
-          <tr class="table-row table-row-header">
-            <th class="table-header">Produto</th>
-            <th class="table-header">Categoria</th>
-            <th class="table-header">Subcategoria</th>
-            <th class="table-header">Preço 1</th>
-            <th class="table-header">Preço 2</th>
-            <th class="table-header">Preço 3</th>
-            <th class="table-header">Preço 4</th>
-            <th class="table-header">Preço 5</th>
-            <th class="table-header">Preço 6</th>
-            <th class="table-header">Preço Promo</th>
-            <th class="table-header">Visib</th>
-          </tr>
-        </thead>
-        
-        <tbody>
-          {% for produto in produtos %}
-          
+<div class="section-content-wide formset-update content">
+  {% include "restau/partials/_conf_menu.html" %}
+  <div class="conta-content">
+    <h2 class="center">Produtos</h2>
+      <p class="center">
+          Atualize os Produtos do seu restaurante, adicione novos Produtos
+          ou exclua Produtos que não são mais necessários.
+      </p>
+      <h3 class="center">Produtos criados</h3>
+      {% if produtos %}
+      <div class="content responsive-table">
+        <table class="products-table">
+          <thead>
+            <tr class="table-row table-row-header">
+              <th class="table-header">Produto</th>
+              <th class="table-header">Preço 1</th>
+              <th class="table-header">Preço 2</th>
+              <th class="table-header">Preço 3</th>
+              <th class="table-header">Visib</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for produto in produtos %}
             <tr class="table-row">
               <td class="table-cell">
                 <a 
@@ -50,19 +31,7 @@
                 >
                   {{ produto.nome }}
                 </a>
-              </td>
-              <td class="table-cell">
-                {{ produto.categoria }}
-              </td>
-              {% if produto.subcategoria %}
-              <td class="table-cell">
-                {{ produto.subcategoria }}
-              </td>
-              {% else %}
-              <td class="table-cell">
-                ----------
-              </td>
-              {% endif %}
+              </td> 
               <td class="table-cell">
                 {{ produto.preco_1 }}
               </td>
@@ -73,33 +42,28 @@
                 {{ produto.preco_3 }}
               </td>
               <td class="table-cell">
-                {{ produto.preco_4 }}
-              </td>
-              <td class="table-cell">
-                {{ produto.preco_5 }}
-              </td>
-              <td class="table-cell">
-                {{ produto.preco_6 }}
-              </td>
-              <td class="table-cell">
-                {{ produto.preco_promo }}
-              </td>
-              <td class="table-cell">
                 {{ produto.visibilidade }}
               </td>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="not-found center">
+        <h1>Nada encontrado!</h1>
+          <p>
+            Não encontrei nada nesse link, clique em outro
+            link do nosso admin ou vá para a
+            <a href="{% url 'restau:index' %}">Home</a>
+          </p>
+      </div>
+      {% endif %}
+      <div class="sub-menu">
+        <a href="" class="menu-btn">Criar</a>
+        <a href="" class="menu-btn">Ordenar</a>
+      </div>
     </div>
-  {% else %}
-    <div class="not-found center">
-      <h1>Nada encontrado!</h1>
-        <p>
-          Não encontrei nada nesse link, clique em outro
-          link do nosso admin ou vá para a
-          <a href="{% url 'restau:index' %}">Home</a>
-        </p>
-    </div>
-  {% endif %}
+  </div>
+</div>
 {% endblock content %}

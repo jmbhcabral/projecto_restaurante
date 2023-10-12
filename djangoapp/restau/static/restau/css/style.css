@@ -310,6 +310,8 @@ img {
 .responsive-table {
   width: 100%;
   overflow-x: auto;
+  min-width: var(--tb-min-width);
+  height: 100%;
 }
 
 .products-table {

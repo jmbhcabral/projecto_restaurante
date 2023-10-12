@@ -3,23 +3,21 @@
 <div class="section-content-wide formset-update content">
     {% include "restau/partials/_conf_menu.html" %}
         <div class="conta-content">
-            <h2 class="center">Subcategoria</h2>
+            <h2 class="center">Categoria</h2>
             <p class="center">
-                Atualize a subcategoria ou exclua-a se não for mais necessária.
+                Atualize a Categoria ou exclua-a se não for mais necessária.
                 
             </p>
             <div class="single-product">
                 <h3 class="single-product">
-                {{ subcategoria.nome}}
+                {{ categoria.nome}}
                 </h3>
-                <p><b>Nome: </b>{{ subcategoria.nome}}</p>
-                <p><b>Categoria: </b>{{ subcategoria.categoria}}</p>
-                <p><b>Ordem: </b>{{ subcategoria.ordem }}</p>
-
+                <p><b>Produto:</b>{{ categoria.nome}}</p>
+                <p><b>Ordem:</b>{{ categoria.ordem }}</p>
                 <div class="product-links">
-                    <a class="btn btn-link" href="{% url 'restau:atualizar_subcategoria' subcategoria.id %}">Update</a>
+                    <a class="btn btn-link" href="{% url 'restau:atualizar_categoria' categoria.id %}">Update</a>
 
-                    <form action="{% url 'restau:apagar_subcategoria' subcategoria.id %}" method='POST'>
+                    <form action="{% url 'restau:apagar_categoria' categoria.id %}" method='POST'>
                         {% csrf_token %}
                         {% if confirmation == 'no' %}
                             <input type="hidden" name="confirmation" value="yes">
@@ -33,5 +31,4 @@
             </div>
         </div>
     </div>
-</div>
 {% endblock content %}

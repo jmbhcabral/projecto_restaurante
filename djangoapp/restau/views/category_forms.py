@@ -9,7 +9,114 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 @login_required
 @user_passes_test(lambda user: user.groups.filter(
     name='acesso_restrito').exists())
-def create_category(request):
+def criar_categoria(request):
+
+    categorias = Category.objects.all().order_by('ordem')
+
+    form_action = reverse('restau:criar_categoria')
+
+    if request.method == 'POST':
+
+        form = CategoryForm(request.POST, request.FILES)
+        context = {
+            'categorias': categorias,
+            'form': form,
+            'form_action': form_action,
+        }
+
+        if form.is_valid():
+            print(f'form is valid: {form.is_valid()}')
+            categoria = form.save()
+            print('form saved')
+            return redirect(
+                'restau:criar_categoria', categoria_id=categoria.id
+            )
+
+        else:
+            print(f'form: {form.errors}')
+
+        return render(
+            request,
+            'restau/pages/criar_categoria.html',
+            context
+        )
+
+    context = {
+        'categorias': categorias,
+        'form': CategoryForm(),
+        'form_action': form_action,
+    }
+
+    return render(
+        request,
+        'restau/pages/criar_categoria.html',
+        context
+    )
+
+
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
+def atualizar_categoria(request, categoria_id):
+    categoria = get_object_or_404(
+        Category, pk=categoria_id)
+    form_action = reverse('restau:atualizar_categoria', args=(categoria_id,))
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, request.FILES, instance=categoria)
+        context = {
+            'categoria': categoria,
+            'form': form,
+            'form_action': form_action,
+        }
+
+        if form.is_valid():
+            categoria = form.save()
+            return redirect('restau:criar_categoria')
+
+        return render(
+            request,
+            'restau/pages/criar_categoria.html',
+            context
+        )
+
+    context = {
+        'categoria': categoria,
+        'form': CategoryForm(instance=categoria),
+        'form_action': form_action,
+    }
+    return render(
+        request,
+        'restau/pages/criar_categoria.html',
+        context
+    )
+
+
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
+def apagar_categoria(request, categoria_id):
+    categoria = get_object_or_404(
+        Category, pk=categoria_id
+    )
+    confirmation = request.POST.get('confirmation', 'no')
+
+    if confirmation == 'yes':
+        categoria.delete()
+        return redirect('restau:criar_categoria')
+
+    return render(
+        request,
+        'restau/pages/categoria.html',
+        {
+            'categoria': categoria,
+            'confirmation': confirmation,
+        }
+    )
+
+
+def ordenar_categorias(request):
+    categorias = Category.objects.all().order_by('ordem')
+
     CategoriaFormSet = modelformset_factory(
         Category, fields=('id', 'nome', 'ordem',), extra=0)
 
@@ -17,115 +124,38 @@ def create_category(request):
                                .all()
                                .order_by('ordem')
                                )
-    categorias = Category.objects.all().order_by('ordem')
-
-    form_action = reverse('restau:create_category')
-
+    form_action = reverse('restau:ordenar_categorias')
     if request.method == 'POST':
         formset = CategoriaFormSet(
             request.POST, request.FILES, queryset=Category.objects.all())
 
-        form = CategoryForm(request.POST, request.FILES)
         context = {
             'categorias': categorias,
             'formset': formset,
-            'form': form,
             'form_action': form_action,
+
         }
 
         if formset.is_valid():
-            print(f'formset is valid: {formset.is_valid()}')
             formset.save()  # Salva o formset diretamente
-            print('formset saved')
-            return redirect('restau:create_category',)
-
-        if form.is_valid():
-            print(f'form is valid: {form.is_valid()}')
-            categoria = form.save()
-            print('form saved')
-            return redirect('restau:create_category', category_id=categoria.id)
+            return redirect('restau:ordenar_categorias')
 
         else:
             print(f'formset: {formset.errors}')
-            print(f'form: {form.errors}')
 
         return render(
             request,
-            'restau/pages/create_category.html',
+            'restau/pages/ordenar_categorias.html',
             context
         )
 
     context = {
         'categorias': categorias,
         'formset': formset,
-        'form': CategoryForm(),
-        'form_action': form_action,
-    }
-    print('-------------------------------------')
-    print('-------------Debugging---------------')
-    print('-------------------------------------')
-    print('-------------------------------------')
-    print(context)
-    return render(
-        request,
-        'restau/pages/create_category.html',
-        context
-    )
-
-
-@login_required
-@user_passes_test(lambda user: user.groups.filter(
-    name='acesso_restrito').exists())
-def update_categories(request, category_id):
-    category = get_object_or_404(
-        Category, pk=category_id)
-    form_action = reverse('restau:update_categories', args=(category_id,))
-    if request.method == 'POST':
-        form = CategoryForm(request.POST, request.FILES, instance=category)
-        context = {
-            'form': form,
-            'form_action': form_action,
-        }
-
-        if form.is_valid():
-            category = form.save()
-            return redirect('restau:create_category')
-
-        return render(
-            request,
-            'restau/pages/create_category.html',
-            context
-        )
-
-    context = {
-        'form': CategoryForm(instance=category),
         'form_action': form_action,
     }
     return render(
         request,
-        'restau/pages/create_category.html',
-        context
-    )
-
-
-@login_required
-@user_passes_test(lambda user: user.groups.filter(
-    name='acesso_restrito').exists())
-def delete_category(request, category_id):
-    category = get_object_or_404(
-        Category, pk=category_id
-    )
-    confirmation = request.POST.get('confirmation', 'no')
-
-    if confirmation == 'yes':
-        category.delete()
-        return redirect('restau:create_category')
-
-    return render(
-        request,
-        'restau/pages/category.html',
-        {
-            'category': category,
-            'confirmation': confirmation,
-        }
+        'restau/pages/ordenar_categorias.html',
+        context,
     )

@@ -3,12 +3,13 @@
 <div class="section-content-wide formset-update content">
   {% include "restau/partials/_conf_menu.html" %}
     <div class="conta-content">
-      <h2 class="center">Criar subcategorias</h2>
+      {% if subcategoria.id %}
+      <h2 class="center">Editar subcategoria</h2>
       <p class="center">
-        crie novas subcategorias.
+        Edite a subcategoria.
       </p>
       <div class="content form-wrapper"> 
-        <h3 class="center">Adicionar Subcategoria</h3>
+        <h3 class="center">Editar subcategoria</h3>
         <form 
         action="{{ form_action }}"
         method="POST"
@@ -38,11 +39,53 @@
           {% endif %}
           <div class="form-content">
             <div class="form-group">
-              <button class="btn" type="submit">Enviar</button>
+              <button class="btn" type="submit">Editar</button>
             </div>
           </div> 
         </form>
-      </div> 
+      </div>
+      {% else %}
+      <h2 class="center">Adicionar Subcategoria</h2>
+      <p class="center">
+        Adicione a subcategoria.
+      </p>
+      <div class="content form-wrapper"> 
+        <h3 class="center">Criar Subcategoria</h3>
+        <form 
+        action="{{ form_action }}"
+        method="POST"
+        enctype="multipart/form-data"
+        >
+          {% csrf_token %}
+          <div class="form-content">
+            {% for field in form %}
+            <div class="form-group">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {{ field.errors }}
+              {% if field.help_text %}
+              <p class="help-text">{{ field.help_text }}</p>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          {% if form.non_field_errors %}
+          <div class="form-content">
+            <div class="">
+              <div class="message error">
+                {{ form.non_field_errors }}
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          <div class="form-content">
+            <div class="form-group">
+              <button class="btn" type="submit">Criar</button>
+            </div>
+          </div> 
+        </form>
+      </div>
+      {% endif %}
     </div>
   </div>
 </div> 
