@@ -5,16 +5,23 @@ from perfil.models import Perfil
 from django.contrib import messages
 from django.db import models
 from django.contrib.auth.models import User
-from django.http import QueryDict
-from decimal import Decimal
+from itertools import zip_longest
 
 
-def fidelidade(request):
+def fidelidades(request):
+    def grouper(iterable, n, fillvalue=None):
+        # "Coleta dados em grupos fixos"
+        args = [iter(iterable)] * n
+        return zip_longest(*args, fillvalue=fillvalue)
+
+    fidelidades = Fidelidade.objects.all()
+    for fidel in fidelidades:
+        print('fidelidade: ', fidel)
+    fidelidades_grouped = list(grouper(fidelidades, 5))
+
     query = request.GET.get('query', None)
-    print('Query: ', query)
 
     if query is not None:
-        print('Query not None')
         resultado_completo = f'CEW-{query}'
 
         try:
@@ -26,7 +33,7 @@ def fidelidade(request):
                     request,
                     f'Cliente {resultado_completo} não tem fidelidade atribuida')
                 return redirect(
-                    'fidelidade:fidelidade')
+                    'fidelidade:fidelidades')
             else:
                 usuario = User.objects.get(pk=perfil.usuario.id)
                 print('Tipo fidelidade is not None')
@@ -40,9 +47,15 @@ def fidelidade(request):
             messages.error(
                 request,
                 f'Cliente {resultado_completo} não encontrado')
+    context = {
+        'fidelidades_grouped': fidelidades_grouped,
+        # 'fidelidades': fidelidades,
+    }
+
     return render(
         request,
-        'fidelidade/pages/fidelidade.html',
+        'fidelidade/pages/fidelidades.html',
+        context,
     )
 
 

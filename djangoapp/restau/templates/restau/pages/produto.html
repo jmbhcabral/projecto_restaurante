@@ -1,36 +1,74 @@
 {% extends 'restau/base.html' %}
 {% block content %}
-    <div class="section-content-narrow content">
-        <h3 class="">
-        {{ product.nome}}
+<div class="section-content-wide formset-update content">
+    {% include "restau/partials/_conf_menu.html" %}
+    <div class="conta-content">
+      <h2 class="center">Produtos</h2>
+        <p class="center">
+            Atualize os Produtos do seu restaurante, adicione novos Produtos
+            ou exclua Produtos que não são mais necessários.
+        </p>
+        <h3 class="center">
+        {{ produto.nome}}
         </h3>
-        <p><b>Produto: </b>{{ product.nome}}</p>
-        <p><b>Imagem: </b>{% if product.imagem %}<img src="{{ product.imagem.url}}" alt="">{% endif %}</p>
-        <p><b>Categoria: </b>{{ product.categoria }}</p>
-        <p><b>Subcategoria: </b>{{ product.subcategoria }}</p>
-        <p><b>Preço 1: </b>{{ product.preco_1 }}</p>
-        <p><b>Preço 2: </b>{{ product.preco_2 }}</p>
-        <p><b>Preço 3: </b>{{ product.preco_3 }}</p>
-        <p><b>Preço 4: </b>{{ product.preco_4 }}</p>
-        <p><b>Preço 5: </b>{{ product.preco_5 }}</p>
-        <p><b>Preço 6: </b>{{ product.preco_6 }}</p>
-        <p><b>Preço Promo: </b>{{  product.preco_promo }}</p>
-        <p><b>Visib: </b>{{ product.visibilidade }}</p>
-
-        <div class="product-links">
-            <a class="btn btn-link" href="{% url 'restau:update' product.id %}">Update</a>
-
-            <form action="{% url 'restau:delete' product.id %}" method='POST'>
-                {% csrf_token %}
-                {% if confirmation == 'no' %}
-                    <input type="hidden" name="confirmation" value="yes">
-                    <button class="btn btn-link btn-delete" type="submit">Confirma?</button>
-                {% else %}
-                    <button class="btn btn-link btn-delete" type="submit">Delete</button>
-                
-                {% endif %}
-            </form>
+        <div class="center">
+            <p><b>Produto: </b>{{ produto.nome}}</p>
+            <p><b>Imagem: </b>{% if produto.imagem %}<img src="{{ produto.imagem.url}}" alt="">{% endif %}</p>
+            <p><b>Categoria: </b>{{ produto.categoria }}</p>
+            <p><b>Subcategoria: </b>{{ produto.subcategoria }}</p>
+            {% if produto.preco_1 %}
+            <p><b>Preço 1: </b>{{ produto.preco_1 }}</p>
+            {% else %}
+            <p><b>Preço 1: </b>------</p>
+            {% endif %}
+            {% if produto.preco_2 %}
+            <p><b>Preço 2: </b>{{ produto.preco_2 }}</p>
+            {% else %}
+            <p><b>Preço 2: </b>------</p>
+            {% endif %}
+            {% if produto.preco_3 %}
+            <p><b>Preço 3: </b>{{ produto.preco_3 }}</p>
+            {% else %}
+            <p><b>Preço 3: </b>------</p>
+            {% endif %}
+            {% if produto.preco_4 %}
+            <p><b>Preço 4: </b>{{ produto.preco_4 }}</p>
+            {% else %}
+            <p><b>Preço 4: </b>------</p>
+            {% endif %}
+            {% if produto.preco_5 %}
+            <p><b>Preço 5: </b>{{ produto.preco_5 }}</p>
+            {% else %}
+            <p><b>Preço 5: </b>------</p>
+            {% endif %}
+            {% if produto.preco_6 %}
+            <p><b>Preço 6: </b>{{ produto.preco_6 }}</p>
+            {% else %}
+            <p><b>Preço 6: </b>------</p>
+            {% endif %}
+            {% if produto.visibilidade %}
+            <p><b>Visibilidade: </b>Vísivel</p>
+            {% else %}
+            <p><b>Visibilidade: </b>Oculto</p>
+            {% endif %}
+            
         </div>
+        
+            <div class="product-links">
+                <a class="btn btn-link" href="{% url 'restau:atualizar_produto' produto.id %}">Atualizar</a>
 
+                <form action="{% url 'restau:apagar_produto' produto.id %}" method='POST'>
+                    {% csrf_token %}
+                    {% if confirmation == 'no' %}
+                        <input type="hidden" name="confirmation" value="yes">
+                        <button class="btn btn-link btn-delete" type="submit">Confirma?</button>
+                    {% else %}
+                        <button class="btn btn-link btn-delete" type="submit">Delete</button>
+                    
+                    {% endif %}
+                </form>
+            </div>
+        </div>
     </div>
+</div>
 {% endblock content %}

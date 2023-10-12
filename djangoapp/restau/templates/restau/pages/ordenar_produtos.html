@@ -1,67 +1,79 @@
 {% extends 'restau/base.html' %}
 {% block content %}
-{% if formset %}
-<div class="main-content content responsive-table">
-  <form action="{% url 'restau:ordenar_produtos' %}" method="post">
-  {% csrf_token %}
-  {{ formset.management_form }}
-  <div class="form-content">
-    
-    <div class="form-group">
-      {% for cat in categorias %}
-      <h2>{{ cat.nome }}</h2>
-      {% for sub in subcategorias %}
-      {% if sub.categoria == cat %}
-      <h4>{{ sub.nome }}<h4>
-      {% for field in formset %}
-      {% if field.instance.categoria == cat and field.instance.subcategoria == sub %}
-      <div class="ordenar">
-        <p> {{ field.id}} </p>
-        <p> {{ field.nome }} </p>
-        <p> {{ field.ordem }} </p>
-      </div>
-      {% endif %}
-      {% endfor %}
-      {% endif %}
-      {% endfor %}
-      {% for field in formset %}
-      {% if field.instance.categoria == cat and not field.instance.subcategoria %}
-      <div class="ordenar">
-        <div> {{ field.id}} </div>
-        <div> {{ field.nome }} </div>
-        <div> {{ field.ordem }} </div>
-      </div>
-      {% endif %}
-      {% endfor %}
-      {% endfor %}
-    </div>
-  </div>
-  {% if form.non_field_errors %}
-  <div class="form-content">
-    <div class="">
-      <div class="message error">
-        {{ form.non_field_errors }}
-      </div>
-    </div>
-  </div>
-  {% endif %}
-  <div class="form-content">
-    <div class="form-group">
-      <button class="btn" type="submit">Enviar</button>
-    </div>
-  </div>  
-</form>
-</div> 
-  </form>
-</div>
-{% else %}
-<div class="not-found center">
-  <h1>Nada encontrado 😞</h1>
-    <p>
-      Não encontrei nada nesse link, clique em outro
-      link do nosso admin ou vá para a
-      <a href="{% url 'restau:index' %}">Home</a>
+<div class="section-content-wide formset-update content">
+  {% include "restau/partials/_conf_menu.html" %}
+  <div class="conta-content">
+    <h2 class="center">Produtos</h2>
+    <p class="center">
+        Ordene os produtos de acordo com a ordem que eles aparecerão no Menu.
     </p>
+    {% if formset %}
+    <div class="content">
+      <form action="{% url 'restau:ordenar_produtos' %}" method="post">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        <div class="form-content">
+          
+          <div class="form-group">
+            {% for cat in categorias %}
+            <div class="letra-categoria">
+              <b>{{ cat.nome }}</b>
+            </div>
+            {% for sub in subcategorias %}
+            {% if sub.categoria == cat %}
+            <div class="letra-subcategoria">
+              <b>{{ sub.nome }}</b>
+            </div>
+            {% for field in formset %}
+            {% if field.instance.categoria == cat and field.instance.subcategoria == sub %}
+            <div class="ordenar">
+              <div> {{ field.id}} </div>
+              <div> {{ field.nome }} </div>
+              <div> {{ field.ordem }} </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+            {% for field in formset %}
+            {% if field.instance.categoria == cat and not field.instance.subcategoria %}
+            <div class="ordenar">
+              <div> {{ field.id}} </div>
+              <div> {{ field.nome }} </div>
+              <div> {{ field.ordem }} </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+          </div>
+        </div>
+        {% if form.non_field_errors %}
+        <div class="form-content">
+          <div class="">
+            <div class="message error">
+              {{ form.non_field_errors }}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        <div class="form-content">
+          <div class="form-group">
+            <button class="btn" type="submit">Enviar</button>
+          </div>
+        </div>  
+      </form>
+    </div> 
+    {% else %}
+    <div class="not-found center">
+      <h1>Nada encontrado 😞</h1>
+        <p>
+          Não encontrei nada nesse link, clique em outro
+          link do nosso admin ou vá para a
+          <a href="{% url 'restau:index' %}">Home</a>
+        </p>
+    </div>
+    {% endif %}
+  </div>
 </div>
-{% endif %}
+</div>
 {% endblock %}

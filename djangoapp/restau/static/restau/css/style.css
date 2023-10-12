@@ -309,9 +309,7 @@ img {
 
 .responsive-table {
   width: 100%;
-  overflow-x: auto;
   min-width: var(--tb-min-width);
-  height: 100%;
 }
 
 .products-table {
@@ -321,7 +319,7 @@ img {
 }
 
 .table-row {
-  text-align: left;
+  text-align: center;
   text-overflow: ellipsis;
   transition: background-color var(--transition-fast) ease-in-out;
 }
@@ -337,13 +335,13 @@ img {
 .table-row-header {
   background: hsl(var(--clr-gray-base));
   color: var(--clr-black);
-  text-align: left;
+  text-align: center;
 }
 
 .table-cel,
 .table-header {
   padding: var(--spacing-base);
-  text-align: center;
+  text-align: left;
 }
 
 .table-link {
@@ -884,13 +882,25 @@ body.frontend {
 
 .ordenar {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   flex-direction: row;
   margin: 0;
-  padding: var(--spacing-smlr);
-  height: auto;
-  width: 50%;
+  padding: var(--spacing-smlst);
+  /* height: auto;
+  width: 50%; */
+}
+
+.letra-categoria {
+  font-size: var(--fs-h3);
+  margin: 0;
+  color: hsl(var(--clr-black));
+}
+
+.letra-subcategoria {
+  font-size: var(--fs-h5);
+  margin: 0;
+  color: hsl(var(--clr-black));
 }
 
 /* prefil */
@@ -932,6 +942,7 @@ body.frontend {
   border: 1px solid #040505;
   border-radius: var(--br-base);
   display: flex;
+  align-items: center;
   flex-direction: column;
   justify-content: start;
   flex-grow: 1;

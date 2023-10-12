@@ -9,8 +9,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 @login_required
 @user_passes_test(lambda user: user.groups.filter(
     name='acesso_restrito').exists())
-def create_product(request):
-    form_action = reverse('restau:create_product')
+def criar_produto(request):
+    form_action = reverse('restau:criar_produto')
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         context = {
@@ -20,11 +20,11 @@ def create_product(request):
 
         if form.is_valid():
             form.save()
-            return redirect('restau:create_product')
+            return redirect('restau:criar_produto')
 
         return render(
             request,
-            'restau/pages/create_product.html',
+            'restau/pages/criar_produto.html',
             context
         )
 
@@ -34,7 +34,7 @@ def create_product(request):
     }
     return render(
         request,
-        'restau/pages/create_product.html',
+        'restau/pages/criar_produto.html',
         context
     )
 
@@ -42,34 +42,36 @@ def create_product(request):
 @login_required
 @user_passes_test(lambda user: user.groups.filter(
     name='acesso_restrito').exists())
-def update(request, product_id):
-    product = get_object_or_404(
-        Products, pk=product_id)
-    form_action = reverse('restau:update', args=(product_id,))
+def atualizar_produto(request, produto_id):
+    produto = get_object_or_404(
+        Products, pk=produto_id)
+    form_action = reverse('restau:atualizar_produto', args=(produto_id,))
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES, instance=product)
+        form = ProductForm(request.POST, request.FILES, instance=produto)
         context = {
+            'produto': produto,
             'form': form,
             'form_action': form_action,
         }
 
         if form.is_valid():
-            product = form.save()
+            produto = form.save()
             return redirect('restau:produtos')
 
         return render(
             request,
-            'restau/pages/create_product.html',
+            'restau/pages/criar_produto.html',
             context
         )
 
     context = {
-        'form': ProductForm(instance=product),
+        'produto': produto,
+        'form': ProductForm(instance=produto),
         'form_action': form_action,
     }
     return render(
         request,
-        'restau/pages/create_product.html',
+        'restau/pages/criar_produto.html',
         context
     )
 
@@ -77,21 +79,21 @@ def update(request, product_id):
 @login_required
 @user_passes_test(lambda user: user.groups.filter(
     name='acesso_restrito').exists())
-def delete(request, product_id):
-    product = get_object_or_404(
-        Products, pk=product_id, visibilidade=True
+def apagar_produto(request, produto_id):
+    produto = get_object_or_404(
+        Products, pk=produto_id, visibilidade=True
     )
     confirmation = request.POST.get('confirmation', 'no')
 
     if confirmation == 'yes':
-        product.delete()
+        produto.delete()
         return redirect('restau:produtos')
 
     return render(
         request,
         'restau/pages/produto.html',
         {
-            'product': product,
+            'produto': produto,
             'confirmation': confirmation,
         }
     )
@@ -118,35 +120,6 @@ def ordenar_produtos(request):
                               )
     form_action = reverse('restau:ordenar_produtos')
 
-    # print('-------------------------------------')
-    # print('-------------------------------------')
-    # print('--------------DEBUGGING--------------')
-    # print('-------------------------------------')
-    # print('-------------------------------------')
-
-    # for cat in categorias:
-    #     print(f'categoria: {cat.nome}')
-    #     found_matching_subcat = False
-    #     for subcat in subcategorias:
-    #         if subcat.categoria == cat:
-    #             print(f'subcategoria: {subcat.nome}')
-    #             for produto in formset:
-    #                 if produto.instance.categoria == cat and \
-    #                         produto.instance.subcategoria == subcat:
-    #                     print(f'produto: {produto.instance.nome}')
-    #             found_matching_subcat = True
-
-    #     if not found_matching_subcat:
-    #         for produto in formset:
-    #             if produto.instance.categoria == cat and not \
-    #                     produto.instance.subcategoria:
-    #                 print(f'produto sem subcat: {produto.instance.nome}')
-
-    # print('-------------------------------------')
-    # print('-------------------------------------')
-    # print('--------------DEBUGGING--------------')
-    # print('-------------------------------------')
-    # print('-------------------------------------')
     if request.method == 'POST':
         formset = Produtosformset(request.POST,
                                   request.FILES,
@@ -158,13 +131,6 @@ def ordenar_produtos(request):
             'formset': formset,
             'form_action': form_action,
         }
-        # for f in formset:
-        #     print(f'formset-id: {f.instance.id}')
-        #     print(f'formset-nome: {f.instance.nome}')
-        #     print(f'formset-ordem: {f.instance.ordem}')
-
-        # print(formset.is_valid())
-        # print(formset.is_valid())
         if formset.is_valid():
             print(f'formset is valid: {formset.is_valid()}')
             formset.save()

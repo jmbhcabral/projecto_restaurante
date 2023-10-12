@@ -26,24 +26,48 @@
             <tr class="table-row">
               <td class="table-cell">
                 <a 
-                href="{% url 'restau:product' produto.id %}" 
+                href="{% url 'restau:produto' produto.id %}" 
                 class="table-link"
                 >
                   {{ produto.nome }}
                 </a>
-              </td> 
+              </td>
+              {% if not produto.preco_1 %}
+              <td class="table-cell">
+                -----
+              </td>
+              {% else %}
               <td class="table-cell">
                 {{ produto.preco_1 }}
               </td>
+              {% endif %}
+              {% if not produto.preco_2 %}
+              <td class="table-cell">
+                -----
+              </td>
+              {% else %}
               <td class="table-cell">
                 {{ produto.preco_2 }}
               </td>
+              {% endif %}
+              {% if not produto.preco_3 %}
+              <td class="table-cell">
+                -----
+              </td>
+              {% else %}
               <td class="table-cell">
                 {{ produto.preco_3 }}
               </td>
+              {% endif %}
+              {% if produto.visibilidade %}
               <td class="table-cell">
-                {{ produto.visibilidade }}
+                Visível
               </td>
+              {% else %}
+              <td class="table-cell">
+                Oculto
+              </td>
+              {% endif %}
             </tr>
             {% endfor %}
           </tbody>
@@ -60,8 +84,8 @@
       </div>
       {% endif %}
       <div class="sub-menu">
-        <a href="" class="menu-btn">Criar</a>
-        <a href="" class="menu-btn">Ordenar</a>
+        <a href="{% url "restau:criar_produto" %}" class="menu-btn">Criar</a>
+        <a href="{% url "restau:ordenar_produtos" %}" class="menu-btn">Ordenar</a>
       </div>
     </div>
   </div>

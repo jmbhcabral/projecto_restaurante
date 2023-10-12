@@ -3,8 +3,6 @@ from restau.models import (
     Products, FrontendSetup, Category, SubCategory, )
 from django.db.models import Prefetch
 
-PER_PAGE = 9
-
 
 def encomendas(request):
     main_logo = FrontendSetup.objects \
@@ -92,13 +90,13 @@ def produtos(request):
     )
 
 
-def product(request, product_id):
-    single_product = get_object_or_404(
+def produto(request, produto_id):
+    produto = get_object_or_404(
         Products.objects
-        .filter(pk=product_id,))
+        .filter(pk=produto_id,))
 
     context = {
-        'product': single_product,
+        'produto': produto,
     }
 
     return render(

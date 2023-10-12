@@ -1,0 +1,38 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+<div class="section-content-wide formset-update content">
+    {% include "restau/partials/_conf_menu.html" %}
+        <div class="conta-content">
+            <h2 class="center">Fidelidade</h2>
+            <p class="center">
+                Crie um programa de fidelidade para seus clientes.
+            </p>
+            <h4 class="center"> Fidelidades criadas</h4>
+            {% if fidelidades_grouped %}
+            <p class="center">Clique na Fidelidade que deseja editar.</p>
+            <div class="sub-links">
+            {% for group in fidelidades_grouped %}
+            <div class="sub-link">
+                {% for fidelidade in group %}
+                    {% if fidelidade %}
+                        <a href="{% url 'fidelidade:fidelidade_individual' fidelidade.id %}" class="sub-link">{{ fidelidade.nome }}</a><br>
+                    {% endif %}
+                    {% endfor %}
+                    </div>
+
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="center">Você ainda não criou nenhuma Fidelidade.</p>
+                {% endif %}
+                <div class="sub-menu">
+                    <a href="{% url "fidelidade:criar_fidelidade" %}" class="menu-btn">Criar</a>
+                </div>
+            <form action="{% url "fidelidade:fidelidades" %}" method="get">
+                <label for="query">CEW-</label>
+                <input type="text" name="query" id="query" pattern="\d+" required>
+                <input type="submit" value="Procurar">
+            </form>
+        </div>
+    </div>    
+ {% endblock content %}

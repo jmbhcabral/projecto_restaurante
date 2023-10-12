@@ -1,11 +1,12 @@
 from django.urls import path
 from restau.views import (                      # type: ignore
-    index, admin_home, produtos, product, create_product, update, delete,
-    encomendas, categoria, criar_categoria, atualizar_categoria,
-    apagar_categoria, subcategoria, criar_subcategoria, atualizar_subcategoria,
-    apagar_subcategoria, ordenar_produtos, ementas_create, ementas_update,
-    ementas_delete, ementa, povoar_ementa, configuracao, Subcategorias,
-    ordenar_subcategorias, categorias, ordenar_categorias
+    index, admin_home, produtos, produto, criar_produto, atualizar_produto,
+    apagar_produto, encomendas, categoria, criar_categoria,
+    atualizar_categoria, apagar_categoria, subcategoria, criar_subcategoria,
+    atualizar_subcategoria, apagar_subcategoria, ordenar_produtos,
+    ementas_create, ementas_update, ementas_delete, ementa, povoar_ementa,
+    configuracao, Subcategorias, ordenar_subcategorias, categorias,
+    ordenar_categorias
 )
 
 # namespace
@@ -17,13 +18,15 @@ urlpatterns = [
     path('restau/pages/admin_home/', admin_home, name='admin_home'),
     # product
     path('restau/pages/produtos/', produtos, name='produtos'),
+    path('restau/pages/<int:produto_id>/', produto, name='produto'),
+    path('restau/pages/criar_produto/',
+         criar_produto, name='criar_produto'),
+    path('restau/pages/<int:produto_id>/atualizar_produto/',
+         atualizar_produto, name='atualizar_produto'),
+    path('restau/pages/<int:produto_id>/apagar_produto/',
+         apagar_produto, name='apagar_produto'),
     path('restau/pages/ordenar_produtos/',
          ordenar_produtos, name='ordenar_produtos'),
-    path('restau/pages/<int:product_id>/', product, name='product'),
-    path('restau/pages/create_product/',
-         create_product, name='create_product'),
-    path('restau/pages/<int:product_id>/update/', update, name='update'),
-    path('restau/pages/<int:product_id>/delete/', delete, name='delete'),
     # category
     path('restau/pages/categorias/', categorias, name='categorias'),
     path('restau/pages/categoria/<int:categoria_id>/',

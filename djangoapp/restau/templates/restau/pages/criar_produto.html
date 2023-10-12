@@ -1,0 +1,128 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+<div class="section-content-wide formset-update content">
+  {% include "restau/partials/_conf_menu.html" %}
+  <div class="conta-content">
+    {% if produto %}
+    <h2 class="center">Produto</h2>
+    <p class="center">
+        Atualize os dados do produto.
+    </p>
+    <div class="content form-wrapper"> 
+      <h3>Produto</h3>
+      <form 
+      action="{{ form_action }}"
+      method="POST"
+      enctype="multipart/form-data"
+      >
+        {% csrf_token %}
+        <div class="form-content">
+          {% for field in form %}
+          {% if field.name == 'visibilidade' %}
+          
+          <div class="form-visib form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+            {% if field.help_text %}
+              <p class="help-text">{{ field.help_text }}</p>
+            {% endif %}
+          </div>
+          {% else %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+            {% if field.help_text %}
+            <p class="help-text">{{ field.help_text }}</p>
+            {% endif %}
+          </div>
+          {% endif %}
+          {% if field.name == 'imagem' and field.value.url %}
+          <div class="form-group">
+            <img src="{{ field.value.url }}" alt="">
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+        {% if form.non_field_errors %}
+        <div class="form-content">
+          <div class="">
+            <div class="message error">
+              {{ form.non_field_errors }}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        <div class="form-content">
+          <div class="form-group">
+            <button class="btn" type="submit">Atualizar</button>
+          </div>
+        </div>  
+      </form>
+    </div>
+    {% else %}
+    <h2 class="center">Produto</h2>
+    <p class="center">
+        Crie Produtos para seu restaurante.
+    </p>
+    <div class="content form-wrapper"> 
+      <h3>Produto</h3>
+      <form 
+      action="{{ form_action }}"
+      method="POST"
+      enctype="multipart/form-data"
+      >
+        {% csrf_token %}
+        <div class="form-content">
+          {% for field in form %}
+          {% if field.name == 'visibilidade' %}
+          
+          <div class="form-visib form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+            {% if field.help_text %}
+              <p class="help-text">{{ field.help_text }}</p>
+            {% endif %}
+          </div>
+          {% else %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+            {% if field.help_text %}
+            <p class="help-text">{{ field.help_text }}</p>
+            {% endif %}
+          </div>
+          {% endif %}
+          {% if field.name == 'imagem' and field.value.url %}
+          <div class="form-group">
+            <img src="{{ field.value.url }}" alt="">
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+        {% if form.non_field_errors %}
+        <div class="form-content">
+          <div class="">
+            <div class="message error">
+              {{ form.non_field_errors }}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        <div class="form-content">
+          <div class="form-group">
+            <button class="btn" type="submit">Criar</button>
+          </div>
+        </div>  
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</div>
+</div>
+{% endblock content %}
+  
+  
