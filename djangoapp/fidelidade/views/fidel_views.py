@@ -59,17 +59,17 @@ def fidelidades(request):
     )
 
 
-def fidelidade_individual(request, fidelidade_id):
-    fidelidade_individual = get_object_or_404(
+def fidelidade(request, fidelidade_id):
+    fidelidade = get_object_or_404(
         Fidelidade, pk=fidelidade_id
     )
     context = {
-        'fidelidade': fidelidade_individual
+        'fidelidade': fidelidade
     }
 
     return render(
         request,
-        'fidelidade/pages/fidelidade_ind.html',
+        'fidelidade/pages/fidelidade.html',
         context
     )
 

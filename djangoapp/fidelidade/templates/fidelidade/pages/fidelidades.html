@@ -15,7 +15,7 @@
             <div class="sub-link">
                 {% for fidelidade in group %}
                     {% if fidelidade %}
-                        <a href="{% url 'fidelidade:fidelidade_individual' fidelidade.id %}" class="sub-link">{{ fidelidade.nome }}</a><br>
+                        <a href="{% url 'fidelidade:fidelidade' fidelidade.id %}" class="sub-link">{{ fidelidade.nome }}</a><br>
                     {% endif %}
                     {% endfor %}
                     </div>

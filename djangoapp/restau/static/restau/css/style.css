@@ -399,10 +399,12 @@ img {
 }
 
 .single-product h3 {
+  text-align: center;
   margin: 1rem 0;
 }
 
 .single-product p {
+  text-align: center;
   margin: 1rem 0;
 }
 

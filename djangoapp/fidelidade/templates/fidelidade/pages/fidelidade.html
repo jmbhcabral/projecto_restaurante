@@ -1,0 +1,39 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+    <div class="section-content-wide formset-update content">
+        {% include "restau/partials/_conf_menu.html" %}
+        <div class="conta-content">
+            <h2 class="center">Fidelidade</h2>
+            <p class="center">
+                Crie um programa de fidelidade para seus clientes.
+            </p>
+            <h1>{{ action }} Fidelidade</h1>
+
+            <div class="single-product">
+            <h3 class="">
+            {{ fidelidade.nome}}
+            </h3>
+            <p><b>Nome: </b>{{ fidelidade.nome}}</p>
+            <p><b>Desconto: </b> {{ fidelidade.desconto }}% </p>
+            <p><b>Ementa: </b>{{ fidelidade.ementa }}</p>
+
+                <div class="product-links">
+                    <a class="btn btn-link" href="{% url 'fidelidade:editar_fidelidade' fidelidade.id %}">Actualizar</a>
+                    <a class="btn btn-link" href="{% url 'fidelidade:fidelidades' %}">Voltar</a>
+
+                    <form action="{% url 'fidelidade:apagar_fidelidade' fidelidade.id %}" method='POST'>
+                        {% csrf_token %}
+                        {% if confirmation == 'no' %}
+                            <input type="hidden" name="confirmation" value="yes">
+                            <button class="btn btn-link btn-delete" type="submit">Confirma?</button>
+                        {% else %}
+                            <button class="btn btn-link btn-delete" type="submit">Apagar</button>
+                        
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
