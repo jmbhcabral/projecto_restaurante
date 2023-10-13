@@ -3,10 +3,10 @@ from restau.views import (                      # type: ignore
     index, admin_home, produtos, produto, criar_produto, atualizar_produto,
     apagar_produto, encomendas, categoria, criar_categoria,
     atualizar_categoria, apagar_categoria, subcategoria, criar_subcategoria,
-    atualizar_subcategoria, apagar_subcategoria, ordenar_produtos,
-    ementas_create, ementas_update, ementas_delete, ementa, povoar_ementa,
+    atualizar_subcategoria, apagar_subcategoria, ordenar_produtos, ementas,
+    criar_ementa, atualizar_ementa, apagar_ementa, povoar_ementa, ementa,
     configuracao, Subcategorias, ordenar_subcategorias, categorias,
-    ordenar_categorias
+    ordenar_categorias, adicionar_foto, galeria
 )
 
 # namespace
@@ -52,16 +52,20 @@ urlpatterns = [
     path('restau/pages/ordenar_subcategorias/',
          ordenar_subcategorias, name='ordenar_subcategorias'),
     # Ementas
-    path('restau/pages/ementas/', ementas_create, name='ementas_create'),
-    path('restau/pages/<int:ementa_id>/ementas_update/',
-         ementas_update, name='ementas_update'),
-    path('restau/pages/<int:ementa_id>/ementas_delete/',
-         ementas_delete, name='ementas_delete'),
+    path('restau/pages/criar_ementa/', criar_ementa, name='criar_ementa'),
+    path('restau/pages/<int:ementa_id>/atualizar_ementa/',
+         atualizar_ementa, name='atualizar_ementa'),
+    path('restau/pages/<int:ementa_id>/apagar_ementa/',
+         apagar_ementa, name='apagar_ementa'),
     path('restau/pages/ementa/<int:ementa_id>/',
          ementa, name='ementa'),
+    path('restau/pages/ementas/', ementas, name='ementas'),
     path('restau/pages/povoar_ementa/<int:ementa_id>/',
          povoar_ementa, name='povoar_ementa'),
     # Configuração
     path('restau/pages/configuracao/', configuracao, name='configuracao'),
-
+    # Galeria
+    path('restau/pages/galeria/', galeria, name='galeria'),
+    path('restau/pages/adicionar_foto/',
+         adicionar_foto, name='adicionar_foto'),
 ]

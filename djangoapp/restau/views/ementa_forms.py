@@ -2,20 +2,20 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from restau.forms import EmentaForm, ProdutosEmentaForm
 from restau.models import (
-    Ementa, Products, ProdutosEmenta, Category,
+    Ementa, Products, Category,
     SubCategory
 )
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 
 
-def ementas_create(request):
-    ementas = Ementa.objects \
-        .filter(nome__isnull=False) \
-        .all() \
-        .order_by('id')
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
+def criar_ementa(request):
+    ementas = Ementa.objects.all().order_by('id')
 
-    form_action = reverse('restau:ementas_create')
+    form_action = reverse('restau:criar_ementa')
 
     if request.method == 'POST':
         form = EmentaForm(request.POST, )
@@ -26,11 +26,11 @@ def ementas_create(request):
         }
         if form.is_valid():
             form.save()
-            return redirect('restau:ementas_create')
+            return redirect('restau:criar_ementa')
 
         return render(
             request,
-            'restau/pages/ementas_create.html',
+            'restau/pages/criar_ementa.html',
             context
         )
 
@@ -42,16 +42,19 @@ def ementas_create(request):
 
     return render(
         request,
-        'restau/pages/ementas.html',
+        'restau/pages/criar_ementa.html',
         context
     )
 
 
-def ementas_update(request, ementa_id):
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
+def atualizar_ementa(request, ementa_id):
     ementa = get_object_or_404(
         Ementa, pk=ementa_id
     )
-    form_action = reverse('restau:ementas_update', args=(ementa_id,))
+    form_action = reverse('restau:atualizar_ementa', args=(ementa_id,))
     if request.method == 'POST':
         form = EmentaForm(request.POST, instance=ementa)
         context = {
@@ -61,7 +64,7 @@ def ementas_update(request, ementa_id):
 
         if form.is_valid():
             ementa = form.save()
-            return redirect('restau:ementas_create')
+            return redirect('restau:criar_ementa')
 
         return render(
             request,
@@ -75,12 +78,15 @@ def ementas_update(request, ementa_id):
     }
     return render(
         request,
-        'restau/pages/ementas.html',
+        'restau/pages/criar_ementa.html',
         context
     )
 
 
-def ementas_delete(request, ementa_id):
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
+def apagar_ementa(request, ementa_id):
     ementa_para_apagar = get_object_or_404(
         Ementa, pk=ementa_id,
     )
@@ -88,7 +94,7 @@ def ementas_delete(request, ementa_id):
 
     if confirmation == 'yes':
         ementa_para_apagar.delete()
-        return redirect('restau:ementas_create')
+        return redirect('restau:criar_ementa')
 
     return render(
         request,
@@ -100,6 +106,9 @@ def ementas_delete(request, ementa_id):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def povoar_ementa(request, ementa_id):
 
     ementa = get_object_or_404(Ementa, pk=ementa_id)
@@ -167,4 +176,8 @@ def povoar_ementa(request, ementa_id):
         'form_action': form_action,
     }
 
-    return render(request, 'restau/pages/povoar_ementa.html', context)
+    return render(
+        request,
+        'restau/pages/povoar_ementa.html',
+        context,
+    )

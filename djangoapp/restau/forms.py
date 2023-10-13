@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django import forms
 from restau.models import (Products, Category, SubCategory, Ementa,
-                           ProdutosEmenta
+                           ProdutosEmenta, Fotos,
                            )
 
 
@@ -241,4 +241,45 @@ class ProdutosEmentaForm(forms.ModelForm):
         model = ProdutosEmenta
         fields = (
             'ementa', 'produto',
+        )
+
+
+class FotosForm(forms.ModelForm):
+    imagem = forms.ImageField(
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'image/*',
+            }
+        ),
+        label='Fotografia',
+        required=False,
+    )
+
+    nome = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': 'digite aqui',
+            }
+        ),
+        label='Nome',
+        help_text='Nome da fotografia.',
+    )
+
+    is_visible = forms.BooleanField(
+        widget=forms.CheckboxInput(
+            attrs={
+                'placeholder': 'digite aqui',
+            }
+        ),
+        label='Visíbilidade',
+        help_text='Seleccionar se visível.',
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = Fotos
+        fields = (
+            'imagem', 'nome', 'is_visible',
         )

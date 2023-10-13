@@ -1,59 +1,36 @@
 {% extends 'restau/base.html' %}
 {% block content %}
-<div class="section-content-wide content">
-<h1 class="center">Ementas</h1>
-<div >
-    <ul class="menu-items">
-    {% for ementa in ementas %}
-    {% if ementa %}
-        <li class="menu-item">
-          <a  href="{% url 'restau:ementa' ementa.id %} " class="table-link">{{ ementa.nome }}</a> - 
-          <a href="{% url 'restau:povoar_ementa' ementa.id %}" class="table-link">Povoar ementa</a> - 
-          <a href="{% url 'restau:povoar_ementa' ementa.id %}" class="table-link">Modificar</a> - 
-          <a href="{% url 'restau:povoar_ementa' ementa.id %}" class="table-link">Apagar</a> - 
-        </li>
-    {% else %}
-    <li><em>Não existem ementas.</em></li>
-    {% endif %}
-    {% endfor %}
-    </ul>
-</div>
-<div class="content form-wrapper"> 
-    <h3 class="center">Adicionar Ementa</h3>
-    <form 
-    action="{{ form_action }}"
-    method="POST"
-    enctype="multipart/form-data"
-    >
-      {% csrf_token %}
-      <div class="form-content">
-        {% for field in form %}
-        
-        <div class="form-group">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {{ field.errors }}
-          {% if field.help_text %}
-          <p class="help-text">{{ field.help_text }}</p>
-          {% endif %}
-        </div>
-        {% endfor %}
+<div class="section-content-wide formset-update content">
+  {% include "restau/partials/_conf_menu.html" %}
+      <div class="conta-content">
+          <h2 class="center">Ementas</h2>
+          <p class="center">
+              Atualize as Ementas do seu restaurante, adicione novas Ementas
+              ou exclua Ementas que não são mais necessárias.
+          </p>
+          <h3 class="center">Ementas criadas</h3>
+          {% if ementas %}
+          <p class="center">Clique na Ementa que deseja editar.</p>
+          <div class="sub-links">
+          {% for group in ementas_grouped %}
+          <div class="sub-link">
+              {% for ementa in group %}
+                  {% if ementa %}
+                      <a href="{% url 'restau:ementa' ementa.id %}" class="sub-link">{{ ementa.nome }}</a> - 
+                      <a href="{% url 'restau:povoar_ementa' ementa.id %}" class="sub-link">Povoar Ementa</a><br>
+                  {% endif %}
+                  {% endfor %}
+                  </div>
+
+                  {% endfor %}
+              </div>
+              {% else %}
+              <p class="center">Você ainda não criou nenhuma Ementa.</p>
+              {% endif %}
+              <div class="sub-menu">
+                  <a href="{% url "restau:criar_ementa" %}" class="menu-btn">Criar</a>
+              </div>
       </div>
-      {% if form.non_field_errors %}
-      <div class="form-content">
-        <div class="">
-          <div class="message error">
-            {{ form.non_field_errors }}
-          </div>
-        </div>
-      </div>
-      {% endif %}
-      <div class="form-content">
-        <div class="form-group">
-          <button class="btn" type="submit">Enviar</button>
-        </div>
-      </div>  
-    </form>
   </div>
 </div>
 {% endblock content %}

@@ -1,0 +1,28 @@
+{% extends "restau/base.html" %}
+{% block content %}
+<div class="section-content-wide formset-update content">
+    {% include "restau/partials/_conf_menu.html" %}
+            <div class="conta-content">
+                <h2 class="center">Galeria</h2>
+                <p class="center">
+                    Adicione imagens para a galeria do restaurante e selecione as que
+                    pretender exibir.
+                </p>
+            
+                {% if fotos %}
+                <div>
+                    <p>Já tem fotos na galeria</p>
+                </div>
+                {% else %}
+                <div>
+                    <p>Não tem fotos na galeria</p>
+                {% endif %}
+                <div class="sub-menu">
+                    <a href="{% url "restau:adicionar_foto" %}" class="menu-btn">Adicionar Foto</a>
+                    <a href="{% url "restau:adicionar_foto" %}" class="menu-btn">visibilidade foto</a>
+                  </div>
+            </div>
+        </div>
+    </div>    
+</div>            
+{% endblock %}

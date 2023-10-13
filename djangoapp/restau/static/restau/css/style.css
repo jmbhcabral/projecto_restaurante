@@ -522,6 +522,7 @@ img {
 .product-links {
   margin-block: calc(var(--fs-smlr) * 2);
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 0 var(--spacing-smlr);
 }
@@ -891,6 +892,27 @@ body.frontend {
   padding: var(--spacing-smlst);
   /* height: auto;
   width: 50%; */
+}
+
+.povoar-ementa {
+  text-align:left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+  margin: 0;
+  padding: var(--spacing-smlst);
+  width: 100%;
+}
+
+.content-povoar-ementa {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+  margin: 0;
+  padding: var(--spacing-smlst);
+  width: 100%;
 }
 
 .letra-categoria {

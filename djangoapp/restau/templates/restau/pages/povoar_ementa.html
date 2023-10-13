@@ -1,46 +1,56 @@
 {% extends 'restau/base.html' %}
 {% block content %}
-<h1>Povoar Ementa</h1>
+<div class="section-content-wide content">
+  {% include "restau/partials/_conf_menu.html" %}
+    <div class="conta-content">
+      <div>
+        <h2 class="center">Povoar Ementa</h2>
+        <p class="center">
+          Assinale os produtos que quer que estejam presentes na ementa.
+        </p>
+      </div>
+      <div class="single-product">
+        <p><b>Nome: </b>{{ ementa.nome}}</p>
+        <p><b>Descrição: </b>{{ ementa.descricao }}</p>
+        <p><b>Preço: </b>{{ ementa.nome_campo_preco_selecionado }}</p>
+      </div>
+      <div class="content content-povoar-ementa">
+        <form action="{{ form_action }}" method="POST">
+          {% csrf_token %}
+          {{ form.ementa }}
+          
+          {% for categoria in categorias %}
+              <h3>{{ categoria.nome }}</h3>
+              
+              {% for subcategoria in subcategorias %}
+              {% if subcategoria.categoria == categoria %}
+              <h5>{{ subcategoria.nome }}</h5>
 
-<div class="single-product">
-  <h3 class="single-product">
-  {{ ementa.nome}}
-  </h3>
-  <p><b>Nome:</b>{{ ementa.nome}}</p>
-  <p><b>Descrição:</b> {{ ementa.descricao }} </p>
-  <p><b>Preço</b>{{ ementa.nome_campo_preco_selecionado }}</p>
+              <!-- AQUI: Customizando a renderização do campo 'produto' do seu formulário -->
+              {% for produto in produtos %}
+              {% if produto.categoria == categoria and produto.subcategoria == subcategoria %}
+              <div class="povoar-ementa">
+                <div>
+                  <label for="produto_{{ produto.id }}">{{ produto.nome }}</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="produto_{{ produto.id }}" name="{{ form.produto.name }}" value="{{ produto.id }}" {% if produto.id in produtos_na_ementa %}checked{% endif %}>
+                </div>
+              </div>
+
+
+              {% endif %}
+              {% endfor %}
+              
+              {% endif %}
+              {% endfor %}
+          {% endfor %}
+          
+          <button type="submit" class="btn">Adicionar à Ementa</button>
+      </form>
+    </div>
+  </div>
 </div>
-<div>
-  <form action="{{ form_action }}" method="POST">
-    {% csrf_token %}
-    {{ form.ementa }}
-    
-    {% for categoria in categorias %}
-    <fieldset>
-        <legend>{{ categoria.nome }}</legend>
-        
-        {% for subcategoria in subcategorias %}
-        {% if subcategoria.categoria == categoria %}
-        <h4>{{ subcategoria.nome }}</h4>
-
-        <!-- AQUI: Customizando a renderização do campo 'produto' do seu formulário -->
-        {% for produto in produtos %}
-        {% if produto.categoria == categoria and produto.subcategoria == subcategoria %}
-        <div class="form-group">
-            <input type="checkbox" id="produto_{{ produto.id }}" name="{{ form.produto.name }}" value="{{ produto.id }}" {% if produto.id in produtos_na_ementa %}checked{% endif %}>
-            <label for="produto_{{ produto.id }}">{{ produto.nome }}</label>
-        </div>
-        {% endif %}
-        {% endfor %}
-        
-        {% endif %}
-        {% endfor %}
-        
-    </fieldset>
-    {% endfor %}
-    
-    <button type="submit">Adicionar à Ementa</button>
-</form>
-
 </div>
+
 {% endblock content %}
