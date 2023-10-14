@@ -11,16 +11,20 @@
             
                 {% if fotos %}
                 <div>
-                    <p>Já tem fotos na galeria</p>
+                    <p class="center">Tem na sua galeria {{ numero_fotos }} fotos.</p>
+                    <div class="sub-menu">
+                        <a href="{% url "restau:adicionar_foto" %}" class="menu-btn">Adicionar Foto</a>
+                        <a href="{% url "restau:povoar_galeria" %}" class="menu-btn">Povoar galeria</a>
+                        <a href="" class="menu-btn">Eliminar fotos</a>
+                    </div>
                 </div>
                 {% else %}
                 <div>
                     <p>Não tem fotos na galeria</p>
+                    <div class="sub-menu">
+                        <a href="{% url "restau:adicionar_foto" %}" class="menu-btn">Adicionar Foto</a>
+                    </div>
                 {% endif %}
-                <div class="sub-menu">
-                    <a href="{% url "restau:adicionar_foto" %}" class="menu-btn">Adicionar Foto</a>
-                    <a href="{% url "restau:adicionar_foto" %}" class="menu-btn">visibilidade foto</a>
-                  </div>
             </div>
         </div>
     </div>    

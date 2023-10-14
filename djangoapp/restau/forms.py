@@ -3,6 +3,7 @@ from django import forms
 from restau.models import (Products, Category, SubCategory, Ementa,
                            ProdutosEmenta, Fotos,
                            )
+from django.forms import modelformset_factory
 
 
 class SubCategoryForm(forms.ModelForm):
@@ -245,6 +246,12 @@ class ProdutosEmentaForm(forms.ModelForm):
 
 
 class FotosForm(forms.ModelForm):
+    class Meta:
+        model = Fotos
+        fields = (
+            'imagem', 'is_visible',
+        )
+
     imagem = forms.ImageField(
         widget=forms.FileInput(
             attrs={
@@ -255,15 +262,15 @@ class FotosForm(forms.ModelForm):
         required=False,
     )
 
-    nome = forms.CharField(
-        widget=forms.TextInput(
-            attrs={
-                'placeholder': 'digite aqui',
-            }
-        ),
-        label='Nome',
-        help_text='Nome da fotografia.',
-    )
+    # nome = forms.CharField(
+    #     widget=forms.TextInput(
+    #         attrs={
+    #             'readonly': True,
+    #         }
+    #     ),
+    #     label='Nome',
+    #     help_text='Nome da fotografia.',
+    # )
 
     is_visible = forms.BooleanField(
         widget=forms.CheckboxInput(
@@ -278,8 +285,10 @@ class FotosForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    class Meta:
-        model = Fotos
-        fields = (
-            'imagem', 'nome', 'is_visible',
-        )
+
+FotosFormSet = modelformset_factory(
+    Fotos,
+    form=FotosForm,
+    extra=0,
+    can_delete=True
+)

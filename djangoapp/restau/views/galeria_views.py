@@ -4,6 +4,7 @@ from restau.models import Fotos
 
 
 def galeria(request):
+    numero_fotos = Fotos.objects.all().count()
     fotos = Fotos.objects.all()
     if fotos:
         print(f'fotos: {fotos}')
@@ -11,6 +12,7 @@ def galeria(request):
         print('fotos: None')
 
     context = {
+        'numero_fotos': numero_fotos,
         'fotos': fotos,
     }
 

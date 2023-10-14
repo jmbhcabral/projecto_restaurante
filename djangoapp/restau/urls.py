@@ -6,7 +6,7 @@ from restau.views import (                      # type: ignore
     atualizar_subcategoria, apagar_subcategoria, ordenar_produtos, ementas,
     criar_ementa, atualizar_ementa, apagar_ementa, povoar_ementa, ementa,
     configuracao, Subcategorias, ordenar_subcategorias, categorias,
-    ordenar_categorias, adicionar_foto, galeria
+    ordenar_categorias, adicionar_foto, galeria, povoar_galeria
 )
 
 # namespace
@@ -68,4 +68,6 @@ urlpatterns = [
     path('restau/pages/galeria/', galeria, name='galeria'),
     path('restau/pages/adicionar_foto/',
          adicionar_foto, name='adicionar_foto'),
+    path('restau/pages/povoar_galeria/',
+         povoar_galeria, name='povoar_galeria')
 ]

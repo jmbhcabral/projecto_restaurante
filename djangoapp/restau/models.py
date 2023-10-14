@@ -60,7 +60,8 @@ class Fotos(models.Model):
     nome = models.CharField(
         max_length=200,
         verbose_name='Nome',
-        help_text='Nome da foto'
+        help_text='Nome da foto',
+        blank=True,
     )
 
     imagem = models.ImageField(
@@ -78,6 +79,8 @@ class Fotos(models.Model):
     )
 
     def save(self, *args, **kwargs):
+        if not self.nome and self.imagem:
+            self.nome = self.imagem.name.split('/')[-1]
         current_imagem_name = str(self.imagem.name)
         super().save(*args, **kwargs)
         imagem_changed = False
@@ -88,6 +91,7 @@ class Fotos(models.Model):
         if imagem_changed:
             print('resizing')
             resize_image(self.imagem, 300)
+            super().save(*args, **kwargs)
 
     def __str__(self):
         return self.nome
