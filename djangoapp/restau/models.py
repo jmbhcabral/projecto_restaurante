@@ -73,9 +73,17 @@ class Fotos(models.Model):
     )
 
     is_visible = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name='Visibilidade',
         help_text='Visibilidade da foto'
+    )
+
+    ordem = models.IntegerField(
+        default=0,
+        verbose_name='Ordem',
+        help_text='Ordem da foto na galeria',
+        blank=True,
+        null=True,
     )
 
     def save(self, *args, **kwargs):

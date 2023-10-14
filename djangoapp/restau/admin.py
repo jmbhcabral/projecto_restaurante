@@ -68,9 +68,10 @@ class ActiveSetupAdmin(admin.ModelAdmin):
 
 @admin.register(Fotos)
 class FotosAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nome', 'imagem', 'image_thumb', 'is_visible',)
+    list_display = ('id', 'nome', 'imagem',
+                    'image_thumb', 'is_visible', 'ordem',)
     list_display_links = ('id', 'nome', 'imagem',)
-    list_editable = ('is_visible',)
+    list_editable = ('is_visible', 'ordem',)
 
     def image_thumb(self, obj):
         if obj.imagem:

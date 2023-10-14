@@ -16,16 +16,20 @@
                     <div class="grid-container">
                         {% for form in formset %}
                             <div class="grid-item">
+                                {{ form.id }}
                                 {% if form.instance.imagem %}
                                 <img src="{{ form.instance.imagem.url }}" width="100%" alt="{{ form.instance.nome }}">
                                 {% else %}
                                 <p>Nao foi carregada nenhuma imagem.</p>
                                 {% endif %}
                                 <div>
-                                    {{ form.nome.label_tag }}: {{ form.nome.value }}
+                                    Nome: {{ form.instance.nome }}
                                 </div>
                                 <div>
                                     {{ form.is_visible.label_tag }}: {{ form.is_visible }}
+                                </div>
+                                <div>
+                                    {{ form.ordem.label_tag }}: {{ form.ordem }}
                                 </div>
                                 <div>
                                     Apagar: {{ form.DELETE }}
@@ -33,7 +37,7 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <input type="submit" value="Salvar">
+                    <input type="submit" value="Salvar" class="btn">
                 </form> 
             </div>
         </div>

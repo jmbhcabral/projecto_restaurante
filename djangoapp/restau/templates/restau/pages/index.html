@@ -53,10 +53,14 @@
     <section class=" white-bg top-background">
         <div class="separator"></div>
         <div>
-            <h2 class="center">BESTSELLER</h2>
+            <h2 class="center">GALERIA</h2>
         </div>
-        <div>
-            <img src="" alt="">
+        <div class="grid-container">  
+            {% for foto in galeria %}
+            <div class="grid-item">
+                <img src="{{ foto.imagem.url }}" alt="{{ foto.imagem.name }}">
+            </div>
+            {% endfor %}
         </div>
     </section >
     <section class="section-gap white-bg top-background">

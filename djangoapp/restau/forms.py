@@ -249,7 +249,7 @@ class FotosForm(forms.ModelForm):
     class Meta:
         model = Fotos
         fields = (
-            'imagem', 'is_visible',
+            'imagem', 'is_visible', 'ordem',
         )
 
     imagem = forms.ImageField(
@@ -273,13 +273,20 @@ class FotosForm(forms.ModelForm):
     # )
 
     is_visible = forms.BooleanField(
-        widget=forms.CheckboxInput(
+        widget=forms.CheckboxInput(),
+        label='Visíbilidade',
+        help_text='Seleccionar se visível.',
+        required=False,
+    )
+
+    ordem = forms.IntegerField(
+        widget=forms.NumberInput(
             attrs={
                 'placeholder': 'digite aqui',
             }
         ),
-        label='Visíbilidade',
-        help_text='Seleccionar se visível.',
+        label='Ordem',
+        help_text='Ordem da galeria.',
     )
 
     def __init__(self, *args, **kwargs):

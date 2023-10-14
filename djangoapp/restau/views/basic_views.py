@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, user_passes_test
-from restau.models import ActiveSetup
+from restau.models import ActiveSetup, Fotos
 
 
 @login_required
@@ -18,6 +18,11 @@ def admin_home(request):
 
 def index(request):
 
+    galeria = Fotos.objects \
+        .all() \
+        .order_by('ordem') \
+
+
     active_setup = ActiveSetup.objects \
         .select_related(
             'active_imagem_logo', 'active_imagem_topo',
@@ -29,5 +34,7 @@ def index(request):
     return render(
         request,
         'restau/pages/index.html',
-        {'active_setup': active_setup, },
+        {'active_setup': active_setup,
+         'galeria': galeria
+         },
     )
