@@ -24,15 +24,12 @@ def index(request):
 
 
     active_setup = ActiveSetup.objects.get()
-    # .select_related(
-    #     'active_imagem_logo', 'active_imagem_topo',
-    #     'active_intro', 'active_frase_inspiradora', 'active_frase_cima',
-    #     'active_frase_baixo') \
-    # .all() \
-    # .first()
+
     print('count:', ActiveSetup.objects.count())
-    print('active_setup', active_setup)
-    print('active_setup', active_setup.active_imagem_logo.imagem.url)
+
+    for foto in galeria:
+        print('URL', foto.imagem.url)
+        print(foto.is_visible)
 
     return render(
         request,

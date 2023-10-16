@@ -440,6 +440,38 @@ class ContactosSite(models.Model):
         default='',
     )
 
+    facebook = models.CharField(
+        max_length=250,
+        verbose_name='Facebook',
+        blank=True,
+        null=True,
+        default='',
+    )
+
+    facebook_icon = models.CharField(
+        max_length=250,
+        verbose_name='Facebook Icon',
+        blank=True,
+        null=True,
+        default='',
+    )
+
+    instagram = models.CharField(
+        max_length=250,
+        verbose_name='Instagram',
+        blank=True,
+        null=True,
+        default='',
+    )
+
+    instagram_icon = models.CharField(
+        max_length=250,
+        verbose_name='Instagram Icon',
+        blank=True,
+        null=True,
+        default='',
+    )
+
     def __str__(self):
         return self.morada
 
@@ -450,7 +482,7 @@ class GoogleMaps(models.Model):
         verbose_name_plural = 'Google Maps'
 
     iframe = models.TextField(
-        max_length=250,
+        max_length=500,
         verbose_name='Iframe',
         blank=True,
         null=True,
@@ -517,28 +549,16 @@ class Horario(models.Model):
     status = models.CharField(
         max_length=10,
         choices=STATUS_CHOICES,
-        verbose_name='Folga',
+        verbose_name='Status',
         blank=True,
         null=True,
         default='Aberto',
     )
 
-    dia_encerramento = models.CharField(
-        max_length=10,
-        choices=DIA_SEMANA_CHOICES,
-        verbose_name='Dia de encerramento',
-        blank=True,
-        null=True,
-        default='Domingo',
-    )
-
     def __str__(self):
-        if self.dia_semana == self.dia_encerramento:
-            return f'{self.dia_semana}: Encerrado'
-        else:
-            return f'{self.dia_semana}: {self.hora_abertura_almoco} - ' \
-                f'{self.hora_fecho_almoco} | {self.hora_abertura_jantar} - ' \
-                f'{self.hora_fecho_jantar}'
+        return f'{self.dia_semana}: {self.hora_abertura_almoco} - ' \
+               f'{self.hora_fecho_almoco} | {self.hora_abertura_jantar} - ' \
+               f'{self.hora_fecho_jantar}'
 
 
 class ActiveSetup(models.Model):
@@ -643,6 +663,12 @@ class ActiveSetup(models.Model):
         related_name='active_google_maps_set',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
+    )
+
+    active_horario = models.ManyToManyField(
+        'Horario',
+        related_name='active_horario_set',
         blank=True,
     )
 

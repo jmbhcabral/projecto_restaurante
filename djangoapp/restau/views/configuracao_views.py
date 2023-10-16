@@ -1,16 +1,12 @@
 from django.shortcuts import render
+from restau.models import ActiveSetup
 
 
 def configuracao(request):
-    # frontend = FrontendSetup.objects \
-    #     .select_related(
-    #         'frontend_imagem_logo', 'frontend_imagem_topo',
-    #         'frontend_intro', 'frontend_frase_inspiradora',
-    #         'frontend_frase_cima', 'frontend_frase_baixo') \
-    #     .all() \
+    campos = ActiveSetup.objects.all()
 
     context = {
-        # 'frontend': frontend,
+        'campos': campos,
     }
 
     return render(

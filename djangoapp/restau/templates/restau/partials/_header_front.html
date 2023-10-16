@@ -2,7 +2,7 @@
     {% if active_setup %}
     <div>
         {% if active_setup.active_imagem_logo %}
-        <img src="{{ active_setup.active_imagem_logo.imagem_logo.url }}" alt="{{ active_setup.active_imagem_logo.imagem_logo.nome }}">
+        <img src="{{ active_setup.active_imagem_logo.imagem.url }}" loading="lazy" alt="{{ active_setup.active_imagem_logo.imagem_logo.nome }}">
         {% else %}
         <h1>Extreme Way</h1>
         {% endif %}
@@ -30,11 +30,11 @@
         </ul>
     </nav>
     <div class="links-front">
-        <a href="https://www.facebook.com/extremewaycanecas/" target="_blank">
-            <img src="https://www.facebook.com/images/fb_icon_325x325.png" alt="Facebook" width="30" height="30">
+        <a href="{{ active_setup.active_contactos_site.facebook }}" target="_blank">
+            <img src="{{ active_setup.active_contactos_site.facebook_icon }}" alt="Facebook" width="30" height="30">
         </a>
-        <a href="https://www.instagram.com/extremeway_ramada" target="_blank">
-            <img src="https://www.instagram.com/static/images/ico/favicon-192.png/68d99ba29cc8.png" alt="Instagram" width="30" height="30">
+        <a href="{{ active_setup.active_contactos_site.instagram }}" target="_blank">
+            <img src="{{ active_setup.active_contactos_site.instagram_icon }}" alt="Instagram" width="30" height="30">
         </a>
     </div>
 </header>

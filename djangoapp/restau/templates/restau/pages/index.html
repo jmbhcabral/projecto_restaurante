@@ -9,7 +9,7 @@
             </div>
             <div class="imagens-ambiente">
                 <div class="imagem-ambiente">
-                    <img src="{{ active_setup.active_imagem_topo.imagem.url }}" alt="random">
+                    <img src="{{ active_setup.active_imagem_topo.imagem.url }}" loading="lazy" alt="">
                 </div>
             </div>
         </div>
@@ -19,7 +19,7 @@
         <div class="frase-inspiradora">
             <div class="frase-imagens-cima">
                 <div class="frase-img-topo">
-                    <img src="{{ active_setup.active_imagem_frase_cima.imagem.url }}" alt="">
+                    <img src="{{ active_setup.active_imagem_frase_cima.imagem.url }}" loading="lazy" alt="">
                     
                 </div>
                 <div>
@@ -39,7 +39,7 @@
                 </div>
             
                 <div class="frase-img-baixo">
-                     <img src="{{ active_setup.active_imagem_frase_baixo.imagem.url }}" alt="">
+                     <img src="{{ active_setup.active_imagem_frase_baixo.imagem.url }}" loading="lazy" alt="">
                 </div>
             </div>
         </div>
@@ -51,9 +51,11 @@
         </div>
         <div class="grid-container">  
             {% for foto in galeria %}
-            <div class="grid-item">
-                <img src="{{ foto.imagem.url }}" alt="{{ foto.imagem.name }}">
-            </div>
+                {% if foto.is_visible %}
+                    <div class="grid-item">
+                    <img src="{{ foto.imagem.url }}" loading="lazy" alt="{{ foto.imagem.name }}">
+                    </div>
+                {% endif %}
             {% endfor %}
         </div>
     </section >
@@ -66,23 +68,26 @@
                         HORÁRIO DE FUNCIONAMENTO
                     </h6>
                     <p>
-                        Seg. a Sex.: 11h30 - 15h00 | 19h00 - 23h00<br>
-                        Sábados: 12h00 - 15h00 | 19h00 - 23h00<br>
-                        Feriados: 12h00 - 15h00 | 19h00 - 23h00<br>
-                        Domingos: Encerrado<br>
+                        {% for dia in active_setup.active_horario.all %}
+                            {% if dia.status == 'Aberto' %}
+                            {{dia.dia_semana}}: {{dia.hora_abertura_almoco}}h-{{dia.hora_fecho_almoco}}h|{{ dia.hora_abertura_jantar }}h-{{ dia.hora_fecho_jantar }}h<br>
+                            {% else %}
+                            {{dia.dia_semana}}: {{dia.status}}<br>
+                            {% endif %}
+                        {% endfor %}
                     </p>
                     <h6 class="left">
                         MORADA:
                     </h6>
                     <p>
-                        Rua 25 Agosto, Lote 1<br>
-                        2620-257 Ramada<br>
-                        Tel: +351 309758819<br>
-                        email: geral@extremeway.pt
+                        {{ active_setup.active_contactos_site.morada|linebreaks }}
+                        {{ active_setup.active_contactos_site.telefone|linebreaks }}
+                        {{ active_setup.active_contactos_site.email|linebreaks }}
+
                     </p>
                 </div>
             <div class="map-box">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3109.3484558085624!2d-9.18377492453104!3d38.80156835235365!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd192dbe92060e4f%3A0xd63b31709ac171f3!2sExtreme%20Way%20-%20Hamburgueria!5e0!3m2!1spt-PT!2spt!4v1691867449875!5m2!1spt-PT!2spt" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <iframe src="{{ active_setup.active_google_maps.iframe }}" width="600" height="600" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
     </section>

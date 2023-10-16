@@ -106,8 +106,10 @@ class ImagemPadraoAdmin(admin.ModelAdmin):
 
 @admin.register(ContactosSite)
 class ContactosSiteAdmin(admin.ModelAdmin):
-    list_display = ('id', 'morada', 'telefone', 'email')
-    list_display_links = ('id', 'morada', 'telefone', 'email')
+    list_display = ('id', 'morada', 'telefone', 'email', 'facebook',
+                    'instagram')
+    list_display_links = ('id', 'morada', 'telefone', 'email', 'facebook',
+                          'instagram')
 
     def has_add_permission(self, request):
         return not ContactosSite.objects.exists()

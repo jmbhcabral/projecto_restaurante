@@ -4,7 +4,25 @@
         {% include "restau/partials/_conf_menu.html" %}
             <div class="conta-content">
                 <h2>Configuração</h2>
+            
+                <div class="content">
+                <!-- configuracao.html -->
 
+                    <h1>Campos em ActiveSetup</h1>
+
+                    <ul>
+                        {% for campo in campos %}
+                            <li>
+                                {{ campo.name }}
+                                <a href="">Editar</a>
+                            </li>
+                        {% empty %}
+                            <li>Nenhum campo encontrado.</li>
+                        {% endfor %}
+                    </ul>
+
+                    <a href="">Criar Novo Campo</a>
+                </div>
             </div>
         </div>
     </div>
