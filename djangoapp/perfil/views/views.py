@@ -8,9 +8,9 @@ from fidelidade import models as fidelidade_models
 from fidelidade import forms as fidelidade_forms
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from restau.models import FrontendSetup
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from restau.models import ActiveSetup
 
 
 class BasePerfil(View):
@@ -19,13 +19,7 @@ class BasePerfil(View):
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
 
-        main_image = FrontendSetup.objects \
-            .filter(imagem_topo__isnull=False) \
-            .order_by('-id') \
-            .first()
-
-        main_logo = FrontendSetup.objects \
-            .filter(imagem_logo__isnull=False) \
+        active_setup = ActiveSetup.objects \
             .order_by('-id') \
             .first()
 
@@ -37,8 +31,7 @@ class BasePerfil(View):
             ).first()
 
             self.context = {
-                'main_logo': main_logo,
-                'main_image': main_image,
+                'active_setup': active_setup,
                 'userform': perfil_forms.UserForm(
                     data=self.request.POST or None,
                     usuario=self.request.user,
@@ -51,8 +44,7 @@ class BasePerfil(View):
             }
         else:
             self.context = {
-                'main_logo': main_logo,
-                'main_image': main_image,
+                'active_setup': active_setup,
                 'userform': perfil_forms.UserForm(
                     data=self.request.POST or None
                 ),
@@ -269,13 +261,7 @@ class CartaoCliente(View):
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
 
-        main_image = FrontendSetup.objects \
-            .filter(imagem_topo__isnull=False) \
-            .order_by('-id') \
-            .first()
-
-        main_logo = FrontendSetup.objects \
-            .filter(imagem_logo__isnull=False) \
+        active_setup = ActiveSetup.objects \
             .order_by('-id') \
             .first()
 
@@ -303,8 +289,7 @@ class CartaoCliente(View):
             usuario=self.request.user).first()
 
         self.context = {
-            'main_logo': main_logo,
-            'main_image': main_image,
+            'active_setup': active_setup,
             'perfil': perfil,
         }
 
@@ -320,13 +305,7 @@ class Vantagens(View):
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
 
-        main_image = FrontendSetup.objects \
-            .filter(imagem_topo__isnull=False) \
-            .order_by('-id') \
-            .first()
-
-        main_logo = FrontendSetup.objects \
-            .filter(imagem_logo__isnull=False) \
+        active_setup = ActiveSetup.objects \
             .order_by('-id') \
             .first()
 
@@ -347,8 +326,7 @@ class Vantagens(View):
             )
 
         self.context = {
-            'main_logo': main_logo,
-            'main_image': main_image,
+            'active_setup': active_setup,
             'lista_fidelidade': lista_fidelidade,
         }
 

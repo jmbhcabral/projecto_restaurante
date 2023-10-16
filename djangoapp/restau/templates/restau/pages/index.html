@@ -4,19 +4,13 @@
         <div class="intro-section">
             <div class="texto-intro">    
                 <p>
-                    {{ active_setup.active_intro.intro|linebreaks }}
+                    {{ active_setup.active_intro.texto|linebreaks }}
                 </p>
             </div>
             <div class="imagens-ambiente">
-                {% comment %} <div class="imagem-ambiente">
-                    <img src="https://source.unsplash.com/featured/1200x400" alt="random">
-                </div> {% endcomment %}
                 <div class="imagem-ambiente">
-                    <img src="https://images.unsplash.com/photo-1695198671984-276e5c3f1f67?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=400&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY5Njg2OTY4Mw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1200" alt="random">
+                    <img src="{{ active_setup.active_imagem_topo.imagem.url }}" alt="random">
                 </div>
-                {% comment %} <div class="imagem-ambiente">
-                    <img src="https://images.unsplash.com/photo-1694845479966-d604089e7b4d?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=400&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY5NjcxMTI5MQ&ixlib=rb-4.0.3&q=80&w=400?r6" alt="random">
-                </div> {% endcomment %}
             </div>
         </div>
     </section>
@@ -25,27 +19,27 @@
         <div class="frase-inspiradora">
             <div class="frase-imagens-cima">
                 <div class="frase-img-topo">
-                    <img src="https://images.unsplash.com/photo-1694845479966-d604089e7b4d?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=400&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY5NjcxMTI5MQ&ixlib=rb-4.0.3&q=80&w=400?r1" alt="">
+                    <img src="{{ active_setup.active_imagem_frase_cima.imagem.url }}" alt="">
                     
                 </div>
                 <div>
                     <p>
-                        {{ active_setup.active_frase_cima.frase_cima|linebreaks }}
+                        {{ active_setup.active_frase_cima.texto|linebreaks }}
                     </p>
                 </div>
             </div>
             <div class="frase">
-                <h3>{{ active_setup.active_frase_inspiradora.frase_inspiradora|linebreaks }}</h3>
+                <h3>{{ active_setup.active_frase_inspiradora.texto|linebreaks }}</h3>
             </div>
             <div class="frase-imagens-baixo">
                 <div>
                     <p>
-                        {{ active_setup.active_frase_baixo.frase_baixo|linebreaks }}
+                        {{ active_setup.active_frase_baixo.texto|linebreaks }}
                     </p>
                 </div>
             
                 <div class="frase-img-baixo">
-                     <img src="https://images.unsplash.com/photo-1694845479966-d604089e7b4d?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=400&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY5NjcxMTI5MQ&ixlib=rb-4.0.3&q=80&w=400?r2" alt="">
+                     <img src="{{ active_setup.active_imagem_frase_baixo.imagem.url }}" alt="">
                 </div>
             </div>
         </div>

@@ -57,13 +57,6 @@ class Fotos(models.Model):
         verbose_name = 'Foto'
         verbose_name_plural = 'Fotos'
 
-    nome = models.CharField(
-        max_length=200,
-        verbose_name='Nome',
-        help_text='Nome da foto',
-        blank=True,
-    )
-
     imagem = models.ImageField(
         upload_to='assets/frontend/galeria',
         blank=True,
@@ -87,8 +80,7 @@ class Fotos(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        if not self.nome and self.imagem:
-            self.nome = self.imagem.name.split('/')[-1]
+
         current_imagem_name = str(self.imagem.name)
         super().save(*args, **kwargs)
         imagem_changed = False
@@ -102,247 +94,556 @@ class Fotos(models.Model):
             super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.nome
+        return self.imagem.name
 
 
-class FrontendSetup(models.Model):
-    nome = models.CharField(
-        max_length=200,
-        verbose_name='Nome',
-        help_text='Nome da configuração'
-    )
-    imagem_logo = models.ImageField(
-        upload_to='assets/frontend/logo',
+class ImagemLogo(models.Model):
+    class Meta:
+        verbose_name = 'Imagem Logo'
+        verbose_name_plural = 'Imagens Logo'
+
+    imagem = models.ImageField(
+        upload_to='assets/frontend/imagem_logo',
         blank=True,
         null=True,
-        verbose_name='Logo',
+        verbose_name='Imagem do logo',
         default='',
-        # validators=[validate_png]
     )
 
-    imagem_topo = models.ImageField(
-        upload_to='assets/frontend/',
+    is_visible = models.BooleanField(
+        default=True,
+        verbose_name='Visibilidade',
+        help_text='Visibilidade do logo.'
+    )
+
+    def save(self, *args, **kwargs):
+
+        current_imagem_name = str(self.imagem.name)
+        super().save(*args, **kwargs)
+        imagem_changed = False
+
+        if self.imagem:
+            imagem_changed = current_imagem_name != self.imagem.name
+
+        if imagem_changed:
+            print('resizing')
+            resize_image(self.imagem, 200)
+            super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.imagem.name
+
+
+class ImagemTopo(models.Model):
+    class Meta:
+        verbose_name = 'Imagem Topo'
+        verbose_name_plural = 'Imagens Topo'
+
+    imagem = models.ImageField(
+        upload_to='assets/frontend/imagem_topo',
         blank=True,
         null=True,
-        verbose_name='Imagem',
+        verbose_name='Imagem Topo',
         default='',
-        # validators=[validate_png]
     )
-    intro = models.TextField(
+
+    is_visible = models.BooleanField(
+        default=True,
+        verbose_name='Visibilidade',
+        help_text='Visibilidade da imagem.'
+    )
+
+    def save(self, *args, **kwargs):
+
+        current_imagem_name = str(self.imagem.name)
+        super().save(*args, **kwargs)
+        imagem_changed = False
+
+        if self.imagem:
+            imagem_changed = current_imagem_name != self.imagem.name
+
+        if imagem_changed:
+            print('resizing')
+            resize_image(self.imagem, 900)
+            super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.imagem.name
+
+
+class Intro(models.Model):
+    class Meta:
+        verbose_name = 'Intro'
+        verbose_name_plural = 'Intros'
+
+    texto = models.TextField(
         max_length=1500,
-        verbose_name='Introdução',
+        verbose_name='Texto da intro',
         blank=True,
         null=True,
-        default=None,
-    )
-
-    intro_imagem = models.ImageField(
-        upload_to='assets/frontend/forntendsetup/',
-        blank=True,
-        null=True,
-        verbose_name='Imagem intro',
         default='',
     )
 
-    frase_inspiradora = models.TextField(
-        max_length=250,
-        verbose_name='Frase inspiradora',
-        blank=True,
-        null=True,
-        default=None,
-    )
-    frase_cima = models.TextField(
-        max_length=250,
-        verbose_name='Frase cima',
-        blank=True,
-        null=True,
-        default=None,
+    is_visible = models.BooleanField(
+        default=True,
+        verbose_name='Visibilidade',
+        help_text='Visibilidade da intro.'
     )
 
-    imagem_frase_cima = models.ImageField(
-        upload_to='assets/frontend/forntendsetup/',
+    def __str__(self):
+        return self.texto
+
+
+class IntroImagem(models.Model):
+    class Meta:
+        verbose_name = 'Intro Imagem'
+        verbose_name_plural = 'Intros Imagens'
+
+    imagem = models.ImageField(
+        upload_to='assets/frontend/intro_imagem',
         blank=True,
         null=True,
-        verbose_name='Imagem frase cima',
+        verbose_name='Imagem da intro',
         default='',
     )
 
-    frase_baixo = models.TextField(
-        max_length=250,
-        verbose_name='Frase baixo',
-        blank=True,
-        null=True,
-        default=None,
+    is_visible = models.BooleanField(
+        default=True,
+        verbose_name='Visibilidade',
+        help_text='Visibilidade da imagem.'
     )
 
-    imagem_frase_baixo = models.ImageField(
-        upload_to='assets/frontend/forntendsetup/',
+    def save(self, *args, **kwargs):
+
+        current_imagem_name = str(self.imagem.name)
+        super().save(*args, **kwargs)
+        imagem_changed = False
+
+        if self.imagem:
+            imagem_changed = current_imagem_name != self.imagem.name
+
+        if imagem_changed:
+            print('resizing')
+            resize_image(self.imagem, 1200)
+            super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.imagem.name
+
+
+class FraseInspiradora(models.Model):
+    class Meta:
+        verbose_name = 'Frase Inspiradora'
+        verbose_name_plural = 'Frases Inspiradoras'
+
+    texto = models.TextField(
+        max_length=250,
+        verbose_name='Frase Inspiradora',
         blank=True,
         null=True,
-        verbose_name='Imagem frase baixo',
         default='',
     )
 
-    imagem_padrao = models.ImageField(
-        upload_to='assets/Products/default/',
+    is_visible = models.BooleanField(
+        default=True,
+        verbose_name='Visibilidade',
+        help_text='Visibilidade da frase inspiradora.'
+    )
+
+    def __str__(self):
+        return self.texto
+
+
+class FraseCima(models.Model):
+    class Meta:
+        verbose_name = 'Frase Cima'
+        verbose_name_plural = 'Frases Cima'
+
+    texto = models.TextField(
+        max_length=250,
+        verbose_name='Frase Cima',
+        blank=True,
+        null=True,
+        default='',
+    )
+
+    is_visible = models.BooleanField(
+        default=True,
+        verbose_name='Visibilidade',
+        help_text='Visibilidade da frase cima.'
+    )
+
+    def __str__(self):
+        return self.texto
+
+
+class ImagemFraseCima(models.Model):
+    class Meta:
+        verbose_name = 'Imagem Frase Cima'
+        verbose_name_plural = 'Imagens Frases Cima'
+
+    imagem = models.ImageField(
+        upload_to='assets/frontend/imagem_frase_cima',
+        blank=True,
+        null=True,
+        verbose_name='Imagem Frase Cima',
+        default='',
+    )
+
+    is_visible = models.BooleanField(
+        default=True,
+        verbose_name='Visibilidade',
+        help_text='Visibilidade da imagem.'
+    )
+
+    def save(self, *args, **kwargs):
+
+        current_imagem_name = str(self.imagem.name)
+        super().save(*args, **kwargs)
+        imagem_changed = False
+
+        if self.imagem:
+            imagem_changed = current_imagem_name != self.imagem.name
+
+        if imagem_changed:
+            print('resizing')
+            resize_image(self.imagem, 300)
+            super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.imagem.name
+
+
+class FraseBaixo(models.Model):
+    class Meta:
+        verbose_name = 'Frase Baixo'
+        verbose_name_plural = 'Frases Baixo'
+
+    texto = models.TextField(
+        max_length=250,
+        verbose_name='Frase Baixo',
+        blank=True,
+        null=True,
+        default='',
+    )
+
+    is_visible = models.BooleanField(
+        default=True,
+        verbose_name='Visibilidade',
+        help_text='Visibilidade da frase baixo.'
+    )
+
+    def __str__(self):
+        return self.texto
+
+
+class ImagemFraseBaixo(models.Model):
+    class Meta:
+        verbose_name = 'Imagem Frase Baixo'
+        verbose_name_plural = 'Imagens Frases Baixo'
+
+    imagem = models.ImageField(
+        upload_to='assets/frontend/imagem_frase_baixo',
+        blank=True,
+        null=True,
+        verbose_name='Imagem Frase Baixo',
+        default='',
+    )
+
+    is_visible = models.BooleanField(
+        default=True,
+        verbose_name='Visibilidade',
+        help_text='Visibilidade da imagem.'
+    )
+
+    def save(self, *args, **kwargs):
+
+        current_imagem_name = str(self.imagem.name)
+        super().save(*args, **kwargs)
+        imagem_changed = False
+
+        if self.imagem:
+            imagem_changed = current_imagem_name != self.imagem.name
+
+        if imagem_changed:
+            print('resizing')
+            resize_image(self.imagem, 300)
+            super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.imagem.name
+
+
+class ImagemPadrao(models.Model):
+    class Meta:
+        verbose_name = 'Imagem Padrão'
+        verbose_name_plural = 'Imagens Padrão'
+
+    imagem = models.ImageField(
+        upload_to='assets/frontend/imagem_padrao',
         blank=True,
         null=True,
         default='default_image.jpg',
         verbose_name='Imagem Padrão',
-        # validators=[validate_png]
     )
-    ementa = models.ForeignKey(
-        'Ementa',
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        default=None,
+
+    is_visible = models.BooleanField(
+        default=True,
+        verbose_name='Visibilidade',
+        help_text='Visibilidade da imagem.'
     )
 
     def save(self, *args, **kwargs):
-        current_imagem_logo_name = str(self.imagem_logo.name)
-        current_imagem_topo_name = str(self.imagem_topo.name)
-        current_imagem_padrao_name = str(self.imagem_padrao.name)
-        current_intro_imagem_name = str(self.intro_imagem.name)
-        current_imagem_frase_cima_name = str(self.imagem_frase_cima.name)
-        current_imagem_frase_baixo_name = str(self.imagem_frase_baixo.name)
+
+        current_imagem_name = str(self.imagem.name)
         super().save(*args, **kwargs)
-        imagem_logo_changed = False
-        imagem_topo_changed = False
-        imagem_padrao_changed = False
-        intro_imagem_changed = False
-        imagem_frase_cima_changed = False
-        imagem_frase_baixo_changed = False
+        imagem_changed = False
 
-        if self.imagem_logo:
-            imagem_logo_changed = current_imagem_logo_name != \
-                self.imagem_logo.name
+        if self.imagem:
+            imagem_changed = current_imagem_name != self.imagem.name
 
-        if self.imagem_topo:
-            imagem_topo_changed = current_imagem_topo_name != \
-                self.imagem_topo.name
-
-        if self.imagem_padrao:
-            imagem_padrao_changed = current_imagem_padrao_name != \
-                self.imagem_padrao.name
-
-        if self.intro_imagem:
-            intro_imagem_changed = current_intro_imagem_name != \
-                self.intro_imagem.name
-
-        if self.imagem_frase_cima:
-            imagem_frase_cima_changed = current_imagem_frase_cima_name != \
-                self.imagem_frase_cima.name
-
-        if self.imagem_frase_baixo:
-            imagem_frase_baixo_changed = current_imagem_frase_baixo_name != \
-                self.imagem_frase_baixo.name
-
-        if imagem_logo_changed:
-            print('Resizing logo')
-            resize_image(self.imagem_logo, 200)
-
-        if imagem_topo_changed:
-            print('Resizing imagem de topo')
-            # Substitua 200 pelo tamanho desejado
-            resize_image(self.imagem_topo, 900)
-
-        if imagem_padrao_changed:
+        if imagem_changed:
             print('resizing')
-            resize_image(self.imagem_padrao, 500)
-
-        if intro_imagem_changed:
-            print('resizing')
-            resize_image(self.intro_imagem, 1200)
-
-        if imagem_frase_cima_changed:
-            print('resizing')
-            resize_image(self.imagem_frase_cima, 300)
-
-        if imagem_frase_baixo_changed:
-            print('resizing')
-            resize_image(self.imagem_frase_baixo, 300)
+            resize_image(self.imagem, 500)
+            super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.nome
+        return self.imagem.name
+
+
+class ContactosSite(models.Model):
+    class Meta:
+        verbose_name = 'Contacto Site'
+        verbose_name_plural = 'Contactos Site'
+
+    morada = models.TextField(
+        max_length=250,
+        verbose_name='Morada',
+        blank=True,
+        null=True,
+        default='',
+    )
+
+    telefone = models.CharField(
+        max_length=15,
+        verbose_name='Telefone',
+        blank=True,
+        null=True,
+        default='',
+    )
+
+    email = models.CharField(
+        max_length=50,
+        verbose_name='Email',
+        blank=True,
+        null=True,
+        default='',
+    )
+
+    def __str__(self):
+        return self.morada
+
+
+class GoogleMaps(models.Model):
+    class Meta:
+        verbose_name = 'Google Maps'
+        verbose_name_plural = 'Google Maps'
+
+    iframe = models.TextField(
+        max_length=250,
+        verbose_name='Iframe',
+        blank=True,
+        null=True,
+        default='',
+    )
+
+    def __str__(self):
+        return self.iframe
+
+
+class Horario(models.Model):
+    class Meta:
+        verbose_name = 'Horário'
+        verbose_name_plural = 'Horários'
+
+    DIA_SEMANA_CHOICES = [
+        ('Segunda', 'Segunda-feira'),
+        ('Terça', 'Terça-feira'),
+        ('Quarta', 'Quarta-feira'),
+        ('Quinta', 'Quinta-feira'),
+        ('Sexta', 'Sexta-feira'),
+        ('Sábado', 'Sábado'),
+        ('Domingo', 'Domingo'),
+    ]
+
+    STATUS_CHOICES = [
+        ('Aberto', 'Aberto'),
+        ('Encerrado', 'Encerrado'),
+    ]
+
+    dia_semana = models.CharField(
+        max_length=10,
+        choices=DIA_SEMANA_CHOICES,
+        verbose_name='Dia da semana',
+        blank=True,
+        null=True,
+        default='',
+    )
+
+    hora_abertura_almoco = models.TimeField(
+        verbose_name='Hora de abertura do almoço',
+        blank=True,
+        null=True,
+    )
+
+    hora_fecho_almoco = models.TimeField(
+        verbose_name='Hora de fecho do almoço',
+        blank=True,
+        null=True,
+    )
+
+    hora_abertura_jantar = models.TimeField(
+        verbose_name='Hora de abertura do jantar',
+        blank=True,
+        null=True,
+    )
+
+    hora_fecho_jantar = models.TimeField(
+        verbose_name='Hora de fecho do jantar',
+        blank=True,
+        null=True,
+    )
+
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        verbose_name='Folga',
+        blank=True,
+        null=True,
+        default='Aberto',
+    )
+
+    dia_encerramento = models.CharField(
+        max_length=10,
+        choices=DIA_SEMANA_CHOICES,
+        verbose_name='Dia de encerramento',
+        blank=True,
+        null=True,
+        default='Domingo',
+    )
+
+    def __str__(self):
+        if self.dia_semana == self.dia_encerramento:
+            return f'{self.dia_semana}: Encerrado'
+        else:
+            return f'{self.dia_semana}: {self.hora_abertura_almoco} - ' \
+                f'{self.hora_fecho_almoco} | {self.hora_abertura_jantar} - ' \
+                f'{self.hora_fecho_jantar}'
 
 
 class ActiveSetup(models.Model):
     active_imagem_logo = models.ForeignKey(
-        'FrontendSetup',
+        'ImagemLogo',
         related_name='active_imagem_logo_set',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
     )
 
     active_imagem_topo = models.ForeignKey(
-        'FrontendSetup',
+        'ImagemTopo',
         related_name='active_imagem_topo_set',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
     )
 
     active_intro = models.ForeignKey(
-        'FrontendSetup',
+        'Intro',
         related_name='active_intro_set',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
     )
 
     active_intro_imagem = models.ForeignKey(
-        'FrontendSetup',
+        'IntroImagem',
         related_name='active_intro_imagem_set',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
     )
 
     active_frase_inspiradora = models.ForeignKey(
-        'FrontendSetup',
+        'FraseInspiradora',
         related_name='active_frase_inspiradora_set',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
     )
 
     active_ementa = models.ForeignKey(
-        'FrontendSetup',
+        'Ementa',
         related_name='active_ementa_set',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
     )
 
     active_frase_cima = models.ForeignKey(
-        'FrontendSetup',
+        'FraseCima',
         related_name='active_frase_cima_set',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
     )
 
     active_imagem_frase_cima = models.ForeignKey(
-        'FrontendSetup',
+        'ImagemFraseCima',
         related_name='active_imagem_frase_cima_set',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
     )
 
     active_frase_baixo = models.ForeignKey(
-        'FrontendSetup',
+        'FraseBaixo',
         related_name='active_frase_baixo_set',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
     )
 
     active_imagem_frase_baixo = models.ForeignKey(
-        'FrontendSetup',
+        'ImagemFraseBaixo',
         related_name='active_imagem_frase_baixo_set',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
     )
 
     active_imagem_padrao = models.ForeignKey(
-        'FrontendSetup',
+        'ImagemPadrao',
         related_name='active_imagem_padrao_set',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
+    )
+
+    active_contactos_site = models.ForeignKey(
+        'ContactosSite',
+        related_name='active_contactos_site_set',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    active_google_maps = models.ForeignKey(
+        'GoogleMaps',
+        related_name='active_google_maps_set',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
 
     def __str__(self):

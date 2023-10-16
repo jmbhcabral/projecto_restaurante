@@ -1,24 +1,23 @@
 from django.shortcuts import render, get_object_or_404
 from restau.models import (
-    Products, FrontendSetup, Category, SubCategory, )
+    Products, Category, SubCategory, ActiveSetup,)
 from django.db.models import Prefetch
 
 
 def encomendas(request):
-    main_logo = FrontendSetup.objects \
-        .filter(imagem_logo__isnull=False) \
+    setup = ActiveSetup.objects \
         .order_by('-id') \
         .first()
 
-    main_image = FrontendSetup.objects \
-        .filter(imagem_topo__isnull=False) \
-        .order_by('-id') \
-        .first()
+    # main_image = FrontendSetup.objects \
+    #     .filter(imagem_topo__isnull=False) \
+    #     .order_by('-id') \
+    #     .first()
 
-    default_image = FrontendSetup.objects \
-        .filter(imagem_topo__isnull=False) \
-        .order_by('-id') \
-        .first()
+    # default_image = FrontendSetup.objects \
+    #     .filter(imagem_topo__isnull=False) \
+    #     .order_by('-id') \
+    #     .first()
 
     categorias = Category.objects \
         .all() \
@@ -27,12 +26,12 @@ def encomendas(request):
         .all() \
         .order_by('ordem')
 
-    frontend_setup = FrontendSetup.objects \
+    frontend_setup = ActiveSetup.objects \
         .order_by('-id') \
         .first()
 
-    if frontend_setup and frontend_setup.ementa:
-        produtos_ementa = frontend_setup.ementa.produtos \
+    if frontend_setup and frontend_setup.active_ementa:
+        produtos_ementa = frontend_setup.active_ementa.produtos \
             .all() \
             .order_by('categoria', 'subcategoria', 'ordem')
 
@@ -51,9 +50,7 @@ def encomendas(request):
     #     Prefetch('subcategoria', queryset=subcategorias)
     # )
     context = {
-        'main_logo': main_logo,
-        'main_image': main_image,
-        'default_image': default_image,
+        'frontend_setup': frontend_setup,
         'produtos': produtos_ementa,
         'categorias': categorias,
         'subcategorias': subcategorias,

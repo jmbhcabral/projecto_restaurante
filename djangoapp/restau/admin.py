@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from restau.models import (
-    Category, SubCategory, Percentage, Products, FrontendSetup, Ementa,
-    ProdutosEmenta, Fotos, ActiveSetup
+    Category, SubCategory, Percentage, Products, Ementa,
+    ProdutosEmenta, Fotos, ActiveSetup, ImagemLogo, ImagemTopo, Intro,
+    IntroImagem, FraseInspiradora, ImagemFraseCima, FraseCima, FraseBaixo,
+    ImagemFraseBaixo, ImagemPadrao, ContactosSite, GoogleMaps, Horario,
 )
 
 
@@ -42,14 +44,88 @@ class ProductsAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(FrontendSetup)
-class FrontendSetupAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nome', 'imagem_logo', 'imagem_topo', 'intro',
-                    'intro_imagem', 'frase_inspiradora', 'imagem_frase_cima',
-                    'frase_cima', 'frase_baixo',
-                    'imagem_frase_baixo', 'imagem_padrao', 'ementa')
-    list_display_links = ('id', 'nome', 'imagem_logo', 'imagem_topo',
-                          'imagem_padrao', 'ementa')
+@admin.register(ImagemLogo)
+class ImagemLogoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'imagem', 'is_visible')
+    list_display_links = ('id', 'imagem', 'is_visible')
+
+
+@admin.register(ImagemTopo)
+class ImagemTopoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'imagem', 'is_visible')
+    list_display_links = ('id', 'imagem', 'is_visible')
+
+
+@admin.register(Intro)
+class IntroAdmin(admin.ModelAdmin):
+    list_display = ('id', 'texto', 'is_visible')
+    list_display_links = ('id', 'texto', 'is_visible')
+
+
+@admin.register(IntroImagem)
+class IntroImagemAdmin(admin.ModelAdmin):
+    list_display = ('id', 'imagem', 'is_visible')
+    list_display_links = ('id', 'imagem', 'is_visible')
+
+
+@admin.register(FraseInspiradora)
+class FraseInspiradoraAdmin(admin.ModelAdmin):
+    list_display = ('id', 'texto', 'is_visible')
+    list_display_links = ('id', 'texto', 'is_visible')
+
+
+@admin.register(ImagemFraseCima)
+class ImagemFraseCimaAdmin(admin.ModelAdmin):
+    list_display = ('id', 'imagem', 'is_visible')
+    list_display_links = ('id', 'imagem', 'is_visible')
+
+
+@admin.register(FraseCima)
+class FraseCimaAdmin(admin.ModelAdmin):
+    list_display = ('id', 'texto', 'is_visible')
+    list_display_links = ('id', 'texto', 'is_visible')
+
+
+@admin.register(FraseBaixo)
+class FraseBaixoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'texto', 'is_visible')
+    list_display_links = ('id', 'texto', 'is_visible')
+
+
+@admin.register(ImagemFraseBaixo)
+class ImagemFraseBaixoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'imagem', 'is_visible')
+    list_display_links = ('id', 'imagem', 'is_visible')
+
+
+@admin.register(ImagemPadrao)
+class ImagemPadraoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'imagem', 'is_visible')
+    list_display_links = ('id', 'imagem', 'is_visible')
+
+
+@admin.register(ContactosSite)
+class ContactosSiteAdmin(admin.ModelAdmin):
+    list_display = ('id', 'morada', 'telefone', 'email')
+    list_display_links = ('id', 'morada', 'telefone', 'email')
+
+    def has_add_permission(self, request):
+        return not ContactosSite.objects.exists()
+
+
+@admin.register(GoogleMaps)
+class GoogleMapsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'iframe')
+    list_display_links = ('id', 'iframe')
+
+    def has_add_permission(self, request):
+        return not GoogleMaps.objects.exists()
+
+
+@admin.register(Horario)
+class HorarioAdmin(admin.ModelAdmin):
+    list_display = ('id', 'dia_semana')
+    list_display_links = ('id', 'dia_semana')
 
 
 @admin.register(ActiveSetup)
@@ -59,7 +135,8 @@ class ActiveSetupAdmin(admin.ModelAdmin):
                     'active_frase_inspiradora', 'active_imagem_frase_cima',
                     'active_frase_cima', 'active_frase_baixo',
                     'active_imagem_frase_baixo', 'active_imagem_padrao',
-                    'active_ementa')
+                    'active_ementa', 'active_contactos_site',
+                    'active_google_maps',)
     list_display_links = ('id',)
 
     def has_add_permission(self, request):
@@ -68,9 +145,9 @@ class ActiveSetupAdmin(admin.ModelAdmin):
 
 @admin.register(Fotos)
 class FotosAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nome', 'imagem',
+    list_display = ('id', 'imagem',
                     'image_thumb', 'is_visible', 'ordem',)
-    list_display_links = ('id', 'nome', 'imagem',)
+    list_display_links = ('id', 'imagem',)
     list_editable = ('is_visible', 'ordem',)
 
     def image_thumb(self, obj):
