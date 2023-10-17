@@ -1,0 +1,37 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+<div class="section-content-wide formset-update content">
+    {% include "restau/partials/_conf_menu.html" %}
+        <div class="conta-content">
+            <h2 class="center">Logotipo</h2>
+            <p class="center">
+                Atualize o Logotipo do seu restaurante, adicione novos logotipos
+                ou exclua Logotipos que não são mais necessários.
+            </p>
+            <h3 class="center">Logotipos criados</h3>
+            {% if logos %}
+            <p class="center">Clique no Logotipo que deseja editar.</p>
+            <div class="sub-links">
+            {% for group in logos_grouped %}
+            <div class="sub-link">
+                {% for logo in group %}
+                    {% if logo.imagem %}
+                        <a href="" class="sub-link">{{ logo.imagem.name }}</a><br>
+                    {% endif %}
+                    {% endfor %}
+                    </div>
+
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="center">Você ainda não criou nenhum logotipo.</p>
+                {% endif %}
+                <div class="sub-menu">
+                    {% comment %} <a href="{% url "restau:criar_logo" %}" class="menu-btn">Criar</a> {% endcomment %}
+                    {% comment %} <a href="{% url "restau:defenir_utilizado" %}" class="menu-btn">Defenir</a> {% endcomment %}
+                </div>
+                
+        </div>
+    </div>
+</div>
+{% endblock %}

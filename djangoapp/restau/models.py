@@ -506,6 +506,7 @@ class Horario(models.Model):
         ('Sexta', 'Sexta-feira'),
         ('Sábado', 'Sábado'),
         ('Domingo', 'Domingo'),
+        ('Feriados', 'Feriados')
     ]
 
     STATUS_CHOICES = [

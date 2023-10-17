@@ -1,53 +1,59 @@
 {% extends "restau/base.html" %}
 {% block content %}
-<h1>Pontos Produtos Fidelidade</h1>
-<div class="single-product">
-    <h3 class="single-product">
-    {{ ementa.nome}}
-    </h3>
-    <p><b>Nome: </b>{{ fidelidade.nome}}</p>
-    <p><b>Desconto: </b> {{ fidelidade.desconto }}% </p>
-    <p><b>Ementa: </b>{{ fidelidade.ementa }}</p>
-  </div>
-  <div class="section-content-wide content">
-    <form action="{{ form_action }}" method="POST">
-        {% csrf_token %}
-        <fieldset>
-            <legend>Adicionar visíveis</legend>        
-            {{ formset.management_form }}
-            {% for form in formset %}
-            {% for produto in produtos %}
-                {% if produto.id == form.produto.initial %}
-            <div>  
-                {% comment %} <p>{{ form.fidelidade.label_tag }}</p> {% endcomment %}
-                <p>{{ form.fidelidade }}</p>
-                <p>{{ form.fidelidade.errors }}</p>
-            </div>              
-            <div>
-                
-                <p>{{ form.produto.label_tag }} {{ produto.nome }}</p>
-                <p>{{ form.produto }}</p>
-                <p>{{ form.produto.errors }}</p> 
+<div class="section-content-wide content">
+  {% include "restau/partials/_conf_menu.html" %}
+      <div class="conta-content">
+          <h2>Fidelidade</h2>
+        <div class="single-product">
+            <h3 class="single-product">
+            {{ ementa.nome}}
+            </h3>
+            <p><b>Nome: </b>{{ fidelidade.nome}}</p>
+            <p><b>Desconto: </b> {{ fidelidade.desconto }}% </p>
+            <p><b>Ementa: </b>{{ fidelidade.ementa }}</p>
+          </div>
+          <div class="section-content-wide content">
+            <form action="{{ form_action }}" method="POST">
+                {% csrf_token %}
+                <fieldset>
+                    <legend>Adicionar visíveis</legend>        
+                    {{ formset.management_form }}
+                    {% for form in formset %}
+                    {% for produto in produtos %}
+                        {% if produto.id == form.produto.initial %}
+                    <div>  
+                        {% comment %} <p>{{ form.fidelidade.label_tag }}</p> {% endcomment %}
+                        <p>{{ form.fidelidade }}</p>
+                        <p>{{ form.fidelidade.errors }}</p>
+                    </div>              
+                    <div>
+                        
+                        <p>{{ form.produto.label_tag }} {{ produto.nome }}</p>
+                        <p>{{ form.produto }}</p>
+                        <p>{{ form.produto.errors }}</p> 
 
-            </div>              
-              <div>  
-                <p>{{ form.pontos_recompensa.label_tag }} {{ form.pontos_recompensa }}</p>
+                    </div>              
+                      <div>  
+                        <p>{{ form.pontos_recompensa.label_tag }} {{ form.pontos_recompensa }}</p>
 
-                <p>{{ form.pontos_recompensa.errors }}</p>
-            </div>              
-              <div>  
-                <p>{{ form.pontos_para_oferta.label_tag }} {{ form.pontos_para_oferta }}</p>
-                <p>{{ form.pontos_para_oferta.errors }}</p>
-            </div>              
-              <div>  
-                <p>{{ form.visibilidade.label_tag }} {{ form.visibilidade }}</p>
-                <p>{{ form.visibilidade.errors }}</p>
-            </div>
-            {% endif %}  
-            {% endfor %}            
-            {% endfor %}  
-        </fieldset>
-        <button type="submit">Adicionar visíveis</button>
-    </form>
-</div>  
+                        <p>{{ form.pontos_recompensa.errors }}</p>
+                    </div>              
+                      <div>  
+                        <p>{{ form.pontos_para_oferta.label_tag }} {{ form.pontos_para_oferta }}</p>
+                        <p>{{ form.pontos_para_oferta.errors }}</p>
+                    </div>              
+                      <div>  
+                        <p>{{ form.visibilidade.label_tag }} {{ form.visibilidade }}</p>
+                        <p>{{ form.visibilidade.errors }}</p>
+                    </div>
+                    {% endif %}  
+                    {% endfor %}            
+                    {% endfor %}  
+                </fieldset>
+                <button type="submit">Adicionar visíveis</button>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>      
 {% endblock %}
