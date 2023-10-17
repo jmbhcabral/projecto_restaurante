@@ -110,8 +110,12 @@ class ImagemLogo(models.Model):
         default='',
     )
 
+    checkbox = models.BooleanField(
+        default=False,
+    )
+
     is_visible = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name='Visibilidade',
         help_text='Visibilidade do logo.'
     )

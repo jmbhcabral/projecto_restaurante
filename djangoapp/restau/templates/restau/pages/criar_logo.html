@@ -1,0 +1,104 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+<div class="section-content-wide content">
+    {% include "restau/partials/_conf_menu.html" %}
+      {% comment %} {% if logo %}
+      <div class="conta-content">
+        <div>
+          <h2 class="center">Atualizar Categoria</h2>
+          <p class="center">
+            Atualize a Categoria ou exclua.
+          </p>
+        </div>
+        <div class="content form-wrapper"> 
+          <h3 class="center">Atualizar Categoria</h3>
+          <form 
+          action="{{ form_action }}"
+          method="POST"
+          enctype="multipart/form-data"
+          >
+          {% csrf_token %}
+            <div class="form-content">
+              {% for field in form %}
+              
+              <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {{ field.errors }}
+                {% if field.help_text %}
+                <p class="help-text">{{ field.help_text }}</p>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+            {% if form.non_field_errors %}
+            <div class="form-content">
+              <div class="">
+                <div class="message error">
+                  {{ form.non_field_errors }}
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            <div class="form-content">
+              <div class="form-group">
+                <button class="btn" type="submit">Atualizar</button>
+              </div>
+            </div>  
+          </form>
+        </div>
+      </div>
+      {% else %} {% endcomment %}
+      <div class="conta-content">
+        <div>
+          
+          <h2 class="center">Criar Logo</h2>
+          <p class="center">
+            Adicione um Logo.
+          </p>
+        </div>
+        
+        <div class="content form-wrapper"> 
+          <h3 class="center">Criar Logo</h3>
+          <form 
+          action="{{ form_action }}"
+          method="POST"
+          enctype="multipart/form-data"
+          >
+          {% csrf_token %}
+            <div class="form-content">
+              {% for field in form %}
+              
+              <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {{ field.errors }}
+                {% if field.help_text %}
+                <p class="help-text">{{ field.help_text }}</p>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+            {% if form.non_field_errors %}
+            <div class="form-content">
+              <div class="">
+                <div class="message error">
+                  {{ form.non_field_errors }}
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            <div class="form-content">
+              <div class="form-group">
+                <button class="btn" type="submit">Criar</button>
+              </div>
+            </div>  
+          </form>
+        </div>
+      </div>
+      {% comment %} {% endif %}  {% endcomment %}
+  </div> 
+</div>
+{% endblock content %}
+  
+  

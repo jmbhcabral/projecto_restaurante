@@ -6,7 +6,8 @@ from restau.views import (                      # type: ignore
     atualizar_subcategoria, apagar_subcategoria, ordenar_produtos, ementas,
     criar_ementa, atualizar_ementa, apagar_ementa, povoar_ementa, ementa,
     configuracao, Subcategorias, ordenar_subcategorias, categorias,
-    ordenar_categorias, adicionar_foto, galeria, povoar_galeria, imagem_logo
+    ordenar_categorias, adicionar_foto, galeria, povoar_galeria, imagem_logo,
+    criar_logo, apagar_logo, escolher_logo
 )
 
 # namespace
@@ -71,5 +72,8 @@ urlpatterns = [
     path('restau/pages/povoar_galeria/',
          povoar_galeria, name='povoar_galeria'),
     # ImagemLogo
-    path('restau/pages/logos/', imagem_logo, name='imagem_logo')
+    path('restau/pages/logos/', imagem_logo, name='imagem_logo'),
+    path('restau/pages/criar_logo/', criar_logo, name='criar_logo'),
+    path('restau/pages/apagar_logo/', apagar_logo, name='apagar_logo'),
+    path('restau/pages/escolher_logo/', escolher_logo, name='escolher_logo'),
 ]

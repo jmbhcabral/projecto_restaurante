@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from restau.models import ActiveSetup, ImagemLogo
 from itertools import zip_longest
+from os.path import basename
 
 
 def configuracao(request):
@@ -25,10 +26,12 @@ def imagem_logo(request):
 
     logos = ImagemLogo.objects.all().order_by('id')
     logos_grouped = list(grouper(logos, 5))
-    print('Count: ', logos.count())
-    for logo in logos:
-        print('imagem_name: ', logo.imagem.name)
-        print('imagem_url: ', logo.imagem.url)
+    if logos:
+        for group in logos_grouped:
+            for logo in group:
+                if logo:
+                    logo.imagem.name = basename(logo.imagem.name)
+
     context = {
         'logos': logos,
         'logos_grouped': logos_grouped,

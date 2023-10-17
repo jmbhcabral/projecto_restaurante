@@ -1,0 +1,43 @@
+{% extends "restau/base.html" %}
+{% block content %}
+<div class="section-content-wide formset-update content">
+    {% include "restau/partials/_conf_menu.html" %}
+        <div class="conta-content">
+            <h2 class="center">Logos</h2>
+            <p class="center">
+                Marque para selecionar o logotipo para o site.
+            </p>
+            <div class="content form-wrapper">
+                <form action="{{ form_action }}" 
+                method="post" 
+                enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ formset.management_form }}
+                    <div class="grid-container">
+                        {% for form in formset %}
+                            <div class="grid-item">
+                                {{ form.id }}
+                                {% if form.instance.imagem %}
+                                <img src="{{ form.instance.imagem.url }}" width="100%" alt="{{ form.instance.nome }}">
+                                {% else %}
+                                <p>Nao foi carregada nenhuma imagem.</p>
+                                {% endif %}
+                                <div>
+                                    Nome: {{ form.instance.nome }}
+                                </div>
+                                <div>
+                                    Visibilidade:
+                                    {% for radio in form.is_visible %}
+                                        {{ radio.tag }} {{ radio.choice_label }}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <input type="submit" value="Salvar" class="btn">
+                </form> 
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
