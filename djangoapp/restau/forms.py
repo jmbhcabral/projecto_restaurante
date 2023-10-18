@@ -298,12 +298,8 @@ class ImagemLogoForm(forms.ModelForm):
     class Meta:
         model = ImagemLogo
         fields = (
-            'imagem', 'is_visible', 'checkbox',
+            'imagem',
         )
-        widget = {
-            'is_visible': forms.RadioSelect(),
-
-        }
 
     imagem = forms.ImageField(
         widget=forms.FileInput(
@@ -315,24 +311,6 @@ class ImagemLogoForm(forms.ModelForm):
         required=False,
     )
 
-    checkbox = forms.BooleanField(
-        widget=forms.CheckboxInput(),
-        label='Visíbilidade',
-        help_text='Seleccionar se visível.',
-        required=False,
-    )
-
-    is_visible = forms.BooleanField(
-        widget=forms.RadioSelect(
-            attrs={
-                'class': 'form-check-input',
-            }
-        ),
-        label='Visíbilidade',
-        help_text='Seleccionar se visível.',
-        required=False,
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -341,7 +319,10 @@ LogosFormSet = modelformset_factory(
     ImagemLogo,
     form=ImagemLogoForm,
     extra=0,
-    can_delete=True
+    can_delete=True,
+    fields=(
+        'imagem',
+    )
 )
 
 

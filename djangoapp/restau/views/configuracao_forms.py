@@ -27,6 +27,9 @@ def criar_logo(request):
         form = ImagemLogoForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
+            messages.success(
+                request, 'Logo adicionado com sucesso!'
+            )
     else:
         form = ImagemLogoForm()
 
@@ -93,31 +96,22 @@ def escolher_logo(request,):
 
     if request.method == 'POST':
         print('request.POST: ', request.POST)
-        formset = LogosFormSet(
-            request.POST,
-            request.FILES,
-            queryset=ImagemLogo.objects.all()
-        )
 
-        if formset.is_valid():
-            for form in formset:
-                if form.has_changed():
-                    instance = form.save(commit=False)
-                    if 'visivel' in form.changed_data:
-                        instance.visivel = True
-                        instance.save()
-                    else:
-                        instance.visivel = False
-                        instance.save()
+        imagem_id = request.POST.get('imagem_id', None)
+        print('imagem_id: ', imagem_id)
 
+        if imagem_id:
+            ImagemLogo.objects.update(is_visible=False)
+            ImagemLogo.objects.filter(id=imagem_id).update(is_visible=True)
+
+            messages.success(
+                request, 'Logo escolhido com sucesso!')
             return redirect('restau:imagem_logo')
 
-    else:
-        formset = LogosFormSet(queryset=ImagemLogo.objects.all())
-
+    imagens = ImagemLogo.objects.all().order_by('id')
     context = {
-        'form_action': form_action,  # 'restau:escolher_visivel
-        'formset': formset,
+        'form_action': form_action,  # 'restau:escolher_logo
+        'imagens': imagens,
     }
 
     return render(

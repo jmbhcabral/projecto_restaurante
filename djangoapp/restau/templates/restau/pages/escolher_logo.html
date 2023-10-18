@@ -1,4 +1,5 @@
 {% extends "restau/base.html" %}
+{% load meus_filtros %}
 {% block content %}
 <div class="section-content-wide formset-update content">
     {% include "restau/partials/_conf_menu.html" %}
@@ -8,34 +9,35 @@
                 Marque para selecionar o logotipo para o site.
             </p>
             <div class="content form-wrapper">
-                <form action="{{ form_action }}" 
-                method="post" 
-                enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ formset.management_form }}
-                    <div class="grid-container">
-                        {% for form in formset %}
-                            <div class="grid-item">
-                                {{ form.id }}
-                                {% if form.instance.imagem %}
-                                <img src="{{ form.instance.imagem.url }}" width="100%" alt="{{ form.instance.nome }}">
-                                {% else %}
-                                <p>Nao foi carregada nenhuma imagem.</p>
-                                {% endif %}
-                                <div>
-                                    Nome: {{ form.instance.nome }}
-                                </div>
-                                <div>
-                                    Visibilidade:
-                                    {% for radio in form.is_visible %}
-                                        {{ radio.tag }} {{ radio.choice_label }}
-                                    {% endfor %}
-                                </div>
+                <div class="grid-container">
+                {% for imagem in imagens %}
+                    <div class="grid-item image-container">
+                        {% if imagem.is_visible %}
+                            <img src="{{ imagem.imagem.url }}" alt="{{ imagem.nome }}">
+                            <div class="overlay">
+                                <span class="material-symbols-outlined">
+                                    check_circle
+                                </span>
+                            
                             </div>
-                        {% endfor %}
+                            <form method="post">
+                            {% csrf_token %}
+                                <input type="hidden" name="imagem_id" value="{{ imagem.id }}">
+                                <input type="submit" value="Tornar visível">
+                            </form>
+                        {% else %}
+                        <img src="{{ imagem.imagem.url }}" alt="{{ imagem.nome }}">
+                            
+                            
+                            <form method="post">
+                            {% csrf_token %}
+                                <input type="hidden" name="imagem_id" value="{{ imagem.id }}">
+                                <input type="submit" value="Tornar visível">
+                            </form> 
+                        {% endif %}  
                     </div>
-                    <input type="submit" value="Salvar" class="btn">
-                </form> 
+                {% endfor %}
+                </div>
             </div>
         </div>
     </div>

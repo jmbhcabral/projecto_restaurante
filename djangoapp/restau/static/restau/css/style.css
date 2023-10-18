@@ -1140,9 +1140,25 @@ body.frontend {
   box-sizing: border-box;
 }
 
+.image-container {
+  position: relative;
+}
 
+/* img {
+  width: 100%;
+  height: auto;
+} */
 
-
-
-
-
+.overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  font-family: 'Material Icons';
+  font-size: 4em;
+  color: hsl(var(--clr-black));
+}
