@@ -7,7 +7,9 @@ from restau.views import (                      # type: ignore
     criar_ementa, atualizar_ementa, apagar_ementa, povoar_ementa, ementa,
     configuracao, Subcategorias, ordenar_subcategorias, categorias,
     ordenar_categorias, adicionar_foto, galeria, povoar_galeria, imagem_logo,
-    criar_logo, apagar_logo, escolher_logo
+    criar_logo, apagar_logo, escolher_logo, imagem_topo, criar_imagem_topo,
+    apagar_imagem_topo, escolher_imagem_topo, intro, criar_intro, apagar_intro,
+    escolher_intro,
 )
 
 # namespace
@@ -76,4 +78,20 @@ urlpatterns = [
     path('restau/pages/criar_logo/', criar_logo, name='criar_logo'),
     path('restau/pages/apagar_logo/', apagar_logo, name='apagar_logo'),
     path('restau/pages/escolher_logo/', escolher_logo, name='escolher_logo'),
+    # ImagemLogo
+    path('restau/pages/imagem_topo/', imagem_topo, name='imagem_topo'),
+    path('restau/pages/criar_imagem_topo/',
+         criar_imagem_topo, name='criar_imagem_topo'),
+    path('restau/pages/apagar_imagem_topo/',
+         apagar_imagem_topo, name='apagar_imagem_topo'),
+    path('restau/pages/escolher_imagem_topo/',
+         escolher_imagem_topo, name='escolher_imagem_topo'),
+    # Intro
+    path('restau/pages/intro/', intro, name='intro'),
+    path('restau/pages/criar_intro/',
+         criar_intro, name='criar_intro'),
+    path('restau/pages/apagar_intro/',
+         apagar_intro, name='apagar_intro'),
+    path('restau/pages/escolher_intro/',
+         escolher_intro, name='escolher_intro'),
 ]

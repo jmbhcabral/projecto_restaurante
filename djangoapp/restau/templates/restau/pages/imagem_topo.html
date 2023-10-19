@@ -1,0 +1,36 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+<div class="section-content-wide formset-update content">
+    {% include "restau/partials/_conf_menu.html" %}
+        <div class="conta-content">
+            <h2 class="center">Imagem Topo</h2>
+            <p class="center">
+                Atualize a imagem Topo do seu restaurante, adicione novas imagens
+                ou exclua imagenss que não são mais necessárias.
+            </p>
+            <h3 class="center">Imagens criadas</h3>
+            {% if imagens %}
+            <p class="center">Clique no Logotipo que deseja editar.</p>
+            <div class="sub-links">
+                {% for group in imagens_grouped %}
+                <div class="sub-link">
+                    {% for imagem in group %}
+                        {% if imagem.imagem %}
+                            <span class="sub-link">{{ imagem.imagem.name }}</span><br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="center">Você ainda não adicionou nenhuma imagem.</p>
+            {% endif %}
+            <div class="sub-menu">
+                <a href="{% url "restau:criar_imagem_topo" %}" class="menu-btn">Criar</a>
+                <a href="{% url "restau:apagar_imagem_topo" %}" class="menu-btn">Apagar</a>
+                <a href="{% url "restau:escolher_imagem_topo" %}" class="menu-btn">Escolher imagem</a>
+            </div>      
+        </div>
+    </div>
+</div>
+{% endblock %}

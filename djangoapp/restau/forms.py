@@ -307,7 +307,7 @@ class ImagemLogoForm(forms.ModelForm):
                 'accept': 'image/*',
             }
         ),
-        label='Fotografia',
+        label='Logotipo',
         required=False,
     )
 
@@ -330,7 +330,7 @@ class ImagemTopoForm(forms.ModelForm):
     class Meta:
         model = ImagemTopo
         fields = (
-            'imagem', 'is_visible',
+            'imagem',
         )
 
     imagem = forms.ImageField(
@@ -343,22 +343,26 @@ class ImagemTopoForm(forms.ModelForm):
         required=False,
     )
 
-    is_visible = forms.BooleanField(
-        widget=forms.CheckboxInput(),
-        label='Visíbilidade',
-        help_text='Seleccionar se visível.',
-        required=False,
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+TopoFormSet = modelformset_factory(
+    ImagemTopo,
+    form=ImagemTopoForm,
+    extra=0,
+    can_delete=True,
+    fields=(
+        'imagem',
+    )
+)
 
 
 class IntroForm(forms.ModelForm):
     class Meta:
         model = Intro
         fields = (
-            'texto', 'is_visible',
+            'texto',
         )
 
     texto = forms.CharField(
@@ -371,15 +375,19 @@ class IntroForm(forms.ModelForm):
         help_text='Introduçao.',
     )
 
-    is_visible = forms.BooleanField(
-        widget=forms.CheckboxInput(),
-        label='Visíbilidade',
-        help_text='Seleccionar se visível.',
-        required=False,
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+IntroFormSet = modelformset_factory(
+    Intro,
+    form=IntroForm,
+    extra=0,
+    can_delete=True,
+    fields=(
+        'texto',
+    )
+)
 
 
 class IntroImagemForm(forms.ModelForm):

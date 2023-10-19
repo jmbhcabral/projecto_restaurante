@@ -3,9 +3,9 @@
 <div class="section-content-wide formset-update content">
     {% include "restau/partials/_conf_menu.html" %}
         <div class="conta-content">
-            <h2 class="center">Logos</h2>
+            <h2 class="center">Imagem Topo</h2>
             <p class="center">
-                Marque para apagar os logos que já não deseja.
+                Marque para apagar as imagens que já não deseja.
             </p>
             <div class="content form-wrapper">
                 <form action="{{ form_action }}" 
@@ -38,7 +38,7 @@
                     <input type="submit" value="Apagar" class="btn">
                     </div>
                     <div class="sub-menu">
-                        <a href="{% url 'restau:imagem_logo' %}" class="menu-btn">Voltar</a>
+                        <a href="{% url 'restau:imagem_topo' %}" class="menu-btn">Voltar</a>
                     </div>
                 </form> 
             </div>
