@@ -20,12 +20,6 @@
                                 </span>
                             
                             </div>
-                            <form method="post">
-                            {% csrf_token %}
-                                <input type="hidden" name="imagem_id" value="{{ imagem.id }}">
-                                <input type="submit" value="Tornar visível">
-                                
-                            </form>
                         {% else %}
                         <img src="{{ imagem.imagem.url }}" alt="{{ imagem.nome }}">
                             

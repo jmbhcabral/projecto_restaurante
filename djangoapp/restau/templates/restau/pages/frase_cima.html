@@ -1,0 +1,32 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+<div class="section-content-wide formset-update content">
+    {% include "restau/partials/_conf_menu.html" %}
+        <div class="conta-content">
+            <h2 class="center">Frase Cima</h2>
+            <p class="center">
+                Atualize a Frase Cima do seu restaurante, adicione novas frases
+                ou exclua frases que não são mais necessárias.
+            </p>
+            <h3 class="center">Frases criadas</h3>
+            {% if textos %}
+                {% if numero_textos == 1 %}
+                    <p class="center">Você tem {{ numero_textos }} frase criada.</p>
+                {% else %}
+                    <p class="center">Você tem {{ numero_textos }} frases criadas.</p>
+                {% endif %}
+                <div class="sub-menu">
+                    <a href="{% url "restau:criar_frase_cima" %}" class="menu-btn">Criar</a>
+                    <a href="{% url "restau:apagar_frase_cima" %}" class="menu-btn">Apagar</a>
+                    <a href="{% url "restau:escolher_frase_cima" %}" class="menu-btn">Escolher imagem</a>
+                </div>
+            {% else %}
+                <p class="center">Você ainda não adicionou nenhuma frase.</p>
+                <div class="sub-menu">
+                    <a href="{% url "restau:criar_frase_cima" %}" class="menu-btn">Criar</a>
+                </div>      
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

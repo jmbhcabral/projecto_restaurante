@@ -3,9 +3,9 @@
 <div class="section-content-wide formset-update content">
     {% include "restau/partials/_conf_menu.html" %}
         <div class="conta-content">
-            <h2 class="center">Introdução</h2>
+            <h2 class="center">Frase Baixo</h2>
             <p class="center">
-                Marque para apagar as introduções que já não deseja.
+                Marque para apagar as Frases Baixo que já não deseja.
             </p>
             <div class="content form-wrapper">
                 <form action="{{ form_action }}" 
@@ -20,9 +20,9 @@
                                 {% if form.instance.texto %}
                                 <p>{{ form.instance.texto }}</p>
                                 {% else %}
-                                <p>Nao foi carregada nenhuma introdução.</p>
+                                <p>Nao foi carregada nenhuma frase.</p>
                                 <div class="sub-menu">
-                                    <a href="{% url 'restau:intro' %}" class="menu-btn">voltar</a>
+                                    <a href="{% url 'restau:frase_baixo' %}" class="menu-btn">voltar</a>
                                 </div>
                                 {% endif %}
                                 
@@ -36,7 +36,7 @@
                     <input type="submit" value="Apagar" class="btn">
                     </div>
                     <div class="sub-menu">
-                        <a href="{% url 'restau:intro' %}" class="menu-btn">Voltar</a>
+                        <a href="{% url 'restau:frase_baixo' %}" class="menu-btn">Voltar</a>
                     </div>
                 </form> 
             </div>

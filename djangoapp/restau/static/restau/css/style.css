@@ -1140,6 +1140,29 @@ body.frontend {
   box-sizing: border-box;
 }
 
+/* ActiveSetup textos */
+.grid-container-texto {
+  display: flex;
+  flex-direction: column;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.6rem;
+}
+
+.grid-item-texto {
+  text-align: left;
+  border: 1px solid #ccc;
+  padding: 0.8rem;
+  box-sizing: border-box;
+}
+
+.align-checked-texto{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Material Icons';
+  color: hsl(var(--clr-black));
+}
+
 .image-container {
   position: relative;
 }

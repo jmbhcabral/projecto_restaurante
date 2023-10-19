@@ -185,7 +185,7 @@ class Intro(models.Model):
     )
 
     is_visible = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name='Visibilidade',
         help_text='Visibilidade da intro.'
     )
@@ -208,7 +208,7 @@ class IntroImagem(models.Model):
     )
 
     is_visible = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name='Visibilidade',
         help_text='Visibilidade da imagem.'
     )
@@ -245,7 +245,7 @@ class FraseInspiradora(models.Model):
     )
 
     is_visible = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name='Visibilidade',
         help_text='Visibilidade da frase inspiradora.'
     )
@@ -268,7 +268,7 @@ class FraseCima(models.Model):
     )
 
     is_visible = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name='Visibilidade',
         help_text='Visibilidade da frase cima.'
     )
@@ -291,7 +291,7 @@ class ImagemFraseCima(models.Model):
     )
 
     is_visible = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name='Visibilidade',
         help_text='Visibilidade da imagem.'
     )
@@ -328,7 +328,7 @@ class FraseBaixo(models.Model):
     )
 
     is_visible = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name='Visibilidade',
         help_text='Visibilidade da frase baixo.'
     )
@@ -351,7 +351,7 @@ class ImagemFraseBaixo(models.Model):
     )
 
     is_visible = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name='Visibilidade',
         help_text='Visibilidade da imagem.'
     )
@@ -388,7 +388,7 @@ class ImagemPadrao(models.Model):
     )
 
     is_visible = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name='Visibilidade',
         help_text='Visibilidade da imagem.'
     )

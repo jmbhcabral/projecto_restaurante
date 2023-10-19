@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from restau.models import (
-    ActiveSetup, ImagemLogo, ImagemTopo, Intro
+    ActiveSetup, ImagemLogo, ImagemTopo, Intro, IntroImagem, FraseCima,
+    ImagemFraseCima, FraseInspiradora, FraseBaixo, ImagemFraseBaixo,
+    ImagemPadrao, ContactosSite
 )
-from itertools import zip_longest
-from os.path import basename
 
 
 def configuracao(request):
@@ -21,22 +21,13 @@ def configuracao(request):
 
 
 def imagem_logo(request):
-    def grouper(iterable, n, fillvalue=None):
-        # "Coleta dados em grupos fixos"
-        args = [iter(iterable)] * n
-        return zip_longest(*args, fillvalue=fillvalue)
 
     logos = ImagemLogo.objects.all().order_by('id')
-    logos_grouped = list(grouper(logos, 5))
-    if logos:
-        for group in logos_grouped:
-            for logo in group:
-                if logo:
-                    logo.imagem.name = basename(logo.imagem.name)
+    numero_logos = len(logos)
 
     context = {
         'logos': logos,
-        'logos_grouped': logos_grouped,
+        'numero_logos': numero_logos,
     }
 
     return render(
@@ -47,22 +38,13 @@ def imagem_logo(request):
 
 
 def imagem_topo(request):
-    def grouper(iterable, n, fillvalue=None):
-        # "Coleta dados em grupos fixos"
-        args = [iter(iterable)] * n
-        return zip_longest(*args, fillvalue=fillvalue)
 
     imagens = ImagemTopo.objects.all().order_by('id')
-    imagens_grouped = list(grouper(imagens, 5))
-    if imagens:
-        for group in imagens_grouped:
-            for imagem in group:
-                if imagem:
-                    imagem.imagem.name = basename(imagem.imagem.name)
+    numero_imagens = len(imagens)
 
     context = {
         'imagens': imagens,
-        'imagens_grouped': imagens_grouped,
+        'numero_imagens': numero_imagens,
     }
 
     return render(
@@ -73,26 +55,153 @@ def imagem_topo(request):
 
 
 def intro(request):
-    def grouper(iterable, n, fillvalue=None):
-        # "Coleta dados em grupos fixos"
-        args = [iter(iterable)] * n
-        return zip_longest(*args, fillvalue=fillvalue)
 
     textos = Intro.objects.all().order_by('id')
-    textos_grouped = list(grouper(textos, 5))
-    # if textos:
-    #     for group in textos_grouped:
-    #         for texto in group:
-    #             if texto:
-    #                 texto.texto.name = basename(texto.texto.name)
+    numero_textos = len(textos)
 
     context = {
+        'numero_textos': numero_textos,
         'textos': textos,
-        'textos_grouped': textos_grouped,
     }
 
     return render(
         request,
         'restau/pages/intro.html',
+        context,
+    )
+
+
+def intro_imagem(request):
+
+    imagens = IntroImagem.objects.all().order_by('id')
+    numero_imagens = len(imagens)
+
+    context = {
+        'imagens': imagens,
+        'numero_imagens': numero_imagens,
+    }
+
+    return render(
+        request,
+        'restau/pages/intro_imagem.html',
+        context,
+    )
+
+
+def frase_cima(request):
+
+    textos = FraseCima.objects.all().order_by('id')
+    numero_textos = len(textos)
+
+    context = {
+        'numero_textos': numero_textos,
+        'textos': textos,
+    }
+
+    return render(
+        request,
+        'restau/pages/frase_cima.html',
+        context,
+    )
+
+
+def imagem_frase_cima(request):
+
+    imagens = ImagemFraseCima.objects.all().order_by('id')
+    numero_imagens = len(imagens)
+
+    context = {
+        'imagens': imagens,
+        'numero_imagens': numero_imagens,
+    }
+
+    return render(
+        request,
+        'restau/pages/imagem_frase_cima.html',
+        context,
+    )
+
+
+def frase_central(request):
+
+    textos = FraseInspiradora.objects.all().order_by('id')
+    numero_textos = len(textos)
+
+    context = {
+        'numero_textos': numero_textos,
+        'textos': textos,
+    }
+
+    return render(
+        request,
+        'restau/pages/frase_central.html',
+        context,
+    )
+
+
+def frase_baixo(request):
+
+    textos = FraseBaixo.objects.all().order_by('id')
+    numero_textos = len(textos)
+
+    context = {
+        'numero_textos': numero_textos,
+        'textos': textos,
+    }
+
+    return render(
+        request,
+        'restau/pages/frase_baixo.html',
+        context,
+    )
+
+
+def imagem_frase_baixo(request):
+
+    imagens = ImagemFraseBaixo.objects.all().order_by('id')
+    numero_imagens = len(imagens)
+
+    context = {
+        'imagens': imagens,
+        'numero_imagens': numero_imagens,
+    }
+
+    return render(
+        request,
+        'restau/pages/imagem_frase_baixo.html',
+        context,
+    )
+
+
+def imagem_padrao(request):
+
+    imagens = ImagemPadrao.objects.all().order_by('id')
+    numero_imagens = len(imagens)
+
+    context = {
+        'imagens': imagens,
+        'numero_imagens': numero_imagens,
+    }
+
+    return render(
+        request,
+        'restau/pages/imagem_padrao.html',
+        context,
+    )
+
+
+def contatos_site(request):
+
+    contatos = ContactosSite.objects.all().order_by('id')
+    numero_contatos = len(contatos)
+
+    context = {
+        'contatos': contatos,
+        'numero_contatos': numero_contatos,
+    }
+
+    return render(
+        request,
+        'restau/pages/contatos_site.html',
         context,
     )

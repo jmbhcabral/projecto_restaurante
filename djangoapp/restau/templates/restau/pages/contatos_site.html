@@ -1,0 +1,30 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+<div class="section-content-wide formset-update content">
+    {% include "restau/partials/_conf_menu.html" %}
+        <div class="conta-content">
+            <h2 class="center">Contatos do Site</h2>
+            <p class="center">
+                Adicione os contatos do seu restaurante ao site.
+            </p>
+            <h3 class="center">Contatos</h3>
+            {% if contatos %}
+                <p>
+                    Você já adicionou os contatos do seu restaurante ao site.
+                    Clique no link para editar.
+                </p>
+                {% for contato in contatos %}
+                <div class="sub-menu">
+                    <a href="{% url "restau:editar_contatos_site" contato.id%}" class="menu-btn">{{ contato.email }}</a>
+                </div>
+                {% endfor %}  
+            {% else %}
+                <p class="center">Você ainda não adicionou contatos.</p>
+                <div class="sub-menu">
+                    <a href="{% url "restau:criar_contatos_site" %}" class="menu-btn">Criar</a>
+                </div>      
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

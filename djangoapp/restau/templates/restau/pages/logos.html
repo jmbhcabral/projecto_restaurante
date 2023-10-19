@@ -10,26 +10,22 @@
             </p>
             <h3 class="center">Logotipos criados</h3>
             {% if logos %}
-            <p class="center">Clique no Logotipo que deseja editar.</p>
-            <div class="sub-links">
-                {% for group in logos_grouped %}
-                <div class="sub-link">
-                    {% for logo in group %}
-                        {% if logo.imagem %}
-                            <span class="sub-link">{{ logo.imagem.name }}</span><br>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                {% endfor %}
-            </div>
+            {% if numero_logos == 1 %}
+                    <p class="center">Você tem {{ numero_logos }} logotipo criado.</p>
+                {% else %}
+                    <p class="center">Você tem {{ numero_logos }} logotipos criados.</p>
+                {% endif %}
+                <div class="sub-menu">
+                    <a href="{% url "restau:criar_logo" %}" class="menu-btn">Criar</a>
+                    <a href="{% url "restau:apagar_logo" %}" class="menu-btn">Apagar</a>
+                    <a href="{% url "restau:escolher_logo" %}" class="menu-btn">Escolher Logo</a>
+                </div>   
             {% else %}
             <p class="center">Você ainda não criou nenhum logotipo.</p>
-            {% endif %}
             <div class="sub-menu">
                 <a href="{% url "restau:criar_logo" %}" class="menu-btn">Criar</a>
-                <a href="{% url "restau:apagar_logo" %}" class="menu-btn">Apagar</a>
-                <a href="{% url "restau:escolher_logo" %}" class="menu-btn">Escolher Logo</a>
             </div>      
+            {% endif %}
         </div>
     </div>
 </div>

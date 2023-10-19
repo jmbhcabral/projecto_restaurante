@@ -1,0 +1,32 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+<div class="section-content-wide formset-update content">
+    {% include "restau/partials/_conf_menu.html" %}
+        <div class="conta-content">
+            <h2 class="center">Imagem Frase Baixo</h2>
+            <p class="center">
+                Atualize a imagem da Frase Baixo do seu restaurante, adicione novas imagens
+                ou exclua imagens que não são mais necessárias.
+            </p>
+            <h3 class="center">Imagens criadas</h3>
+            {% if imagens %}
+                {% if numero_imagens == 1 %}
+                    <p class="center">Você tem {{ numero_imagens }} imagem criada.</p>
+                {% else %}
+                    <p class="center">Você tem {{ numero_imagens }} imagens criadas.</p>
+                {% endif %}
+                <div class="sub-menu">
+                    <a href="{% url "restau:criar_imagem_frase_baixo" %}" class="menu-btn">Criar</a>
+                    <a href="{% url "restau:apagar_imagem_frase_baixo" %}" class="menu-btn">Apagar</a>
+                    <a href="{% url "restau:escolher_imagem_frase_baixo" %}" class="menu-btn">Escolher imagem</a>
+                </div>
+            {% else %}
+                <p class="center">Você ainda não adicionou nenhuma imagem.</p>
+                <div class="sub-menu">
+                    <a href="{% url "restau:criar_imagem_frase_baixo" %}" class="menu-btn">Criar</a>
+                </div>      
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

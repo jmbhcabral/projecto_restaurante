@@ -3,9 +3,9 @@
 <div class="section-content-wide formset-update content">
     {% include "restau/partials/_conf_menu.html" %}
         <div class="conta-content">
-            <h2 class="center">Introdução</h2>
+            <h2 class="center">Imagem Padrão</h2>
             <p class="center">
-                Marque para apagar as introduções que já não deseja.
+                Marque para apagar as imagens que já não deseja.
             </p>
             <div class="content form-wrapper">
                 <form action="{{ form_action }}" 
@@ -13,20 +13,22 @@
                 enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ formset.management_form }}
-                    <div class="grid-container-texto">
+                    <div class="grid-container">
                         {% for form in formset %}
-                            <div class="grid-item-texto">
+                            <div class="grid-item">
                                 {{ form.id }}
-                                {% if form.instance.texto %}
-                                <p>{{ form.instance.texto }}</p>
+                                {% if form.instance.imagem %}
+                                <img src="{{ form.instance.imagem.url }}" width="100%" alt="{{ form.instance.nome }}">
                                 {% else %}
-                                <p>Nao foi carregada nenhuma introdução.</p>
+                                <p>Nao foi carregada nenhuma imagem.</p>
                                 <div class="sub-menu">
-                                    <a href="{% url 'restau:intro' %}" class="menu-btn">voltar</a>
+                                    <a href="{% url 'restau:imagem_padrao' %}" class="menu-btn">voltar</a>
                                 </div>
                                 {% endif %}
-                                
-                                <div class="center">
+                                <div>
+                                    Nome: {{ form.instance.nome }}
+                                </div>
+                                <div>
                                     Apagar: {{ form.DELETE }}
                                 </div>
                             </div>
@@ -36,7 +38,7 @@
                     <input type="submit" value="Apagar" class="btn">
                     </div>
                     <div class="sub-menu">
-                        <a href="{% url 'restau:intro' %}" class="menu-btn">Voltar</a>
+                        <a href="{% url 'restau:imagem_padrao' %}" class="menu-btn">Voltar</a>
                     </div>
                 </form> 
             </div>

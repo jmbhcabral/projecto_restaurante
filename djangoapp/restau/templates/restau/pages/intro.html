@@ -10,20 +10,13 @@
             </p>
             <h3 class="center">Introduções criadas</h3>
             {% if textos %}
-            <p class="center">Clique no Logotipo que deseja editar.</p>
-            <div class="sub-links">
-                {% for group in textos_grouped %}
-                <div class="sub-link">
-                    {% for texto in group %}
-                        {% if texto.texto %}
-                            <span class="sub-link">{{ texto.texto }}</span><br>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                {% endfor %}
-            </div>
+                {% if numero_textos == 1 %}
+                    <p class="center">Você tem {{ numero_textos }} introdução criada.</p>
+                {% else %}
+                    <p class="center">Você tem {{ numero_textos }} introduçoes criadas.</p>
+                {% endif %}
             {% else %}
-            <p class="center">Você ainda não adicionou nenhuma introdução.</p>
+                <p class="center">Você ainda não adicionou nenhuma introdução.</p>
             {% endif %}
             <div class="sub-menu">
                 <a href="{% url "restau:criar_intro" %}" class="menu-btn">Criar</a>

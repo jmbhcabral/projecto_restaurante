@@ -366,7 +366,7 @@ class IntroForm(forms.ModelForm):
         )
 
     texto = forms.CharField(
-        widget=forms.TextInput(
+        widget=forms.Textarea(
             attrs={
                 'placeholder': 'digite aqui',
             }
@@ -394,7 +394,7 @@ class IntroImagemForm(forms.ModelForm):
     class Meta:
         model = IntroImagem
         fields = (
-            'imagem', 'is_visible',
+            'imagem',
         )
 
     imagem = forms.ImageField(
@@ -407,26 +407,30 @@ class IntroImagemForm(forms.ModelForm):
         required=False,
     )
 
-    is_visible = forms.BooleanField(
-        widget=forms.CheckboxInput(),
-        label='Visíbilidade',
-        help_text='Seleccionar se visível.',
-        required=False,
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+IntroImagemFormSet = modelformset_factory(
+    IntroImagem,
+    form=IntroImagemForm,
+    extra=0,
+    can_delete=True,
+    fields=(
+        'imagem',
+    )
+)
 
 
 class FraseInspiradoraForm(forms.ModelForm):
     class Meta:
         model = FraseInspiradora
         fields = (
-            'texto', 'is_visible',
+            'texto',
         )
 
     texto = forms.CharField(
-        widget=forms.TextInput(
+        widget=forms.Textarea(
             attrs={
                 'placeholder': 'digite aqui',
             }
@@ -435,26 +439,30 @@ class FraseInspiradoraForm(forms.ModelForm):
         help_text='Frase central.',
     )
 
-    is_visible = forms.BooleanField(
-        widget=forms.CheckboxInput(),
-        label='Visíbilidade',
-        help_text='Seleccionar se visível.',
-        required=False,
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+FraseInspiradoraFormSet = modelformset_factory(
+    FraseInspiradora,
+    form=FraseInspiradoraForm,
+    extra=0,
+    can_delete=True,
+    fields=(
+        'texto',
+    )
+)
 
 
 class FraseCimaForm(forms.ModelForm):
     class Meta:
         model = FraseCima
         fields = (
-            'texto', 'is_visible',
+            'texto',
         )
 
     texto = forms.CharField(
-        widget=forms.TextInput(
+        widget=forms.Textarea(
             attrs={
                 'placeholder': 'digite aqui',
             }
@@ -463,22 +471,26 @@ class FraseCimaForm(forms.ModelForm):
         help_text='Frase Cima.',
     )
 
-    is_visible = forms.BooleanField(
-        widget=forms.CheckboxInput(),
-        label='Visíbilidade',
-        help_text='Seleccionar se visível.',
-        required=False,
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+FraseCimaFormSet = modelformset_factory(
+    FraseCima,
+    form=FraseCimaForm,
+    extra=0,
+    can_delete=True,
+    fields=(
+        'texto',
+    )
+)
 
 
 class ImagemFraseCimaForm(forms.ModelForm):
     class Meta:
         model = ImagemFraseCima
         fields = (
-            'imagem', 'is_visible',
+            'imagem',
         )
 
     imagem = forms.ImageField(
@@ -491,26 +503,30 @@ class ImagemFraseCimaForm(forms.ModelForm):
         required=False,
     )
 
-    is_visible = forms.BooleanField(
-        widget=forms.CheckboxInput(),
-        label='Visíbilidade',
-        help_text='Seleccionar se visível.',
-        required=False,
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+ImagemFraseCimaFormSet = modelformset_factory(
+    ImagemFraseCima,
+    form=ImagemFraseCimaForm,
+    extra=0,
+    can_delete=True,
+    fields=(
+        'imagem',
+    )
+)
 
 
 class FraseBaixoForm(forms.ModelForm):
     class Meta:
         model = FraseBaixo
         fields = (
-            'texto', 'is_visible',
+            'texto',
         )
 
     texto = forms.CharField(
-        widget=forms.TextInput(
+        widget=forms.Textarea(
             attrs={
                 'placeholder': 'digite aqui',
             }
@@ -519,22 +535,26 @@ class FraseBaixoForm(forms.ModelForm):
         help_text='Frase Baixo.',
     )
 
-    is_visible = forms.BooleanField(
-        widget=forms.CheckboxInput(),
-        label='Visíbilidade',
-        help_text='Seleccionar se visível.',
-        required=False,
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+FraseBaixoFormSet = modelformset_factory(
+    FraseBaixo,
+    form=FraseBaixoForm,
+    extra=0,
+    can_delete=True,
+    fields=(
+        'texto',
+    )
+)
 
 
 class ImagemFraseBaixoForm(forms.ModelForm):
     class Meta:
         model = ImagemFraseBaixo
         fields = (
-            'imagem', 'is_visible',
+            'imagem',
         )
 
     imagem = forms.ImageField(
@@ -547,22 +567,26 @@ class ImagemFraseBaixoForm(forms.ModelForm):
         required=False,
     )
 
-    is_visible = forms.BooleanField(
-        widget=forms.CheckboxInput(),
-        label='Visíbilidade',
-        help_text='Seleccionar se visível.',
-        required=False,
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+ImagemFraseBaixoFormSet = modelformset_factory(
+    ImagemFraseBaixo,
+    form=ImagemFraseBaixoForm,
+    extra=0,
+    can_delete=True,
+    fields=(
+        'imagem',
+    )
+)
 
 
 class ImagemPadraoForm(forms.ModelForm):
     class Meta:
         model = ImagemPadrao
         fields = (
-            'imagem', 'is_visible',
+            'imagem',
         )
 
     imagem = forms.ImageField(
@@ -575,22 +599,27 @@ class ImagemPadraoForm(forms.ModelForm):
         required=False,
     )
 
-    is_visible = forms.BooleanField(
-        widget=forms.CheckboxInput(),
-        label='Visíbilidade',
-        help_text='Seleccionar se visível.',
-        required=False,
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+ImagemPadraoFormSet = modelformset_factory(
+    ImagemPadrao,
+    form=ImagemPadraoForm,
+    extra=0,
+    can_delete=True,
+    fields=(
+        'imagem',
+    )
+)
 
 
 class ContactosSiteForm(forms.ModelForm):
     class Meta:
         model = ContactosSite
         fields = (
-            'morada', 'telefone', 'email', 'facebook', 'instagram',
+            'morada', 'telefone', 'email', 'facebook', 'facebook_icon',
+            'instagram', 'instagram_icon',
         )
 
     telefone = forms.CharField(
@@ -604,23 +633,13 @@ class ContactosSiteForm(forms.ModelForm):
     )
 
     morada = forms.CharField(
-        widget=forms.TextInput(
+        widget=forms.Textarea(
             attrs={
                 'placeholder': 'digite aqui',
             }
         ),
         label='Morada',
         help_text='Morada.',
-    )
-
-    telefone = forms.CharField(
-        widget=forms.TextInput(
-            attrs={
-                'placeholder': 'digite aqui',
-            }
-        ),
-        label='Telefone',
-        help_text='Telefone.',
     )
 
     email = forms.CharField(
@@ -643,6 +662,16 @@ class ContactosSiteForm(forms.ModelForm):
         help_text='Facebook.',
     )
 
+    facebook_icon = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': 'digite aqui',
+            }
+        ),
+        label='Facebook Icon',
+        help_text='Facebook Icon.',
+    )
+
     instagram = forms.CharField(
         widget=forms.TextInput(
             attrs={
@@ -651,6 +680,16 @@ class ContactosSiteForm(forms.ModelForm):
         ),
         label='Instagram',
         help_text='Instagram.',
+    )
+
+    instagram_icon = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': 'digite aqui',
+            }
+        ),
+        label='Instagram Icon',
+        help_text='Instagram Icon.',
     )
 
     def __init__(self, *args, **kwargs):
