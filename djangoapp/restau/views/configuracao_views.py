@@ -2,7 +2,7 @@ from django.shortcuts import render
 from restau.models import (
     ActiveSetup, ImagemLogo, ImagemTopo, Intro, IntroImagem, FraseCima,
     ImagemFraseCima, FraseInspiradora, FraseBaixo, ImagemFraseBaixo,
-    ImagemPadrao, ContactosSite
+    ImagemPadrao, ContactosSite, GoogleMaps, Horario
 )
 
 
@@ -203,5 +203,39 @@ def contatos_site(request):
     return render(
         request,
         'restau/pages/contatos_site.html',
+        context,
+    )
+
+
+def google_maps(request):
+
+    locais = GoogleMaps.objects.all().order_by('id')
+    numero_locais = len(locais)
+
+    context = {
+        'locais': locais,
+        'numero_locais': numero_locais,
+    }
+
+    return render(
+        request,
+        'restau/pages/google_maps.html',
+        context,
+    )
+
+
+def horario(request):
+
+    horarios = Horario.objects.all().order_by('id')
+    numero_horarios = len(horarios)
+
+    context = {
+        'horarios': horarios,
+        'numero_horarios': numero_horarios,
+    }
+
+    return render(
+        request,
+        'restau/pages/horario.html',
         context,
     )

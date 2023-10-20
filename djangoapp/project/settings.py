@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 'restau.apps.RestauConfig',
     'rest_framework',
     'perfil',
     'restau',

@@ -18,7 +18,8 @@ from restau.views import (                      # type: ignore
     imagem_frase_baixo, criar_imagem_frase_baixo, apagar_imagem_frase_baixo,
     escolher_imagem_frase_baixo, imagem_padrao, criar_imagem_padrao,
     apagar_imagem_padrao, escolher_imagem_padrao, contatos_site,
-    criar_contatos_site, editar_contatos_site
+    criar_contatos_site, editar_contatos_site, google_maps, criar_google_maps,
+    editar_google_maps, horario, criar_horario, editar_horario,
 )
 
 # namespace
@@ -87,7 +88,7 @@ urlpatterns = [
     path('restau/pages/criar_logo/', criar_logo, name='criar_logo'),
     path('restau/pages/apagar_logo/', apagar_logo, name='apagar_logo'),
     path('restau/pages/escolher_logo/', escolher_logo, name='escolher_logo'),
-    # ImagemLogo
+    # ImagemTopo
     path('restau/pages/imagem_topo/', imagem_topo, name='imagem_topo'),
     path('restau/pages/criar_imagem_topo/',
          criar_imagem_topo, name='criar_imagem_topo'),
@@ -170,4 +171,16 @@ urlpatterns = [
          criar_contatos_site, name='criar_contatos_site'),
     path('restau/pages/editar_contatos_site/<int:contato_id>',
          editar_contatos_site, name='editar_contatos_site'),
+    # Google Maps
+    path('restau/pages/google_maps/', google_maps, name='google_maps'),
+    path('restau/pages/criar_google_maps/',
+         criar_google_maps, name='criar_google_maps'),
+    path('restau/pages/editar_google_maps/<int:map_id>',
+         editar_google_maps, name='editar_google_maps'),
+    # Horário
+    path('restau/pages/horario/', horario, name='horario'),
+    path('restau/pages/criar_horario/',
+         criar_horario, name='criar_horario'),
+    path('restau/pages/editar_horario/<int:horario_id>',
+         editar_horario, name='editar_horario'),
 ]

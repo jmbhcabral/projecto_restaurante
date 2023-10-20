@@ -148,7 +148,7 @@ class ImagemTopo(models.Model):
     )
 
     is_visible = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name='Visibilidade',
         help_text='Visibilidade da imagem.'
     )

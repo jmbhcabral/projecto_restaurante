@@ -1,0 +1,30 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+<div class="section-content-wide formset-update content">
+    {% include "restau/partials/_conf_menu.html" %}
+        <div class="conta-content">
+            <h2 class="center">Google Maps</h2>
+            <p class="center">
+                Adicione a localização do seu restaurante ao site.
+            </p>
+            <h3 class="center">Local</h3>
+            {% if locais %}
+                <p>
+                    Você já adicionou a localizaçação do seu restaurante ao site.
+                    Clique no link para editar.
+                </p>
+                {% for local in locais %}
+                <div class="sub-menu">
+                    <a href="{% url "restau:editar_google_maps" local.id%}" class="menu-btn">{{ local.id }}</a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="center">Você ainda não adicionou a sua localização.</p>
+                <div class="sub-menu">
+                    <a href="{% url "restau:criar_google_maps" %}" class="menu-btn">Criar</a>
+                </div>      
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

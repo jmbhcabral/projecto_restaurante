@@ -5,7 +5,7 @@ from django.urls import reverse
 from restau.models import (
     ActiveSetup, ImagemLogo, ImagemTopo, Intro, IntroImagem, FraseCima,
     ImagemFraseCima, FraseInspiradora, FraseBaixo, ImagemFraseBaixo,
-    ImagemPadrao, ContactosSite
+    ImagemPadrao, ContactosSite, GoogleMaps, Horario
 )
 from restau.forms import (
     ImagemLogoForm, LogosFormSet, ImagemTopoForm, TopoFormSet, IntroForm,
@@ -13,7 +13,8 @@ from restau.forms import (
     FraseCimaFormSet, ImagemFraseCimaForm, ImagemFraseCimaFormSet,
     FraseInspiradoraForm, FraseInspiradoraFormSet, FraseBaixoForm,
     FraseBaixoFormSet, ImagemFraseBaixoForm, ImagemFraseBaixoFormSet,
-    ImagemPadraoForm, ImagemPadraoFormSet, ContactosSiteForm,
+    ImagemPadraoForm, ImagemPadraoFormSet, ContactosSiteForm, GoogleMapsForm,
+    HorarioForm,
 )
 
 
@@ -113,13 +114,28 @@ def escolher_logo(request,):
         print('imagem_id: ', imagem_id)
 
         if imagem_id:
-            ImagemLogo.objects.update(is_visible=False)
-            ImagemLogo.objects.filter(id=imagem_id).update(is_visible=True)
+            try:
+                ImagemLogo.objects.update(is_visible=False)
+                # ImagemLogo.objects.filter(id=imagem_id).update(is_visible=True)
+                logo = ImagemLogo.objects.get(id=imagem_id)
+                logo.is_visible = True
+                logo.save()
 
-            messages.success(
-                request, 'Logo escolhido com sucesso!')
-            return redirect('restau:imagem_logo')
+                active_setup = ActiveSetup.objects.first()
+                print("Logo object:", logo)
+                print("Active Setup object:", active_setup)
 
+                if active_setup:
+                    active_setup.active_imagem_logo = logo  # type: ignore
+                    active_setup.save()
+
+                messages.success(
+                    request, 'Logo escolhido com sucesso!')
+                return redirect('restau:imagem_logo')
+            except ImagemLogo.DoesNotExist:
+                messages.error(
+                    request, 'Ocorreu um erro ao escolher o logo!')
+                return redirect('restau:imagem_logo')
     imagens = ImagemLogo.objects.all().order_by('id')
     context = {
         'form_action': form_action,  # 'restau:escolher_logo
@@ -187,7 +203,7 @@ def apagar_imagem_topo(request, ):
                         instance = form.instance
                         instance.delete()
 
-            return redirect('restau:imagem_Topo')
+            return redirect('restau:imagem_topo')
 
     else:
         formset = TopoFormSet(queryset=ImagemTopo.objects.all())
@@ -215,13 +231,27 @@ def escolher_imagem_topo(request,):
         print('imagem_id: ', imagem_id)
 
         if imagem_id:
-            ImagemTopo.objects.update(is_visible=False)
-            ImagemTopo.objects.filter(id=imagem_id).update(is_visible=True)
+            try:
+                ImagemTopo.objects.update(is_visible=False)
+                imagem = ImagemTopo.objects.get(id=imagem_id)
+                imagem.is_visible = True
+                imagem.save()
 
-            messages.success(
-                request, 'Imagem escolhida com sucesso!')
-            return redirect('restau:imagem_topo')
+                active_setup = ActiveSetup.objects.first()
+                print("Logo object:", imagem)
+                print("Active Setup object:", active_setup)
 
+                if active_setup:
+                    active_setup.active_imagem_topo = imagem  # type: ignore
+                    active_setup.save()
+
+                messages.success(
+                    request, 'Imagem escolhida com sucesso!')
+                return redirect('restau:imagem_topo')
+            except ImagemTopo.DoesNotExist:
+                messages.error(
+                    request, 'Ocorreu um erro ao escolher a imagem!')
+                return redirect('restau:imagem_topo')
     imagens = ImagemTopo.objects.all().order_by('id')
     context = {
         'form_action': form_action,  # 'restau:escolher_imagem_topo
@@ -419,12 +449,27 @@ def escolher_intro_imagem(request,):
         print('imagem_id: ', imagem_id)
 
         if imagem_id:
-            IntroImagem.objects.update(is_visible=False)
-            IntroImagem.objects.filter(id=imagem_id).update(is_visible=True)
+            try:
+                IntroImagem.objects.update(is_visible=False)
+                imagem = IntroImagem.objects.get(id=imagem_id)
+                imagem.is_visible = True
+                imagem.save()
 
-            messages.success(
-                request, 'Imagem escolhida com sucesso!')
-            return redirect('restau:imagem_topo')
+                active_setup = ActiveSetup.objects.first()
+                print("Logo object:", imagem)
+                print("Active Setup object:", active_setup)
+
+                if active_setup:
+                    active_setup.active_intro_imagem = imagem  # type: ignore
+                    active_setup.save()
+
+                messages.success(
+                    request, 'Imagem escolhida com sucesso!')
+                return redirect('restau:intro_imagem')
+            except IntroImagem.DoesNotExist:
+                messages.error(
+                    request, 'Ocorreu um erro ao escolher a imagem!')
+                return redirect('restau:intro_imagem')
 
     imagens = IntroImagem.objects.all().order_by('id')
     context = {
@@ -551,7 +596,7 @@ def criar_imagem_frase_cima(request):
                 request, 'Texto adicionado com sucesso!'
             )
 
-            return redirect('restau:image_frase_cima')
+            return redirect('restau:imagem_frase_cima')
     else:
         form = ImagemFraseCimaForm()
 
@@ -624,13 +669,29 @@ def escolher_imagem_frase_cima(request,):
         print('texto_id: ', imagem_id)
 
         if imagem_id:
-            ImagemFraseCima.objects.update(is_visible=False)
-            ImagemFraseCima.objects.filter(
-                id=imagem_id).update(is_visible=True)
+            try:
+                ImagemFraseCima.objects.update(is_visible=False)
+                imagem = ImagemFraseCima.objects.get(id=imagem_id)
+                imagem.is_visible = True
+                imagem.save()
 
-            messages.success(
-                request, 'Imagem escolhida com sucesso!')
-            return redirect('restau:imagem_frase_cima')
+                active_setup = ActiveSetup.objects.first()
+                print("Logo object:", imagem)
+                print("Active Setup object:", active_setup)
+
+                if active_setup:
+                    active_setup.active_imagem_frase_cima = (  # type: ignore
+                        imagem
+                    )
+                    active_setup.save()
+
+                messages.success(
+                    request, 'Imagem escolhida com sucesso!')
+                return redirect('restau:imagem_frase_cima')
+            except ImagemFraseCima.DoesNotExist:
+                messages.error(
+                    request, 'Ocorreu um erro ao escolher a imagem!')
+                return redirect('restau:imagem_frase_cima')
 
     imagens = ImagemFraseCima.objects.all().order_by('id')
     context = {
@@ -863,7 +924,7 @@ def criar_imagem_frase_baixo(request):
                 request, 'Texto adicionado com sucesso!'
             )
 
-            return redirect('restau:image_frase_baixo')
+            return redirect('restau:imagem_frase_baixo')
     else:
         form = ImagemFraseBaixoForm()
 
@@ -936,13 +997,29 @@ def escolher_imagem_frase_baixo(request,):
         print('texto_id: ', imagem_id)
 
         if imagem_id:
-            ImagemFraseBaixo.objects.update(is_visible=False)
-            ImagemFraseBaixo.objects.filter(
-                id=imagem_id).update(is_visible=True)
+            try:
+                ImagemFraseBaixo.objects.update(is_visible=False)
+                imagem = ImagemFraseBaixo.objects.get(id=imagem_id)
+                imagem.is_visible = True
+                imagem.save()
 
-            messages.success(
-                request, 'Imagem escolhida com sucesso!')
-            return redirect('restau:imagem_frase_baixo')
+                active_setup = ActiveSetup.objects.first()
+                print("Logo object:", imagem)
+                print("Active Setup object:", active_setup)
+
+                if active_setup:
+                    active_setup.active_imagem_frase_baixo = (  # type: ignore
+                        imagem
+                    )
+                    active_setup.save()
+
+                messages.success(
+                    request, 'Imagem escolhida com sucesso!')
+                return redirect('restau:imagem_frase_baixo')
+            except ImagemFraseBaixo.DoesNotExist:
+                messages.error(
+                    request, 'Ocorreu um erro ao escolher a imagem!')
+                return redirect('restau:imagem_frase_baixo')
 
     imagens = ImagemFraseBaixo.objects.all().order_by('id')
     context = {
@@ -1040,13 +1117,29 @@ def escolher_imagem_padrao(request,):
         print('texto_id: ', imagem_id)
 
         if imagem_id:
-            ImagemPadrao.objects.update(is_visible=False)
-            ImagemPadrao.objects.filter(
-                id=imagem_id).update(is_visible=True)
+            try:
+                ImagemPadrao.objects.update(is_visible=False)
+                imagem = ImagemPadrao.objects.get(id=imagem_id)
+                imagem.is_visible = True
+                imagem.save()
 
-            messages.success(
-                request, 'Imagem escolhida com sucesso!')
-            return redirect('restau:imagem_padrao')
+                active_setup = ActiveSetup.objects.first()
+                print("Logo object:", imagem)
+                print("Active Setup object:", active_setup)
+
+                if active_setup:
+                    active_setup.active_imagem_padrao = (  # type: ignore
+                        imagem
+                    )
+                    active_setup.save()
+
+                messages.success(
+                    request, 'Imagem escolhida com sucesso!')
+                return redirect('restau:imagem_padrao')
+            except ImagemPadrao.DoesNotExist:
+                messages.error(
+                    request, 'Ocorreu um erro ao escolher a imagem!')
+                return redirect('restau:imagem_padrao')
 
     imagens = ImagemPadrao.objects.all().order_by('id')
     context = {
@@ -1094,7 +1187,6 @@ def editar_contatos_site(request, contato_id):
     form_action = reverse('restau:editar_contatos_site',
                           kwargs={'contato_id': contato_id})
     contato = get_object_or_404(ContactosSite, id=contato_id)
-    contatos = ContactosSite.objects.all().first()
     if request.method == 'POST':
         form = ContactosSiteForm(request.POST, request.FILES, instance=contato)
         if form.is_valid():
@@ -1108,7 +1200,7 @@ def editar_contatos_site(request, contato_id):
         form = ContactosSiteForm(instance=contato)
 
     context = {
-        'contatos': contatos,
+        'contato': contato,
         'form_action': form_action,  # 'restau:criar_contatos_site
         'form': form,
     }
@@ -1116,5 +1208,122 @@ def editar_contatos_site(request, contato_id):
     return render(
         request,
         'restau/pages/criar_contatos_site.html',
+        context,
+    )
+
+
+def criar_google_maps(request):
+    local = GoogleMaps.objects.all().first()
+    print('locais: ', local)
+    form_action = reverse('restau:criar_google_maps')
+    if request.method == 'POST':
+        form = GoogleMapsForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, 'Local adicionado com sucesso!'
+            )
+
+            return redirect('restau:google_maps')
+    else:
+        form = GoogleMapsForm()
+
+    context = {
+        'local': local,
+        'form_action': form_action,  # 'restau:criar_google_maps
+        'form': form,
+    }
+
+    return render(
+        request,
+        'restau/pages/criar_google_maps.html',
+        context,
+    )
+
+
+def editar_google_maps(request, map_id):
+    form_action = reverse('restau:editar_google_maps',
+                          kwargs={'map_id': map_id})
+    local = get_object_or_404(GoogleMaps, id=map_id)
+    if request.method == 'POST':
+        form = GoogleMapsForm(request.POST, request.FILES, instance=local)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, 'Local editado com sucesso!'
+            )
+
+            return redirect('restau:google_maps')
+    else:
+        form = GoogleMapsForm(instance=local)
+
+    context = {
+        'local': local,
+        'form_action': form_action,  # 'restau:criar_google_maps
+        'form': form,
+    }
+
+    return render(
+        request,
+        'restau/pages/criar_google_maps.html',
+        context,
+    )
+
+
+def criar_horario(request):
+    horario = Horario.objects.all().first()
+    print('Horario: ', horario)
+    form_action = reverse('restau:criar_horario')
+    if request.method == 'POST':
+        form = HorarioForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, 'Horário adicionado com sucesso!'
+            )
+
+            return redirect('restau:horario')
+    else:
+        form = HorarioForm()
+
+    context = {
+        'horario': horario,
+        'form_action': form_action,  # 'restau:criar_horario
+        'form': form,
+    }
+
+    return render(
+        request,
+        'restau/pages/criar_horario.html',
+        context,
+    )
+
+
+def editar_horario(request, horario_id):
+    form_action = reverse('restau:editar_horario',
+                          kwargs={'horario_id': horario_id})
+    horario = get_object_or_404(Horario, id=horario_id)
+
+    if request.method == 'POST':
+        form = HorarioForm(request.POST, request.FILES, instance=horario)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, 'Horário editado com sucesso!'
+            )
+
+            return redirect('restau:horario')
+    else:
+        form = HorarioForm(instance=horario)
+
+    context = {
+        'horario': horario,
+        'form_action': form_action,  # 'restau:criar_horario
+        'form': form,
+    }
+
+    return render(
+        request,
+        'restau/pages/criar_horario.html',
         context,
     )

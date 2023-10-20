@@ -4,15 +4,15 @@
     {% include "restau/partials/_conf_menu.html" %}
       <div class="conta-content">
         <div>
-          {% if contato %}
-          <h2 class="center">Editar Contatos</h2>
+          {% if local %}
+          <h2 class="center">Editar Localização</h2>
           <p class="center">
-            Edite o Contato.
+            Edite a localização.
           </p>
         </div>
         
         <div class="content form-wrapper"> 
-          <h3 class="center">Editar Contato</h3>
+          <h3 class="center">Editar localização</h3>
           <form 
           action="{{ form_action }}"
           method="POST"
@@ -46,14 +46,14 @@
                 <button class="btn" type="submit">Editar</button>
               </div>
           {% else %}
-          <h2 class="center">Criar Contatos</h2>
+          <h2 class="center">Criar Localização</h2>
           <p class="center">
-            Adicione um Contato.
+            Adicione uma Localização.
           </p>
         </div>
         
         <div class="content form-wrapper"> 
-          <h3 class="center">Criar Contato</h3>
+          <h3 class="center">Criar Localização</h3>
           <form 
           action="{{ form_action }}"
           method="POST"
@@ -88,7 +88,7 @@
               </div>
           {% endif %}
               <div class="sub-menu">
-                <a href="{% url 'restau:contatos_site' %}" class="menu-btn">voltar</a>
+                <a href="{% url 'restau:google_maps' %}" class="menu-btn">voltar</a>
             </div>
             </div>  
           </form>

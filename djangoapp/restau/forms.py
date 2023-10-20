@@ -748,6 +748,7 @@ class HorarioForm(forms.ModelForm):
         ),
         label='Hora de abertura para almoço',
         help_text='Formato: 00:00',
+        required=False,
     )
 
     hora_fecho_almoco = forms.TimeField(
@@ -758,6 +759,7 @@ class HorarioForm(forms.ModelForm):
         ),
         label='Hora de fecho para almoço',
         help_text='Formato: 00:00',
+        required=False,
     )
 
     hora_abertura_jantar = forms.TimeField(
@@ -768,6 +770,7 @@ class HorarioForm(forms.ModelForm):
         ),
         label='Hora de abertura para jantar',
         help_text='Formato: 00:00',
+        required=False,
     )
 
     hora_fecho_jantar = forms.TimeField(
@@ -778,12 +781,13 @@ class HorarioForm(forms.ModelForm):
         ),
         label='Hora de fecho para jantar',
         help_text='Formato: 00:00',
+        required=False,
     )
 
     status = forms.ChoiceField(
         choices=[
             ('Aberto', 'Aberto'),
-            ('Fechado', 'Fechado'),
+            ('Encerrado', 'Encerrado'),
         ],
         label='Estado',
         help_text='Estado.',

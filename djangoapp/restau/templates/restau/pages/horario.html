@@ -1,0 +1,37 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+<div class="section-content-wide formset-update content">
+    {% include "restau/partials/_conf_menu.html" %}
+        <div class="conta-content">
+            <h2 class="center">Horário do Site</h2>
+            <p class="center">
+                Adicione o horário do seu restaurante ao site.
+            </p>
+            <h3 class="center">Horário</h3>
+            {% if horarios %}
+                <p>
+                    Você já adicionou o horário do seu restaurante ao site.
+                    Clique no link para editar.
+                </p>
+                {% for horario in horarios %}
+                <div class="sub-menu">
+                    <a href="{% url "restau:editar_horario" horario.id%}" class="menu-btn">
+                        {{ horario.dia_semana|default:"---" }}: 
+                        {{ horario.hora_abertura_almoco|default:"---" }} - 
+                        {{ horario.hora_fecho_almoco|default:"---" }} | 
+                        {{ horario.hora_abertura_jantar|default:"---" }} - 
+                        {{ horario.hora_fecho_jantar|default:"---" }} || 
+                        {{ horario.status|default:"---" }}
+                    </a>
+                </div>
+                {% endfor %}  
+            {% else %}
+                <p class="center">Você ainda não adicionou o horário.</p>
+                <div class="sub-menu">
+                    <a href="{% url "restau:criar_horario" %}" class="menu-btn">Criar</a>
+                </div>      
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
