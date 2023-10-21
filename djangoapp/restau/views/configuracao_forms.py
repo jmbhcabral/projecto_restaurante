@@ -292,6 +292,7 @@ def criar_intro(request):
 
 
 def apagar_intro(request, ):
+    print('REQUEST: ', request.POST)
 
     form_action = reverse('restau:apagar_intro')
     if request.method == 'POST':
@@ -301,25 +302,18 @@ def apagar_intro(request, ):
             queryset=Intro.objects.all()
         )
 
-        if formset.is_valid():
-            delete_flag = False
-            for form in formset:
-                if form.has_changed():
-                    instance = form.save(commit=False)
-                    if 'DELETE' in form.changed_data:
-                        delete_flag = True
-                        messages.success(
-                            request, 'Intro(s) apagado(s) com sucesso!')
-                    else:
-                        instance.save()
+        delete_flag = False
+        for form in formset:
+            if 'DELETE' in form.changed_data:
+                instance = form.instance
+                instance.delete()
+                delete_flag = True
 
-            if delete_flag:
-                for form in formset:
-                    if 'DELETE' in form.changed_data:
-                        instance = form.instance
-                        instance.delete()
+        if delete_flag:
+            messages.success(
+                request, 'Introdução apagada com sucesso!')
 
-            return redirect('restau:intro')
+        return redirect('restau:intro')
 
     else:
         formset = IntroFormSet(queryset=Intro.objects.all())
@@ -347,12 +341,29 @@ def escolher_intro(request,):
         print('texto_id: ', texto_id)
 
         if texto_id:
-            Intro.objects.update(is_visible=False)
-            Intro.objects.filter(id=texto_id).update(is_visible=True)
+            try:
+                Intro.objects.update(is_visible=False)
+                texto = Intro.objects.get(id=texto_id)
+                texto.is_visible = True
+                texto.save()
 
-            messages.success(
-                request, 'Introdução escolhida com sucesso!')
-            return redirect('restau:intro')
+                active_setup = ActiveSetup.objects.first()
+                print("Logo object:", texto)
+                print("Active Setup object:", active_setup)
+
+                if active_setup:
+                    active_setup.active_intro = (  # type: ignore
+                        texto
+                    )
+                    active_setup.save()
+
+                messages.success(
+                    request, 'Introdução escolhida com sucesso!')
+                return redirect('restau:intro')
+            except Intro.DoesNotExist:
+                messages.error(
+                    request, 'Ocorreu um erro ao escolher a Introdução!')
+                return redirect('restau:intro')
 
     textos = Intro.objects.all().order_by('id')
     context = {
@@ -520,25 +531,18 @@ def apagar_frase_cima(request, ):
             queryset=FraseCima.objects.all()
         )
 
-        if formset.is_valid():
-            delete_flag = False
-            for form in formset:
-                if form.has_changed():
-                    instance = form.save(commit=False)
-                    if 'DELETE' in form.changed_data:
-                        delete_flag = True
-                        messages.success(
-                            request, 'Intro(s) apagado(s) com sucesso!')
-                    else:
-                        instance.save()
+        delete_flag = False
+        for form in formset:
+            if 'DELETE' in form.changed_data:
+                instance = form.instance
+                instance.delete()
+                delete_flag = True
 
-            if delete_flag:
-                for form in formset:
-                    if 'DELETE' in form.changed_data:
-                        instance = form.instance
-                        instance.delete()
+        if delete_flag:
+            messages.success(
+                request, 'Frase apagada com sucesso!')
 
-            return redirect('restau:frase_cima')
+        return redirect('restau:frase_cima')
 
     else:
         formset = FraseCimaFormSet(queryset=FraseCima.objects.all())
@@ -566,12 +570,29 @@ def escolher_frase_cima(request,):
         print('texto_id: ', texto_id)
 
         if texto_id:
-            FraseCima.objects.update(is_visible=False)
-            FraseCima.objects.filter(id=texto_id).update(is_visible=True)
+            try:
+                FraseCima.objects.update(is_visible=False)
+                texto = FraseCima.objects.get(id=texto_id)
+                texto.is_visible = True
+                texto.save()
 
-            messages.success(
-                request, 'Frase escolhida com sucesso!')
-            return redirect('restau:frase_cima')
+                active_setup = ActiveSetup.objects.first()
+                print("Logo object:", texto)
+                print("Active Setup object:", active_setup)
+
+                if active_setup:
+                    active_setup.active_frase_cima = (  # type: ignore
+                        texto
+                    )
+                    active_setup.save()
+
+                messages.success(
+                    request, 'Frase escolhida com sucesso!')
+                return redirect('restau:frase_cima')
+            except FraseCima.DoesNotExist:
+                messages.error(
+                    request, 'Ocorreu um erro ao escolher a Frase!')
+                return redirect('restau:frase_cima')
 
     textos = FraseCima.objects.all().order_by('id')
     context = {
@@ -742,23 +763,16 @@ def apagar_frase_central(request, ):
             queryset=FraseInspiradora.objects.all()
         )
 
-        if formset.is_valid():
-            delete_flag = False
-            for form in formset:
-                if form.has_changed():
-                    instance = form.save(commit=False)
-                    if 'DELETE' in form.changed_data:
-                        delete_flag = True
-                        messages.success(
-                            request, 'Imagem apagada com sucesso!')
-                    else:
-                        instance.save()
+        delete_flag = False
+        for form in formset:
+            if 'DELETE' in form.changed_data:
+                instance = form.instance
+                instance.delete()
+                delete_flag = True
 
-            if delete_flag:
-                for form in formset:
-                    if 'DELETE' in form.changed_data:
-                        instance = form.instance
-                        instance.delete()
+        if delete_flag:
+            messages.success(
+                request, 'Frase apagada com sucesso!')
 
             return redirect('restau:frase_central')
 
@@ -789,13 +803,29 @@ def escolher_frase_central(request,):
         print('texto_id: ', texto_id)
 
         if texto_id:
-            FraseInspiradora.objects.update(is_visible=False)
-            FraseInspiradora.objects.filter(
-                id=texto_id).update(is_visible=True)
+            try:
+                FraseInspiradora.objects.update(is_visible=False)
+                texto = FraseInspiradora.objects.get(id=texto_id)
+                texto.is_visible = True
+                texto.save()
 
-            messages.success(
-                request, 'Frase escolhida com sucesso!')
-            return redirect('restau:frase_central')
+                active_setup = ActiveSetup.objects.first()
+                print("Logo object:", texto)
+                print("Active Setup object:", active_setup)
+
+                if active_setup:
+                    active_setup.active_frase_inspiradora = (  # type: ignore
+                        texto
+                    )
+                    active_setup.save()
+
+                messages.success(
+                    request, 'Frase escolhida com sucesso!')
+                return redirect('restau:frase_central')
+            except FraseInspiradora.DoesNotExist:
+                messages.error(
+                    request, 'Ocorreu um erro ao escolher a Frase!')
+                return redirect('restau:frase_central')
 
     textos = FraseInspiradora.objects.all().order_by('id')
     context = {
@@ -846,23 +876,16 @@ def apagar_frase_baixo(request, ):
             queryset=FraseBaixo.objects.all()
         )
 
-        if formset.is_valid():
-            delete_flag = False
-            for form in formset:
-                if form.has_changed():
-                    instance = form.save(commit=False)
-                    if 'DELETE' in form.changed_data:
-                        delete_flag = True
-                        messages.success(
-                            request, 'Imagem apagada com sucesso!')
-                    else:
-                        instance.save()
+        delete_flag = False
+        for form in formset:
+            if 'DELETE' in form.changed_data:
+                instance = form.instance
+                instance.delete()
+                delete_flag = True
 
-            if delete_flag:
-                for form in formset:
-                    if 'DELETE' in form.changed_data:
-                        instance = form.instance
-                        instance.delete()
+        if delete_flag:
+            messages.success(
+                request, 'Frase apagada com sucesso!')
 
             return redirect('restau:frase_baixo')
 
@@ -893,13 +916,29 @@ def escolher_frase_baixo(request,):
         print('texto_id: ', texto_id)
 
         if texto_id:
-            FraseBaixo.objects.update(is_visible=False)
-            FraseBaixo.objects.filter(
-                id=texto_id).update(is_visible=True)
+            try:
+                FraseBaixo.objects.update(is_visible=False)
+                texto = FraseBaixo.objects.get(id=texto_id)
+                texto.is_visible = True
+                texto.save()
 
-            messages.success(
-                request, 'Frase escolhida com sucesso!')
-            return redirect('restau:frase_baixo')
+                active_setup = ActiveSetup.objects.first()
+                print("Logo object:", texto)
+                print("Active Setup object:", active_setup)
+
+                if active_setup:
+                    active_setup.active_frase_baixo = (  # type: ignore
+                        texto
+                    )
+                    active_setup.save()
+
+                messages.success(
+                    request, 'Frase escolhida com sucesso!')
+                return redirect('restau:frase_baixo')
+            except FraseBaixo.DoesNotExist:
+                messages.error(
+                    request, 'Ocorreu um erro ao escolher a Frase!')
+                return redirect('restau:frase_baixo')
 
     textos = FraseBaixo.objects.all().order_by('id')
     context = {
