@@ -13,3 +13,5 @@ from .configuracao_views import *
 from .configuracao_forms import *
 from .galeria_forms import *
 from .galeria_views import *
+from .utilizadores_views import *
+from .utilizadores_forms import *

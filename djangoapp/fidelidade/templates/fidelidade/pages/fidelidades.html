@@ -28,11 +28,7 @@
                 <div class="sub-menu">
                     <a href="{% url "fidelidade:criar_fidelidade" %}" class="menu-btn">Criar</a>
                 </div>
-            <form action="{% url "fidelidade:fidelidades" %}" method="get">
-                <label for="query">CEW-</label>
-                <input type="text" name="query" id="query" pattern="\d+" required>
-                <input type="submit" value="Procurar">
-            </form>
+            
         </div>
     </div>    
  {% endblock content %}

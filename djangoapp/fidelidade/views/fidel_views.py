@@ -19,37 +19,8 @@ def fidelidades(request):
         print('fidelidade: ', fidel)
     fidelidades_grouped = list(grouper(fidelidades, 5))
 
-    query = request.GET.get('query', None)
-
-    if query is not None:
-        resultado_completo = f'CEW-{query}'
-
-        try:
-            perfil = Perfil.objects.get(numero_cliente=resultado_completo)
-            print('Perfil:', perfil)
-            if perfil.tipo_fidelidade is None:
-                print('Tipo fidelidade is None')
-                messages.error(
-                    request,
-                    f'Cliente {resultado_completo} não tem fidelidade atribuida')
-                return redirect(
-                    'fidelidade:fidelidades')
-            else:
-                usuario = User.objects.get(pk=perfil.usuario.id)
-                print('Tipo fidelidade is not None')
-                print('fidelidade id: ', perfil.tipo_fidelidade.id)
-                print('Utilizador id: ', perfil.usuario.id)
-                print('Utilizador master id: ', usuario.id)
-                return redirect(
-                    'fidelidade:util_ind_fidelidade',
-                    utilizador_pk=usuario.pk)
-        except Perfil.DoesNotExist:
-            messages.error(
-                request,
-                f'Cliente {resultado_completo} não encontrado')
     context = {
         'fidelidades_grouped': fidelidades_grouped,
-        # 'fidelidades': fidelidades,
     }
 
     return render(

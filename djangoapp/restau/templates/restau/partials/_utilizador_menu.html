@@ -1,0 +1,12 @@
+<div>
+    <h3>Utilizador</h3>
+    <p>-----------------------</p>
+</div>
+<div class="conta">
+    <div class="conta-menu">
+        <a href="{% url "restau:admin_utilizador" utilizador.id %}" class="menu-btn">Dados utilizador</a>
+        <a href="" class="menu-btn">Qrcode</a>
+        <a href="{% url "restau:compras_utilizador" utilizador.id %}" class="menu-btn">Adicionar Compra</a>
+        <a href="{% url "restau:ofertas_utilizador" utilizador.id %}" class="menu-btn">Adicionar oferta</a>
+        <a href="" class="menu-btn">Movimentos</a> 
+    </div>

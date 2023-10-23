@@ -1,0 +1,19 @@
+{% extends "restau/base.html" %}
+{% block content %}
+    <div class="section-content-wide content">
+        {% include "restau/partials/_utilizador_menu.html" %}
+            <div class="conta-content">
+                <h2>**********</h2>
+                <div class="content">
+                    <p>Nome: {{utilizador.first_name}} {{utilizador.last_name}}</p>
+                    <p>id: {{perfil.id}}</p>
+                    <p>pontos: {{total_pontos}}</p>
+                    <p>telefone: {{perfil.telemovel}}</p>
+                    <p>Numero Cliente: {{ perfil.numero_cliente }}</p>
+                    <p>Fidelidade: {{ perfil.tipo_fidelidade.id }}</p>
+                    <p>utilizador: {{ perfil.usuario.id }}</p>  
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

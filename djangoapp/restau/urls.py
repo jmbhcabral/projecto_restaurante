@@ -20,6 +20,8 @@ from restau.views import (                      # type: ignore
     apagar_imagem_padrao, escolher_imagem_padrao, contatos_site,
     criar_contatos_site, editar_contatos_site, google_maps, criar_google_maps,
     editar_google_maps, horario, criar_horario, editar_horario,
+    admin_utilizadores, admin_utilizador, compras_utilizador,
+    ofertas_utilizador,
 )
 
 # namespace
@@ -183,4 +185,13 @@ urlpatterns = [
          criar_horario, name='criar_horario'),
     path('restau/pages/editar_horario/<int:horario_id>',
          editar_horario, name='editar_horario'),
+    # Admin-Utilizadores
+    path('restau/pages/admin_utilizadores/',
+         admin_utilizadores, name='admin_utilizadores'),
+    path('restau/pages/admin_utilizador/<int:utilizador_pk>/',
+         admin_utilizador, name='admin_utilizador'),
+    path('restau/pages/compras_utilizador/<int:utilizador_id>/',
+         compras_utilizador, name='compras_utilizador'),
+    path('restau/pages/ofertas_utilizador/<int:utilizador_id>/',
+         ofertas_utilizador, name='ofertas_utilizador'),
 ]

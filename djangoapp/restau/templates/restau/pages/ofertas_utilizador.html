@@ -1,0 +1,23 @@
+{% extends "restau/base.html" %}
+{% block content %}
+    <div class="section-content-wide content">
+        {% include "restau/partials/_utilizador_menu.html" %}
+            <div class="conta-content">
+                <h2>**********</h2>
+                <div class="content">
+                    <form 
+                    action="#" 
+                    method="POST"
+                    enctype="multipart/form-data"
+                    >
+                        {% csrf_token %}
+                        <input type="hidden" name="form" value="ofertas">
+                        {{form}}
+                
+                        <input type="submit" value="Submeter">
+                    </form> 
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

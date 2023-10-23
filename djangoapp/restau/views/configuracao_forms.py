@@ -1080,10 +1080,10 @@ def criar_imagem_padrao(request):
         if form.is_valid():
             form.save()
             messages.success(
-                request, 'Texto adicionado com sucesso!'
+                request, 'Imagem padrão adicionada com sucesso!'
             )
 
-            return redirect('restau:image_padrao')
+            return redirect('restau:imagem_padrao')
     else:
         form = ImagemPadraoForm()
 
