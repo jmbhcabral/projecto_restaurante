@@ -8,12 +8,12 @@
                 Adicione o horário do seu restaurante ao site.
             </p>
             <h3 class="center">Horário</h3>
-            {% if horarios %}
+            {% if horarios_ordenados %}
                 <p>
                     Você já adicionou o horário do seu restaurante ao site.
                     Clique no link para editar.
                 </p>
-                {% for horario in horarios %}
+                {% for horario in horarios_ordenados %}
                 <div class="sub-menu">
                     <a href="{% url "restau:editar_horario" horario.id%}" class="menu-btn">
                         {{ horario.dia_semana|default:"---" }}: 
@@ -24,7 +24,16 @@
                         {{ horario.status|default:"---" }}
                     </a>
                 </div>
-                {% endfor %}  
+                {% endfor %}
+                <div class="sub-menu">
+                    <a href="{% url "restau:criar_horario" %}" class="menu-btn">Criar</a>
+                </div>
+                <div>
+                    <form method="post" action="{% url 'restau:horario' %}">
+                        {% csrf_token %}
+                        <input type="submit" value="Ativar Todos os Horários">
+                    </form>
+                </div>  
             {% else %}
                 <p class="center">Você ainda não adicionou o horário.</p>
                 <div class="sub-menu">

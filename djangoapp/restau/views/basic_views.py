@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, user_passes_test
-from restau.models import ActiveSetup, Fotos
+from restau.models import ActiveSetup, Fotos, Horario
+from typing import Dict
 
 
 @login_required
@@ -25,16 +26,29 @@ def index(request):
 
     active_setup = ActiveSetup.objects.get()
 
-    print('count:', ActiveSetup.objects.count())
+    horarios = Horario.objects.all()
 
-    for foto in galeria:
-        print('URL', foto.imagem.url)
-        print(foto.is_visible)
+    dict_horarios: Dict[str, int] = {
+        'Segunda': 1,
+        'Terça': 2,
+        'Quarta': 3,
+        'Quinta': 4,
+        'Sexta': 5,
+        'Sábado': 6,
+        'Domingo': 7,
+        'Feriados': 8,
+    }
+
+    horarios_ordenados = sorted(
+        horarios,
+        key=lambda x: dict_horarios.get(x.dia_semana, 0),  # type: ignore
+    )
 
     return render(
         request,
         'restau/pages/index.html',
         {'active_setup': active_setup,
-         'galeria': galeria
+         'galeria': galeria,
+         'horarios_ordenados': horarios_ordenados,
          },
     )

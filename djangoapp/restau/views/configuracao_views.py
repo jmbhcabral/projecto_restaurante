@@ -4,6 +4,7 @@ from restau.models import (
     ImagemFraseCima, FraseInspiradora, FraseBaixo, ImagemFraseBaixo,
     ImagemPadrao, ContactosSite, GoogleMaps, Horario
 )
+from typing import Dict
 
 
 def configuracao(request):
@@ -229,8 +230,30 @@ def horario(request):
     horarios = Horario.objects.all().order_by('id')
     numero_horarios = len(horarios)
 
+    dict_horarios: Dict[str, int] = {
+        'Segunda': 1,
+        'Terça': 2,
+        'Quarta': 3,
+        'Quinta': 4,
+        'Sexta': 5,
+        'Sábado': 6,
+        'Domingo': 7,
+        'Feriados': 8,
+    }
+
+    horarios_ordenados = sorted(
+        horarios,
+        key=lambda x: dict_horarios.get(x.dia_semana, 0),  # type: ignore
+    )
+
+    active_setup = ActiveSetup.objects.first()
+
+    if request.method == 'POST':
+        horarios_para_activar = Horario.objects.all()
+        active_setup.active_horario.set(horarios_para_activar)
+
     context = {
-        'horarios': horarios,
+        'horarios_ordenados': horarios_ordenados,
         'numero_horarios': numero_horarios,
     }
 

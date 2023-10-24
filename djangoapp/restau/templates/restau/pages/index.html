@@ -68,7 +68,7 @@
                         HORÁRIO DE FUNCIONAMENTO
                     </h6>
                     <p>
-                        {% for dia in active_setup.active_horario.all %}
+                        {% for dia in horarios_ordenados %}
                             {% if dia.status == 'Aberto' %}
                             {{dia.dia_semana}}: {{dia.hora_abertura_almoco}}h-{{dia.hora_fecho_almoco}}h|{{ dia.hora_abertura_jantar }}h-{{ dia.hora_fecho_jantar }}h<br>
                             {% else %}
