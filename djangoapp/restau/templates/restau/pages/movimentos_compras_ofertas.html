@@ -1,0 +1,27 @@
+{% extends "restau/base.html" %}
+{% block content %}
+    <div class="section-content-wide content">
+        {% include "restau/partials/_utilizador_menu.html" %}
+            <div class="conta-content">
+                <h2>Movimentos</h2>
+                <div class="content">
+                    Utilizador: {{ utilizador.first_name }}<br>
+                    {% for registro in registros_ordenados %}
+                        <tr>
+                            <td>
+                                {{ registro.criado_em }} - 
+                            </td>
+                            <td>
+                                {% if registro.pontos_adicionados %}
+                                    {{ registro.pontos_adicionados }} - Adição<br>
+                                {% elif registro.pontos_gastos %}
+                                    {{ registro.pontos_gastos }} - Subtração<br>
+                                {% endif %}
+                            </td>
+                        </tr> 
+                    {% endfor %}  
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

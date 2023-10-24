@@ -1,23 +1,13 @@
 from django.shortcuts import render, get_object_or_404
 from restau.models import (
     Products, Category, SubCategory, ActiveSetup,)
+from fidelidade.models import (
+    ProdutoFidelidadeIndividual)
 from django.db.models import Prefetch
 
 
 def encomendas(request):
-    setup = ActiveSetup.objects \
-        .order_by('-id') \
-        .first()
-
-    # main_image = FrontendSetup.objects \
-    #     .filter(imagem_topo__isnull=False) \
-    #     .order_by('-id') \
-    #     .first()
-
-    # default_image = FrontendSetup.objects \
-    #     .filter(imagem_topo__isnull=False) \
-    #     .order_by('-id') \
-    #     .first()
+    active_setup = ActiveSetup.objects.first()
 
     categorias = Category.objects \
         .all() \
@@ -30,11 +20,13 @@ def encomendas(request):
         .order_by('-id') \
         .first()
 
+    produtos_fidelidade = ProdutoFidelidadeIndividual.objects.all()
+
     if frontend_setup and frontend_setup.active_ementa:
         produtos_ementa = frontend_setup.active_ementa.produtos \
             .all() \
             .order_by('categoria', 'subcategoria', 'ordem')
-
+        print('active_ementa', frontend_setup.active_ementa)
     else:
         produtos_ementa = Products.objects.none()
 
@@ -43,13 +35,16 @@ def encomendas(request):
         Prefetch('subcategoria', queryset=subcategorias)
     )
 
-    # produtos_queryset = Products.objects.all().order_by(
-    #     'categoria', 'subcategoria', 'ordem')
-    # produtos = produtos_queryset.prefetch_related(
-    #     Prefetch('categoria', queryset=categorias),
-    #     Prefetch('subcategoria', queryset=subcategorias)
-    # )
+    for p in produtos_fidelidade:
+        print('p.produto', p.produto)
+        for q in produtos_ementa:
+            print('q', q)
+            if p.produto == q:
+                print(f'{p.produto} = {q}')
+
     context = {
+        'produtos_fidelidade': produtos_fidelidade,
+        'active_setup': active_setup,
         'frontend_setup': frontend_setup,
         'produtos': produtos_ementa,
         'categorias': categorias,

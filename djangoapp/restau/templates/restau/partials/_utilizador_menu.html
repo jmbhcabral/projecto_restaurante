@@ -8,5 +8,6 @@
         <a href="" class="menu-btn">Qrcode</a>
         <a href="{% url "restau:compras_utilizador" utilizador.id %}" class="menu-btn">Adicionar Compra</a>
         <a href="{% url "restau:ofertas_utilizador" utilizador.id %}" class="menu-btn">Adicionar oferta</a>
-        <a href="" class="menu-btn">Movimentos</a> 
+        <a href="{% url "restau:movimentos" utilizador.id %}" class="menu-btn">Movimentos</a> 
+        <a href="{% url "restau:admin_utilizadores" %}" class="menu-btn">Utilizadores</a> 
     </div>

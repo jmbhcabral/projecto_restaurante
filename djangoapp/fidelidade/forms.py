@@ -209,7 +209,7 @@ class OfertasFidelidadeForm(forms.ModelForm):
     )
 
     utilizador = forms.ModelChoiceField(
-        queryset=Products.objects.all(),
+        queryset=User.objects.all(),
         widget=forms.HiddenInput(),
         required=False,
     )

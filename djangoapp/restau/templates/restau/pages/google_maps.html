@@ -8,16 +8,21 @@
                 Adicione a localização do seu restaurante ao site.
             </p>
             <h3 class="center">Local</h3>
-            {% if locais %}
+            {% if local %}
                 <p>
                     Você já adicionou a localizaçação do seu restaurante ao site.
                     Clique no link para editar.
                 </p>
-                {% for local in locais %}
+                
                 <div class="sub-menu">
-                    <a href="{% url "restau:editar_google_maps" local.id%}" class="menu-btn">{{ local.id }}</a>
+                    <a href="{% url "restau:editar_google_maps" local.id%}" class="menu-btn">Localização no Google Maps</a>
                 </div>
-                {% endfor %}
+                <div>
+                    <form method="post" action="{% url 'restau:google_maps' %}">
+                        {% csrf_token %}
+                        <input type="submit" value="Ativar Mapa">
+                    </form>
+                </div>
             {% else %}
                 <p class="center">Você ainda não adicionou a sua localização.</p>
                 <div class="sub-menu">

@@ -14,14 +14,22 @@
         {% if not produto.imagem %}
         <div class="product-frame">
             <div class="product-image">
-                <img src="{{ default_image.imagem_padrao.url }}" alt="Product Image">
+                <img src="{{ active_setup.active_imagem_padrao.imagem.url }}" alt="Default">
             </div>
             <div class="product-details">
                 <h3 class="product-name">{{ produto.nome }}</h3>
                 <p class="product-description">{{ produto.descricao_curta }}</p>
                 <div class="product-price-section">
                     <div class="product-price">Preço: <span class="price">{{ produto.preco|floatformat:2 }}</span></div>
-                    <div class="product-old-price">Preço anterior: <span class="old-price">{{ produto.preco_promo }}</span></div>
+                    {% for item in produtos_fidelidade %}
+                        {% if item.produto == produto %}
+                            {{ item.produto.nome }} - {{ produto }} - {{ item.pontos_recompensa }} - {{ item.pontos_para_oferta }}
+                            <div class="product-old-price">Pontos por compra: <span class="old-price">{{ item.pontos_recompensa }}</span></div>
+                            <div class="product-old-price">Pontos para Oferta: <span class="old-price">{{ item.pontos_para_oferta }}</span></div>
+                        {% comment %} {% else %}
+                        Não há pontos para este produto {% endcomment %}
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
         </div>

@@ -10,8 +10,19 @@
                     <p>pontos: {{total_pontos}}</p>
                     <p>telefone: {{perfil.telemovel}}</p>
                     <p>Numero Cliente: {{ perfil.numero_cliente }}</p>
-                    <p>Fidelidade: {{ perfil.tipo_fidelidade.id }}</p>
-                    <p>utilizador: {{ perfil.usuario.id }}</p>  
+                    <p>Fidelidade: {{ perfil.tipo_fidelidade.nome }}</p>
+                    <p>Aniversário: {{ perfil.data_nascimento }}</p>
+                    {% if ultima_compra %}
+                    <p>Ultima compra: {{ ultima_compra.criado_em }}</p>
+                    {% else %}
+                    <p>Ultima compra: Nenhuma compra recente.</p>
+                    {% endif %}
+                    {% if ultima_oferta %}
+                    <p>Ultima Oferta: {{ ultima_oferta.criado_em }}</p>
+                    {% else %}
+                    <p>Ultima Oferta: Nenhuma oferta recente.</p>
+                    {% endif %}
+                    <p>Dias sem comprar: {{ dias_sem_comprar }} dias.</p>
                 </div>
             </div>
         </div>

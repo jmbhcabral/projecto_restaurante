@@ -1,10 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from restau.models import (
     ActiveSetup, ImagemLogo, ImagemTopo, Intro, IntroImagem, FraseCima,
     ImagemFraseCima, FraseInspiradora, FraseBaixo, ImagemFraseBaixo,
     ImagemPadrao, ContactosSite, GoogleMaps, Horario
 )
 from typing import Dict
+from django.contrib import messages
 
 
 def configuracao(request):
@@ -193,12 +194,31 @@ def imagem_padrao(request):
 
 def contatos_site(request):
 
-    contatos = ContactosSite.objects.all().order_by('id')
-    numero_contatos = len(contatos)
+    contacto = ContactosSite.objects.all().first()
+
+    active_setup = ActiveSetup.objects.first()
+
+    if request.method == 'POST':
+        if active_setup:
+            contactos_para_activar = ContactosSite.objects.all().first()
+            active_setup.active_contactos_site = contactos_para_activar
+            active_setup.save()
+            messages.success(
+                request,
+                'Contactos Ativados com sucesso!'
+            )
+            return redirect(
+                'restau:contatos_site',
+            )
+
+        else:
+            messages.error(
+                request,
+                'Não existe uma configuração ativa!'
+            )
 
     context = {
-        'contatos': contatos,
-        'numero_contatos': numero_contatos,
+        'contacto': contacto,
     }
 
     return render(
@@ -210,12 +230,31 @@ def contatos_site(request):
 
 def google_maps(request):
 
-    locais = GoogleMaps.objects.all().order_by('id')
-    numero_locais = len(locais)
+    local = GoogleMaps.objects.all().first()
+
+    active_setup = ActiveSetup.objects.first()
+
+    if request.method == 'POST':
+        if active_setup:
+            mapa_para_activar = GoogleMaps.objects.all().first()
+            active_setup.active_google_maps = mapa_para_activar
+            active_setup.save()
+            messages.success(
+                request,
+                'Mapa Ativado com sucesso!'
+            )
+            return redirect(
+                'restau:google_maps',
+            )
+
+        else:
+            messages.error(
+                request,
+                'Não existe uma configuração ativa!'
+            )
 
     context = {
-        'locais': locais,
-        'numero_locais': numero_locais,
+        'local': local,
     }
 
     return render(

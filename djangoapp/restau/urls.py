@@ -21,7 +21,7 @@ from restau.views import (                      # type: ignore
     criar_contatos_site, editar_contatos_site, google_maps, criar_google_maps,
     editar_google_maps, horario, criar_horario, editar_horario,
     admin_utilizadores, admin_utilizador, compras_utilizador,
-    ofertas_utilizador,
+    ofertas_utilizador, movimentos
 )
 
 # namespace
@@ -194,4 +194,6 @@ urlpatterns = [
          compras_utilizador, name='compras_utilizador'),
     path('restau/pages/ofertas_utilizador/<int:utilizador_id>/',
          ofertas_utilizador, name='ofertas_utilizador'),
+    path('restau/pages/movimentos/<int:utilizador_id>/',
+         movimentos, name='movimentos'),
 ]

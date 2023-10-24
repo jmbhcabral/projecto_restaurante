@@ -37,7 +37,7 @@ def compras_utilizador(request, utilizador_id):
 
 
 def ofertas_utilizador(request, utilizador_id):
-    user = get_object_or_404(User, pk=utilizador_id)
+    user = get_object_or_404(User, id=utilizador_id)
 
     pontos_ganhos = ComprasFidelidade.objects.filter(
         utilizador=user).aggregate(
@@ -69,8 +69,8 @@ def ofertas_utilizador(request, utilizador_id):
             ofertas = form.save(commit=False)
             if ofertas.pontos_gastos is not None and \
                     total_pontos >= ofertas.pontos_gastos:
-                ofertas.fidelidade_id = user.perfil.tipo_fidelidade.id
-                ofertas.utilizador_id = utilizador_id
+                ofertas.utilizador = user
+                ofertas.fidelidade = user.perfil.tipo_fidelidade
                 ofertas.save()
             return redirect(
                 'restau:ofertas_utilizador',

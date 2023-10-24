@@ -8,16 +8,20 @@
                 Adicione os contatos do seu restaurante ao site.
             </p>
             <h3 class="center">Contatos</h3>
-            {% if contatos %}
+            {% if contacto %}
                 <p>
                     Você já adicionou os contatos do seu restaurante ao site.
                     Clique no link para editar.
                 </p>
-                {% for contato in contatos %}
                 <div class="sub-menu">
-                    <a href="{% url "restau:editar_contatos_site" contato.id%}" class="menu-btn">{{ contato.email }}</a>
+                    <a href="{% url "restau:editar_contatos_site" contacto.id%}" class="menu-btn">{{ contacto.email }}</a>
                 </div>
-                {% endfor %}  
+                <div class="sub-menu">
+                    <form method="post" action="{% url 'restau:contatos_site' %}">
+                        {% csrf_token %}
+                        <input type="submit" value="Ativar Contactos">
+                    </form>
+                </div>
             {% else %}
                 <p class="center">Você ainda não adicionou contatos.</p>
                 <div class="sub-menu">

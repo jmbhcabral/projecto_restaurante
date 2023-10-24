@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from perfil.models import Perfil
 from fidelidade.models import ComprasFidelidade, OfertasFidelidade
 from django.db import models
+from operator import attrgetter
+from datetime import datetime, timedelta
 
 
 def admin_utilizadores(request):
@@ -42,6 +44,18 @@ def admin_utilizadores(request):
 def admin_utilizador(request, utilizador_pk):
     user = get_object_or_404(User, pk=utilizador_pk)
 
+    ultima_compra = ComprasFidelidade.objects.filter(
+        utilizador=user).order_by('-criado_em').first()
+
+    ultima_oferta = OfertasFidelidade.objects.filter(
+        utilizador=user).order_by('-criado_em').first()
+
+    if ultima_compra:
+        dias_sem_comprar = (datetime.now().date() -
+                            ultima_compra.criado_em.date()).days
+    else:
+        dias_sem_comprar = 'Nunca comprou.'
+
     pontos_ganhos = ComprasFidelidade.objects.filter(
         utilizador=user).aggregate(
         total_pontos_ganhos=models.Sum('pontos_adicionados'))
@@ -58,6 +72,9 @@ def admin_utilizador(request, utilizador_pk):
         'utilizador': user,
         'perfil': user.perfil,
         'total_pontos': total_pontos,
+        'ultima_compra': ultima_compra,
+        'ultima_oferta': ultima_oferta,
+        'dias_sem_comprar': dias_sem_comprar,
     }
     return render(
         request,
@@ -66,3 +83,33 @@ def admin_utilizador(request, utilizador_pk):
     )
 
     # return render(request, 'restau/pages/admin_utilizador.html')
+
+
+def movimentos(request, utilizador_id):
+    user = get_object_or_404(User, pk=utilizador_id)
+
+    compras = ComprasFidelidade.objects.filter(
+        utilizador=user).order_by('-criado_em')
+
+    ofertas = OfertasFidelidade.objects.filter(
+        utilizador=user).order_by('-criado_em')
+
+    registros_combinados = list(compras) + list(ofertas)
+
+    registros_ordenados = sorted(
+        registros_combinados,
+        key=attrgetter('criado_em'),
+        reverse=True
+    )
+
+    context = {
+        'registros_ordenados': registros_ordenados,
+        'utilizador': user,
+        'compras': compras,
+        'ofertas': ofertas,
+    }
+    return render(
+        request,
+        'restau/pages/movimentos_compras_ofertas.html',
+        context
+    )
