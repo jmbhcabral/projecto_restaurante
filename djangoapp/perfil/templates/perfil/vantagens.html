@@ -15,15 +15,39 @@
 
             </div>
             <div>
-                {% for item in lista_fidelidade %}
-                    <p>fidelidade: {{ item.fidelidade.nome }}</p>
-                    <p>Categoria: {{ item.produto.categoria }}</p>
-                    <p>Subcategoria: {{ item.produto.subcategoria }}</p>
-                    <p>Ordem: {{ item.produto.ordem }}</p>
-                    <p>Produto: {{ item.produto }}</p>
-                    <p>Pontos Recompensa: {{ item.pontos_recompensa }}</p>
-                    <p>Pontos para oferta: {{ item.pontos_para_oferta }}</p>
-                {% endfor %}
+                Fidelidade: {{ tipo_fidelidade }}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                Produto
+                            </th>
+                            <th>
+                                Pontos Recompensa
+                            </th>
+                            <th>
+                                Pontos para oferta
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in lista_fidelidade %}
+                        {% if item.visibilidade %}
+                        <tr>
+                            <td>
+                                {{ item.produto }}
+                            </td>
+                            <td>
+                                {{ item.pontos_recompensa }}
+                            </td>
+                            <td>
+                                {{ item.pontos_para_oferta }}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </section>

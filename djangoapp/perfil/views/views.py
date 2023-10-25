@@ -328,6 +328,7 @@ class Vantagens(View):
         self.context = {
             'active_setup': active_setup,
             'lista_fidelidade': lista_fidelidade,
+            'tipo_fidelidade': tipo_fidelidade,
         }
 
     def get(self, *args, **kwargs):

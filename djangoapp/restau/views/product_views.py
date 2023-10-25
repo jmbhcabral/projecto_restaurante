@@ -1,8 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from restau.models import (
     Products, Category, SubCategory, ActiveSetup,)
-from fidelidade.models import (
-    ProdutoFidelidadeIndividual)
 from django.db.models import Prefetch
 
 
@@ -16,36 +14,31 @@ def encomendas(request):
         .all() \
         .order_by('ordem')
 
-    frontend_setup = ActiveSetup.objects \
-        .order_by('-id') \
-        .first()
+    ementa = active_setup.active_ementa
+    campo_preco = ementa.nome_campo_preco_selecionado
 
-    produtos_fidelidade = ProdutoFidelidadeIndividual.objects.all()
-
-    if frontend_setup and frontend_setup.active_ementa:
-        produtos_ementa = frontend_setup.active_ementa.produtos \
+    if active_setup and active_setup.active_ementa:
+        produtos_ementa = active_setup.active_ementa.produtos \
             .all() \
             .order_by('categoria', 'subcategoria', 'ordem')
-        print('active_ementa', frontend_setup.active_ementa)
+
+        produtos_ementa = produtos_ementa.prefetch_related(
+            Prefetch('categoria', queryset=categorias),
+            Prefetch('subcategoria', queryset=subcategorias)
+        )
+
+        for produto in produtos_ementa:
+            preco = getattr(produto, campo_preco, None)
+            if preco is not None:
+                produto.preco_dinamico = preco
+            else:
+                produto.preco_dinamico = 'Preço não definido'
+
     else:
         produtos_ementa = Products.objects.none()
 
-    produtos_ementa = produtos_ementa.prefetch_related(
-        Prefetch('categoria', queryset=categorias),
-        Prefetch('subcategoria', queryset=subcategorias)
-    )
-
-    for p in produtos_fidelidade:
-        print('p.produto', p.produto)
-        for q in produtos_ementa:
-            print('q', q)
-            if p.produto == q:
-                print(f'{p.produto} = {q}')
-
     context = {
-        'produtos_fidelidade': produtos_fidelidade,
         'active_setup': active_setup,
-        'frontend_setup': frontend_setup,
         'produtos': produtos_ementa,
         'categorias': categorias,
         'subcategorias': subcategorias,
