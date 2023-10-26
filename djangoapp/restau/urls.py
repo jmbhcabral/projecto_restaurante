@@ -21,7 +21,8 @@ from restau.views import (                      # type: ignore
     criar_contatos_site, editar_contatos_site, google_maps, criar_google_maps,
     editar_google_maps, horario, criar_horario, editar_horario,
     admin_utilizadores, admin_utilizador, compras_utilizador,
-    ofertas_utilizador, movimentos
+    ofertas_utilizador, movimentos, lista_produtos_api, detalhe_produtos_api,
+    categoria_api_detalhe
 )
 
 # namespace
@@ -196,4 +197,12 @@ urlpatterns = [
          ofertas_utilizador, name='ofertas_utilizador'),
     path('restau/pages/movimentos/<int:utilizador_id>/',
          movimentos, name='movimentos'),
+
+    # Produtos API
+    path('produtos/api/v1/',
+         lista_produtos_api, name='produtos_api_v1'),
+    path('produtos/api/v1/<int:pk>/',
+         detalhe_produtos_api, name='detalhe_produtos_api_v1'),
+    path('produtos/api/v1/categoria/<int:pk>/',
+         categoria_api_detalhe, name='produto_categoria_api_v1'),
 ]
