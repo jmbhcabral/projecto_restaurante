@@ -22,7 +22,7 @@ from restau.views import (                      # type: ignore
     editar_google_maps, horario, criar_horario, editar_horario,
     admin_utilizadores, admin_utilizador, compras_utilizador,
     ofertas_utilizador, movimentos, lista_produtos_api, detalhe_produtos_api,
-    categoria_api_detalhe
+    categoria_api_detalhe, subcategoria_api_detalhe
 )
 
 # namespace
@@ -205,4 +205,6 @@ urlpatterns = [
          detalhe_produtos_api, name='detalhe_produtos_api_v1'),
     path('produtos/api/v1/categoria/<int:pk>/',
          categoria_api_detalhe, name='produto_categoria_api_v1'),
+    path('produtos/api/v1/subcategoria/<int:pk>/',
+         subcategoria_api_detalhe, name='produto_subcategoria_api_v1'),
 ]
