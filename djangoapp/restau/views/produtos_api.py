@@ -1,4 +1,6 @@
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
+
 from rest_framework.response import Response
 from ..models import Products, Category, SubCategory
 from ..serializers import (
@@ -8,9 +10,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 
 
-@api_view(http_method_names=['GET', 'POST'])
-def lista_produtos_api(request):
-    if request.method == 'GET':
+class ProdutosAPIv1View(APIView):
+    def get(self, request):
         produtos = Products.objects.all()
         serializer = ProdutoSerializer(
             instance=produtos,
@@ -18,34 +19,57 @@ def lista_produtos_api(request):
             context={'request': request},
         )
         return Response(serializer.data)
-    elif request.method == 'POST':
+
+    def post(self, request):
+        serializer = ProdutoSerializer(
+            data=request.data
+        )
+        if serializer.is_valid():
+            return Response(
+                serializer.validated_data,
+                status=status.HTTP_201_CREATED,
+            )
         return Response(
-            'Não implementado',
-            status=status.HTTP_501_NOT_IMPLEMENTED)
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
-@api_view()
-def detalhe_produtos_api(request, pk):
-    produto = get_object_or_404(
-        Products.objects.all(),
-        pk=pk,
-    )
-    serializer = ProdutoSerializer(
-        instance=produto,
-        many=False,
-        context={'request': request},
-    )
-    return Response(serializer.data)
-    # produto = Products.objects.filter(pk=pk).first()
+class ProdutoAPIv1Detalhe(APIView):
+    def get_produto(self, pk):
+        produto = get_object_or_404(
+            Products.objects.all(),
+            pk=pk,
+        )
+        return produto
 
-    # if produto:
-    #     serializer = ProdutoSerializer(instance=produto, many=False)
-    #     return Response(serializer.data)
-    # else:
-    #     return Response(
-    #         {'detail': 'Não existe.'},
-    #         status=404,
-    #     )
+    def get(self, request, pk):
+        produto = self.get_produto(pk)
+        serializer = ProdutoSerializer(
+            instance=produto,
+            many=False,
+            context={'request': request},
+        )
+        return Response(serializer.data)
+
+    def patch(self, request, pk):
+        produto = self.get_produto(pk)
+        serializer = ProdutoSerializer(
+            instance=produto,
+            data=request.data,
+            many=False,
+            context={'request': request},
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            serializer.data
+        )
+
+    def delete(self, request, pk):
+        produto = self.get_produto(pk)
+        produto.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view()

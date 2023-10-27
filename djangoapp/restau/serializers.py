@@ -1,38 +1,43 @@
 from rest_framework import serializers
-from .models import Category, SubCategory
+from .models import Category, SubCategory, Products
 
 
-class ProdutoSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    nome = serializers.CharField(max_length=100)
-    descricao_curta = serializers.CharField(max_length=200)
-    descricao_longa = serializers.CharField(max_length=500)
-    categoria = serializers.PrimaryKeyRelatedField(
-        queryset=Category.objects.all(),
-    )
+class ProdutoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Products
+        fields = [
+            'id', 'nome', 'descricao_curta', 'descricao_longa', 'categoria',
+            'categoria_nome', 'categoria_links', 'subcategoria',
+            'subcategoria_nome', 'subcategoria_links', 'imagem', 'ordem',
+            'visibilidade'
+        ]
+    # categoria = serializers.PrimaryKeyRelatedField(
+    #     queryset=Category.objects.all(),
+    # )
     categoria_nome = serializers.StringRelatedField(
         source='categoria.nome',
+        read_only=True,
     )
     categoria_links = serializers.HyperlinkedRelatedField(
         source='categoria',
-        queryset=Category.objects.all(),
-        view_name='restau:produto_categoria_api_v1'
+        # queryset=Category.objects.all(),
+        view_name='restau:produto_categoria_api_v1',
+        read_only=True,
     )
 
-    subcategoria = serializers.PrimaryKeyRelatedField(
-        queryset=SubCategory.objects.all(),
-    )
+    # subcategoria = serializers.PrimaryKeyRelatedField(
+    #     queryset=SubCategory.objects.all(),
+    # )
     subcategoria_nome = serializers.StringRelatedField(
         source='subcategoria.nome',
+        read_only=True,
     )
     subcategoria_links = serializers.HyperlinkedRelatedField(
         source='subcategoria',
-        queryset=SubCategory.objects.all(),
-        view_name='restau:produto_subcategoria_api_v1'
+        # queryset=SubCategory.objects.all(),
+        view_name='restau:produto_subcategoria_api_v1',
+        read_only=True,
     )
-    imagem = serializers.CharField(max_length=200)
-    ordem = serializers.IntegerField()
-    visibilidade = serializers.BooleanField()
 
 
 class CategoriaSerializer(serializers.ModelSerializer):
