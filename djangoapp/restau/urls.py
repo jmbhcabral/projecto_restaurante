@@ -1,10 +1,24 @@
 from django.urls import path
 from restau import views
 from rest_framework.routers import SimpleRouter
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView
+)
 
 
 # namespace
 app_name = 'restau'
+
+produto_api_v1_router = SimpleRouter()
+produto_api_v1_router.register(
+    'produtos/api/v1',
+    views.ProdutosAPIv1ViewSet,  # type: ignore
+    basename='produtos-api'
+)
+# se não tiver outras urls sem ser de api
+# urlpatterns = produto_api_v1_router.urls
 
 urlpatterns = [
     path(
@@ -452,28 +466,28 @@ urlpatterns = [
         name='movimentos'),
 
     # Produtos API
-    path(
-        'produtos/api/v1/',
-        views.ProdutosAPIv1ViewSet.as_view(  # type: ignore
-            {
-                'get': 'list',
-                'post': 'create'
-            }
-        ),
-        name='produtos_api_v1'
-    ),
-    path(
-        'produtos/api/v1/<int:pk>/',
-        views.ProdutosAPIv1ViewSet.as_view(  # type: ignore
-            {
-                'get': 'retrieve',
-                'patch': 'partial_update',
-                'delete': 'destroy',
-            }
-        ),
+    # path(
+    #     'produtos/api/v1/',
+    #     views.ProdutosAPIv1ViewSet.as_view(  # type: ignore
+    #         {
+    #             'get': 'list',
+    #             'post': 'create'
+    #         }
+    #     ),
+    #     name='produtos_api_v1'
+    # ),
+    # path(
+    #     'produtos/api/v1/<int:pk>/',
+    #     views.ProdutosAPIv1ViewSet.as_view(  # type: ignore
+    #         {
+    #             'get': 'retrieve',
+    #             'patch': 'partial_update',
+    #             'delete': 'destroy',
+    #         }
+    #     ),
 
-        name='detalhe_produtos_api_v1'
-    ),
+    #     name='detalhe_produtos_api_v1'
+    # ),
     path(
         'produtos/api/v1/categoria/<int:pk>/',
         views.categoria_api_detalhe,  # type: ignore
@@ -484,4 +498,21 @@ urlpatterns = [
         views.subcategoria_api_detalhe,  # type: ignore
         name='produto_subcategoria_api_v1'
     ),
+    path(
+        'produtos/api/token/',
+        TokenObtainPairView.as_view(),
+        name='token_obtain_pair'
+    ),
+    path(
+        'produtos/api/token/refresh/',
+        TokenRefreshView.as_view(),
+        name='token_refresh'
+    ),
+    path(
+        'produtos/api/token/verify/',
+        TokenVerifyView.as_view(),
+        name='token_verify'
+    ),
 ]
+
+urlpatterns += produto_api_v1_router.urls
