@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404
 # )
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ModelViewSet
+from ..permissions import IsAcessoRestritoOrReadOnly
 
 
 class ProdutosAPIv1Pagination(PageNumberPagination):
@@ -23,7 +24,30 @@ class ProdutosAPIv1ViewSet(ModelViewSet):
     queryset = Products.objects.all()
     serializer_class = ProdutoSerializer
     pagination_class = ProdutosAPIv1Pagination
+    permission_classes = [IsAcessoRestritoOrReadOnly]
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
 
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        obj = get_object_or_404(
+            self.get_queryset(),
+            pk=pk,
+        )
+
+        self.check_object_permissions(self.request, obj)
+
+        return obj
+
+    def get_permissions(self):
+        if self.request.method in ['PATCH', 'DELETE']:
+            return [IsAcessoRestritoOrReadOnly()]
+        return super().get_permissions()
+
+    def list(self, request, *args, **kwargs):
+        print('request: ', request.user)
+        print('request: ', request.user.is_authenticated)
+
+        return super().list(request, *args, **kwargs)
 
 # class ProdutosAPIv1View(ListCreateAPIView):
 #     queryset = Products.objects.all()
