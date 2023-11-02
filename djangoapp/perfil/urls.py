@@ -1,7 +1,14 @@
 from django.urls import path
-from perfil.views import views
+from perfil import views
+from rest_framework.routers import SimpleRouter
 
 app_name = 'perfil'
+
+register_user_api_v1 = SimpleRouter()
+register_user_api_v1.register(
+    'register/api/v1', views.RegisterUserView, basename='register-api',
+
+)
 
 urlpatterns = [
     path('perfil/', views.Criar.as_view(), name='criar'),
@@ -14,3 +21,5 @@ urlpatterns = [
     path('perfil/conta/cartao_cliente/',
          views.CartaoCliente.as_view(), name='cartao_cliente'),
 ]
+
+urlpatterns += register_user_api_v1.urls
