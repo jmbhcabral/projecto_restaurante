@@ -1,7 +1,10 @@
 from django.contrib.auth import get_user_model
 from rest_framework.serializers import ModelSerializer
 from perfil.models import Perfil
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
+from rest_framework import serializers
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.core.validators import validate_email as django_validate_email
 
 
 class PerfilSerializer(ModelSerializer):
@@ -15,11 +18,72 @@ class UserRegistrationSerializer(ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ('username', 'email', 'first_name', 'last_name', 'password',)
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'password',
+            'perfil', 'id'
+        )
+
+    def validate_email(self, value):
+        # Se estamos criando um novo usuário ou atualizando o e-mail de um
+        # existente, verificar unicidade.
+        if not self.instance or (self.instance.email != value):
+            if get_user_model().objects.filter(email=value).exists():
+                raise serializers.ValidationError(
+                    'Já existe um usuário com este e-mail.')
+        return value
+
+    def validate(self, data):
+        errors = {}
+
+        # Validação do email
+        email = data.get('email')
+        if email is None or email == '':
+            errors['email'] = 'O campo email é obrigatório.'
+
+        else:
+            try:
+                django_validate_email(email)
+            except DjangoValidationError:
+                errors['email'] = 'O email informado é inválido.'
+
+        if self.instance and self.instance.email != email:
+            if get_user_model().objects.exclude(
+                    pk=self.instance.pk).filter(email=email).exists():
+                errors['email'] = 'Este email já está em uso.'
+
+        # Validação do Nome
+        if not data.get('first_name'):
+            errors['first_name'] = 'O campo Nome é obrigatório.'
+
+        # Validação do Sobrenome
+        if not data.get('last_name'):
+            errors['last_name'] = 'O campo Sobrenome é obrigatório.'
+
+        perfil_data = data.get('perfil')
+        if perfil_data:
+            if 'telemovel' not in perfil_data:
+                errors['perfil.telemovel'] = 'O campo telemovel é obrigatório.'
+            if 'telemovel' in perfil_data and \
+                    len(perfil_data['telemovel']) < 9:
+                errors['perfil.telemovel'] = 'O campo telemovel é inválido.'
+
+            if 'data_nascimento' not in perfil_data:
+                errors['perfil.data_nascimento'] = (
+                    'O campo data de nascimento é obrigatório.'
+                )
+
+            if 'estudante' not in perfil_data:
+                errors['perfil.estudante'] = 'O campo estudante é obrigatório.'
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return data
 
     def create(self, validated_data):
         perfil_data = validated_data.pop('perfil', None)
-        user = User(
+
+        user = get_user_model().objects.create_user(    # type: ignore
             username=validated_data['username'],
             email=validated_data['email'],
             first_name=validated_data['first_name'],
@@ -32,3 +96,29 @@ class UserRegistrationSerializer(ModelSerializer):
             Perfil.objects.create(usuario=user, **perfil_data)
 
         return user
+
+    def update(self, instance, validated_data):
+        instance.username = validated_data.get('username', instance.username)
+        instance.email = validated_data.get('email', instance.email)
+        instance.first_name = validated_data.get(
+            'first_name', instance.first_name)
+        instance.last_name = validated_data.get(
+            'last_name', instance.last_name)
+
+        if 'password' in validated_data:
+            instance.set_password(validated_data['password'])
+
+        instance.save()
+
+        perfil_data = validated_data.get('perfil')
+        if perfil_data:
+            perfil, _ = Perfil.objects.get_or_create(usuario=instance)
+            perfil.data_nascimento = perfil_data.get(
+                'data_nascimento', perfil.data_nascimento)
+            perfil.telemovel = perfil_data.get(
+                'telemovel', perfil.telemovel)
+            perfil.estudante = perfil_data.get(
+                'estudante', perfil.estudante)
+            perfil.save()
+
+            return instance

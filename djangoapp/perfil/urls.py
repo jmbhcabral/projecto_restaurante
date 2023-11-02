@@ -4,9 +4,9 @@ from rest_framework.routers import SimpleRouter
 
 app_name = 'perfil'
 
-register_user_api_v1 = SimpleRouter()
-register_user_api_v1.register(
-    'register/api/v1', views.RegisterUserView, basename='register-api',
+users_api_v1 = SimpleRouter()
+users_api_v1.register(
+    'users/api/v1', views.RegisterUserView, basename='users-api',
 
 )
 
@@ -22,4 +22,4 @@ urlpatterns = [
          views.CartaoCliente.as_view(), name='cartao_cliente'),
 ]
 
-urlpatterns += register_user_api_v1.urls
+urlpatterns += users_api_v1.urls
