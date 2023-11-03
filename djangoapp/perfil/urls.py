@@ -10,6 +10,7 @@ users_api_v1.register(
 
 )
 
+
 urlpatterns = [
     path('perfil/', views.Criar.as_view(), name='criar'),
     path('perfil/atualizar/', views.Atualizar.as_view(), name='atualizar'),
@@ -20,6 +21,19 @@ urlpatterns = [
          views.Vantagens.as_view(), name='vantagens'),
     path('perfil/conta/cartao_cliente/',
          views.CartaoCliente.as_view(), name='cartao_cliente'),
+    # API
+    # path(
+    # 'Register/api/v1/',
+    # views.RegisterUserView.as_view(),
+    # name='register-api'),
+    path(
+        'perfis/api/v1/',
+        views.UserListView.as_view(),
+        name='perfis-api-v1'),
+    path(
+        'perfil/api/v1/<int:pk>/',
+        views.UserPerfilView.as_view(),
+        name='perfil-api-v1'),
 ]
 
 urlpatterns += users_api_v1.urls

@@ -2,9 +2,10 @@ from django.contrib.auth.models import User
 from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
 from ..models import Perfil
-from ..serializers import UserRegistrationSerializer, PerfilSerializer
+from ..serializers import (
+    UserRegistrationSerializer, PerfilSerializer, UserPerfilSerializer)
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
 class UsersAPIv1Pagination(PageNumberPagination):
@@ -14,6 +15,7 @@ class UsersAPIv1Pagination(PageNumberPagination):
 class RegisterUserView(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserRegistrationSerializer
+    permission_classes = [AllowAny]
     pagination_class = UsersAPIv1Pagination
     http_method_names = ['post']
 
@@ -36,12 +38,24 @@ class RegisterUserView(viewsets.ModelViewSet):
             )
 
 
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserPerfilSerializer
+    permission_classes = [AllowAny]
+    pagination_class = UsersAPIv1Pagination
+    http_method_names = ['get']
+
+
 class UserPerfilView(generics.RetrieveUpdateAPIView):
     serializer_class = PerfilSerializer
     permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'patch']
+
+    def get_queryset(self):
+        return Perfil.objects.filter(usuario=self.request.user)
 
     def get_object(self):
-        assert hasattr(
-            self.request.user, 'perfil'
-        ), 'O objeto User deve ter um atributo perfil.'
-        return self.request.user.perfil
+        perfil, _ = Perfil.objects.get_or_create(
+            usuario=self.request.user)
+
+        return perfil

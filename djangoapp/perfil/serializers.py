@@ -16,23 +16,26 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class PerfilSerializer(ModelSerializer):
-    user = UserSerializer()
+    usuario = UserSerializer()
     qrcode_url = SerializerMethodField()
 
     class Meta:
         model = Perfil
-        fields = ('data_nascimento', 'telemovel', 'estudante', 'qrcode_url')
+        fields = ('usuario', 'data_nascimento',
+                  'telemovel', 'estudante', 'qrcode_url')
 
     def get_qrcode_url(self, obj):
         request = self.context.get('request')
-        qrcode_url = obj.qrcode.url if obj.qrcode else None
-        return request.build_absolute_uri(qrcode_url) if qrcode_url else None
+        if request:
+            qrcode_url = obj.qr_code.url if obj.qr_code else None
+            return request.build_absolute_uri(
+                qrcode_url) if qrcode_url else None
 
     def update(self, instance, validated_data):
-        user_data = validated_data.pop('user', {})
+        user_data = validated_data.pop('usuario', None)
         user_serializer = UserSerializer(
             instance.usuario, data=user_data, partial=True)
-        if user_serializer.is_valid():
+        if user_serializer.is_valid(raise_exception=True):
             user_serializer.save()
         return super().update(instance, validated_data)
 
@@ -146,3 +149,22 @@ class UserRegistrationSerializer(ModelSerializer):
             perfil.save()
 
             return instance
+
+
+class UserPerfilSerializer(serializers.ModelSerializer):
+    perfil_data = serializers.SerializerMethodField()
+
+    class Meta:
+        model = get_user_model()
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'perfil_data')
+
+    def get_perfil_data(self, obj):
+        perfil = Perfil.objects.get(usuario=obj)
+        return {
+            'data_nascimento': perfil.data_nascimento,
+            'telemovel': perfil.telemovel,
+            'estudante': perfil.estudante,
+            'qrcode_url': perfil.qr_code.url if perfil.qr_code else None,
+
+        }
