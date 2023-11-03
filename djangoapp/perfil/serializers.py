@@ -1,16 +1,40 @@
 from django.contrib.auth import get_user_model
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from perfil.models import Perfil
 # from django.contrib.auth.models import User
 from rest_framework import serializers
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.validators import validate_email as django_validate_email
 
+User = get_user_model()
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name')
+
 
 class PerfilSerializer(ModelSerializer):
+    user = UserSerializer()
+    qrcode_url = SerializerMethodField()
+
     class Meta:
         model = Perfil
-        fields = ('data_nascimento', 'telemovel', 'estudante',)
+        fields = ('data_nascimento', 'telemovel', 'estudante', 'qrcode_url')
+
+    def get_qrcode_url(self, obj):
+        request = self.context.get('request')
+        qrcode_url = obj.qrcode.url if obj.qrcode else None
+        return request.build_absolute_uri(qrcode_url) if qrcode_url else None
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', {})
+        user_serializer = UserSerializer(
+            instance.usuario, data=user_data, partial=True)
+        if user_serializer.is_valid():
+            user_serializer.save()
+        return super().update(instance, validated_data)
 
 
 class UserRegistrationSerializer(ModelSerializer):
