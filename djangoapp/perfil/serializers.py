@@ -16,12 +16,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class PerfilSerializer(ModelSerializer):
-    usuario = UserSerializer()
     qrcode_url = SerializerMethodField()
 
     class Meta:
         model = Perfil
-        fields = ('usuario', 'data_nascimento',
+        fields = ('data_nascimento',
                   'telemovel', 'estudante', 'qrcode_url')
 
     def get_qrcode_url(self, obj):
@@ -149,22 +148,3 @@ class UserRegistrationSerializer(ModelSerializer):
             perfil.save()
 
             return instance
-
-
-class UserPerfilSerializer(serializers.ModelSerializer):
-    perfil_data = serializers.SerializerMethodField()
-
-    class Meta:
-        model = get_user_model()
-        fields = ('username', 'email', 'first_name',
-                  'last_name', 'perfil_data')
-
-    def get_perfil_data(self, obj):
-        perfil = Perfil.objects.get(usuario=obj)
-        return {
-            'data_nascimento': perfil.data_nascimento,
-            'telemovel': perfil.telemovel,
-            'estudante': perfil.estudante,
-            'qrcode_url': perfil.qr_code.url if perfil.qr_code else None,
-
-        }

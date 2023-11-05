@@ -26,14 +26,6 @@ urlpatterns = [
     # 'Register/api/v1/',
     # views.RegisterUserView.as_view(),
     # name='register-api'),
-    path(
-        'perfis/api/v1/',
-        views.UserListView.as_view(),
-        name='perfis-api-v1'),
-    path(
-        'perfil/api/v1/<int:pk>/',
-        views.UserPerfilView.as_view(),
-        name='perfil-api-v1'),
 ]
 
 urlpatterns += users_api_v1.urls
