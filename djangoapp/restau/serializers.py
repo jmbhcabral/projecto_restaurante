@@ -8,7 +8,8 @@ class ProdutoSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'nome', 'descricao_curta', 'descricao_longa', 'categoria',
             'categoria_nome', 'categoria_links', 'subcategoria',
-            'subcategoria_nome', 'subcategoria_links', 'imagem', 'ordem',
+            'subcategoria_nome', 'subcategoria_links', 'preco_1', 'preco_2',
+            'preco_3', 'preco_4', 'preco_5', 'preco_6', 'imagem', 'ordem',
             'visibilidade'
         ]
     # categoria = serializers.PrimaryKeyRelatedField(
