@@ -17,7 +17,7 @@ from ..permissions import IsAcessoRestritoOrReadOnly
 
 
 class ProdutosAPIv1Pagination(PageNumberPagination):
-    page_size = 5
+    page_size = 20
 
 
 class ProdutosAPIv1ViewSet(ModelViewSet):

@@ -802,6 +802,15 @@ class Products(models.Model):
     )
 
     def save(self, *args, **kwargs):
+        if not self.imagem:
+            # Obtendo a primeira instância de ActiveSetup
+            active_setup = ActiveSetup.objects.first()
+            if active_setup and active_setup.active_imagem_padrao:
+                self.imagem = active_setup.active_imagem_padrao.imagem
+            else:
+                # Caminho para a imagem padrão, caso não haja ActiveSetup
+                self.imagem = 'caminho/para/imagem/default.jpg'
+
         current_imagem_name = str(self.imagem.name)
         super().save(*args, **kwargs)
         imagem_changed = False

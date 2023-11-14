@@ -150,11 +150,12 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
         preco = getattr(produto, preco_field, None)
 
         if produto_fidelidade:
-
+            subcategoria_nome = produto.subcategoria.nome if \
+                produto.subcategoria else "Sem Subcategoria"
             initial_data.append({
                 'produto_nome': produto.nome,
                 'categoria': produto.categoria.nome,
-                'subcategoria': produto.subcategoria.nome,
+                'subcategoria': subcategoria_nome,
                 'fidelidade': produto_fidelidade.fidelidade.pk,
                 'produto': produto_fidelidade.produto.pk,
                 'pontos_recompensa': produto_fidelidade.pontos_recompensa,
