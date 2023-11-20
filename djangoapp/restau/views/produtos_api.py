@@ -1,5 +1,6 @@
 from rest_framework.decorators import api_view
-# from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
+from ..serializers import MyTokenObtainPairSerializer
 
 from rest_framework.response import Response
 from ..models import Products, Category, SubCategory
@@ -76,3 +77,7 @@ def subcategoria_api_detalhe(request, pk):
         context={'request': request},
     )
     return Response(serializer.data)
+
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer

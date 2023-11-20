@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Category, SubCategory, Products
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 class ProdutoSerializer(serializers.ModelSerializer):
@@ -74,3 +75,17 @@ class SubCategoriaSerializer(serializers.ModelSerializer):
         view_name='restau:produto_categoria_api_v1'
     )
     # ordem = serializers.IntegerField()
+
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        # Assegurando que o atributo 'id' existe
+        user_id = getattr(self.user, 'id', None)
+        if user_id is not None:
+            data['user_id'] = user_id
+        else:
+            raise serializers.ValidationError("ID de usuário não encontrado.")
+
+        return data

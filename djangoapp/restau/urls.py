@@ -1,8 +1,9 @@
 from django.urls import path
 from restau import views
+from restau.views import MyTokenObtainPairView
 from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
+    # TokenObtainPairView,
     TokenRefreshView,
     TokenVerifyView
 )
@@ -499,17 +500,17 @@ urlpatterns = [
         name='produto_subcategoria_api_v1'
     ),
     path(
-        'produtos/api/token/',
-        TokenObtainPairView.as_view(),
+        'api/token/',
+        MyTokenObtainPairView.as_view(),
         name='token_obtain_pair'
     ),
     path(
-        'produtos/api/token/refresh/',
+        'api/token/refresh/',
         TokenRefreshView.as_view(),
         name='token_refresh'
     ),
     path(
-        'produtos/api/token/verify/',
+        'api/token/verify/',
         TokenVerifyView.as_view(),
         name='token_verify'
     ),

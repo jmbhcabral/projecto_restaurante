@@ -211,31 +211,42 @@ class Logout(View):
 class Conta(BasePerfil):
     template_name = 'perfil/conta.html'
 
-    def get(self, *args, **kwargs):
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+
         if not self.request.user.is_authenticated:
             return redirect('perfil:criar')
 
-        total_recompensas = fidelidade_models.ComprasFidelidade.objects.filter(
-            utilizador=self.request.user).aggregate(
-            total_pontos_ganhos=models.Sum('pontos_adicionados'))
+        active_setup = ActiveSetup.objects \
+            .order_by('-id') \
+            .first()
 
-        total_ofertas = fidelidade_models.OfertasFidelidade.objects.filter(
-            utilizador=self.request.user).aggregate(
-            total_pontos_gastos=models.Sum('pontos_gastos'))
+        def get(self, *args, **kwargs):
+            if not self.request.user.is_authenticated:
+                return redirect('perfil:criar')
 
-        total_recompensas_decimal = (
-            total_recompensas['total_pontos_ganhos'] or 0)
-        total_ofertas_decimal = total_ofertas['total_pontos_gastos'] or 0
+            total_recompensas = fidelidade_models.ComprasFidelidade.objects.filter(
+                utilizador=self.request.user).aggregate(
+                total_pontos_ganhos=models.Sum('pontos_adicionados'))
 
-        total_pontos = total_recompensas_decimal - total_ofertas_decimal
+            total_ofertas = fidelidade_models.OfertasFidelidade.objects.filter(
+                utilizador=self.request.user).aggregate(
+                total_pontos_gastos=models.Sum('pontos_gastos'))
 
-        self.context = {
-            'total_pontos': total_pontos,
-            'total_recompensas': total_recompensas_decimal,
-            'total_ofertas': total_ofertas_decimal,
-        }
+            total_recompensas_decimal = (
+                total_recompensas['total_pontos_ganhos'] or 0)
+            total_ofertas_decimal = total_ofertas['total_pontos_gastos'] or 0
 
-        return render(self.request, self.template_name, self.context)
+            total_pontos = total_recompensas_decimal - total_ofertas_decimal
+
+            self.context = {
+                'active_setup': active_setup,
+                'total_pontos': total_pontos,
+                'total_recompensas': total_recompensas_decimal,
+                'total_ofertas': total_ofertas_decimal,
+            }
+
+            return render(self.request, self.template_name, self.context)
 
 
 # class Deletar(View):
