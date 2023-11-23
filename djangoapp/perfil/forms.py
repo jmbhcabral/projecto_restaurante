@@ -39,7 +39,7 @@ class PerfilForm(forms.ModelForm):
     estudante = forms.ChoiceField(
         choices=(
             ('escola_sec_ramada', 'Sim, na Esc. Sec. Ramada'),
-            ('agrup_vasco_santana', 'Sim no Agrup. Vasco Santana'),
+            ('agrup_vasco_santana', 'Sim, no Agrup. Vasco Santana'),
             ('outra_escola', 'Sim, noutra escola'),
             ('nao', 'Não'),
         ),
