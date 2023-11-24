@@ -23,6 +23,41 @@ class PerfilSerializer(ModelSerializer):
         fields = ('data_nascimento',
                   'telemovel', 'estudante', 'qrcode_url')
 
+    def validate_telemovel(self, value):
+        # Ignora a validação se estiver atualizando o perfil atual
+        if self.instance and self.instance.telemovel == value:
+            return value
+
+        # Verifica se o número de telemóvel já está em uso
+        if Perfil.objects.filter(telemovel=value).exclude(
+                pk=self.instance.pk if self.instance else None).exists():
+            raise serializers.ValidationError(
+                'Este número de telemóvel já está em uso.')
+        return value
+
+    def validate(self, data):
+        errors = {}
+
+        # Validação do telemovel
+        if 'telemovel' not in data:
+            errors['telemovel'] = 'O campo telemovel é obrigatório.'
+        elif len(data['telemovel']) < 9:
+            errors['telemovel'] = 'O campo telemovel é inválido.'
+
+        # Validação da data de nascimento
+        if 'data_nascimento' not in data:
+            errors['data_nascimento'] = (
+                'O campo data de nascimento é obrigatório.')
+
+        # Validação do campo estudante
+        if 'estudante' not in data:
+            errors['estudante'] = 'O campo estudante é obrigatório.'
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return data
+
     def get_qrcode_url(self, obj):
         request = self.context.get('request')
         if request:
@@ -49,13 +84,23 @@ class UserRegistrationSerializer(ModelSerializer):
             'perfil', 'id'
         )
 
+    def validate_username(self, value):
+        # Verifica se estamos criando um novo usuário ou atualizando um
+        # existente
+        if not self.instance or (
+                self.instance and self.instance.username != value):
+            if get_user_model().objects.filter(username=value).exists():
+                raise serializers.ValidationError(
+                    'Este nome de utilizador já está em uso.')
+        return value
+
     def validate_email(self, value):
         # Se estamos criando um novo usuário ou atualizando o e-mail de um
         # existente, verificar unicidade.
         if not self.instance or (self.instance.email != value):
             if get_user_model().objects.filter(email=value).exists():
                 raise serializers.ValidationError(
-                    'Já existe um usuário com este e-mail.')
+                    'Já existe um utilizador com este e-mail.')
         return value
 
     def validate(self, data):
@@ -85,21 +130,9 @@ class UserRegistrationSerializer(ModelSerializer):
         if not data.get('last_name'):
             errors['last_name'] = 'O campo Sobrenome é obrigatório.'
 
-        perfil_data = data.get('perfil')
-        if perfil_data:
-            if 'telemovel' not in perfil_data:
-                errors['perfil.telemovel'] = 'O campo telemovel é obrigatório.'
-            if 'telemovel' in perfil_data and \
-                    len(perfil_data['telemovel']) < 9:
-                errors['perfil.telemovel'] = 'O campo telemovel é inválido.'
-
-            if 'data_nascimento' not in perfil_data:
-                errors['perfil.data_nascimento'] = (
-                    'O campo data de nascimento é obrigatório.'
-                )
-
-            if 'estudante' not in perfil_data:
-                errors['perfil.estudante'] = 'O campo estudante é obrigatório.'
+        # Validação do username
+        if not data.get('username'):
+            errors['username'] = 'O campo username é obrigatório.'
 
         if errors:
             raise serializers.ValidationError(errors)
