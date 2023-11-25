@@ -33,6 +33,7 @@ class PerfilSerializer(ModelSerializer):
                 pk=self.instance.pk if self.instance else None).exists():
             raise serializers.ValidationError(
                 'Este número de telemóvel já está em uso.')
+
         return value
 
     def validate(self, data):
@@ -41,7 +42,7 @@ class PerfilSerializer(ModelSerializer):
         # Validação do telemovel
         if 'telemovel' not in data:
             errors['telemovel'] = 'O campo telemovel é obrigatório.'
-        elif len(data['telemovel']) < 9:
+        elif len(data['telemovel']) != 9:
             errors['telemovel'] = 'O campo telemovel é inválido.'
 
         # Validação da data de nascimento
@@ -103,6 +104,12 @@ class UserRegistrationSerializer(ModelSerializer):
                     'Já existe um utilizador com este e-mail.')
         return value
 
+    def validate_password(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError(
+                'A senha deve ter no mínimo 8 caracteres.')
+        return value
+
     def validate(self, data):
         errors = {}
 
@@ -133,6 +140,9 @@ class UserRegistrationSerializer(ModelSerializer):
         # Validação do username
         if not data.get('username'):
             errors['username'] = 'O campo username é obrigatório.'
+        # Validação do password
+        if not data.get('password'):
+            errors['passwod'] = 'O campo password é obrigatório.'
 
         if errors:
             raise serializers.ValidationError(errors)
