@@ -8,6 +8,7 @@ from ..permissions import IsAcessoRestrito, IsOwner
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny
+from perfil.models import Perfil
 
 
 class UsersAPIv1Pagination(PageNumberPagination):
@@ -83,4 +84,39 @@ class RegisterUserView(viewsets.ModelViewSet):
             return Response(
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def update(self, request, *args, **kwargs):
+        pk = self.kwargs.get('pk')
+        user_instance = get_object_or_404(User, pk=pk)
+        perfil_instance = Perfil.objects.filter(
+            usuario=user_instance).first()
+
+        print('user_instance', user_instance)
+        print('request.data', request.data)
+        print('request.user', request.user)
+        print('request.user.id', request.user.id)
+
+        # Passando a instância para o serializador
+        serializer = UserRegistrationSerializer(
+            user_instance,
+            data=request.data,
+            partial=True,
+            context={
+                'perfil_instance': perfil_instance,
+                'request': request,
+            }
+        )
+
+        print('serializer', serializer)
+
+        if serializer.is_valid():
+            serializer.save()
+            print('serializer.data', serializer.data)
+            return Response(serializer.data)
+        else:
+            print('serializer.errors', serializer.errors)
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
             )

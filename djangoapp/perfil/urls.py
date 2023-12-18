@@ -21,11 +21,6 @@ urlpatterns = [
          views.Vantagens.as_view(), name='vantagens'),
     path('perfil/conta/cartao_cliente/',
          views.CartaoCliente.as_view(), name='cartao_cliente'),
-    # API
-    # path(
-    # 'Register/api/v1/',
-    # views.RegisterUserView.as_view(),
-    # name='register-api'),
 ]
 
 urlpatterns += users_api_v1.urls

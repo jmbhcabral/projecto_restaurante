@@ -1,6 +1,8 @@
 from django.urls import path
 from restau import views
-from restau.views import MyTokenObtainPairView
+from restau.views import (
+    MyTokenObtainPairView, MyTokenRefreshView
+)
 from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt.views import (
     # TokenObtainPairView,
@@ -506,7 +508,7 @@ urlpatterns = [
     ),
     path(
         'api/token/refresh/',
-        TokenRefreshView.as_view(),
+        MyTokenRefreshView.as_view(),
         name='token_refresh'
     ),
     path(

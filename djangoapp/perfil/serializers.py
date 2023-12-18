@@ -5,6 +5,10 @@ from perfil.models import Perfil
 from rest_framework import serializers
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.validators import validate_email as django_validate_email
+import logging
+from django.contrib.auth.hashers import check_password
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -24,15 +28,25 @@ class PerfilSerializer(ModelSerializer):
                   'telemovel', 'estudante', 'qrcode_url')
 
     def validate_telemovel(self, value):
+        perfil_instance = self.context.get('perfil_instance')
         # Ignora a validação se estiver atualizando o perfil atual
-        if self.instance and self.instance.telemovel == value:
+        print('perfil_instance validate_telemovel: ', perfil_instance)
+        if perfil_instance and perfil_instance.telemovel == value:
             return value
 
+        print('existe telemovel: ', Perfil.objects.filter(telemovel=value).exclude(
+            pk=perfil_instance.pk if perfil_instance else None).exists())
+        print('telemovel: ', value)
+
+        if perfil_instance:
+            print('Self.instance.pk: ', perfil_instance.pk)
+        else:
+            print('Não existe self.instance.pk')
         # Verifica se o número de telemóvel já está em uso
         if Perfil.objects.filter(telemovel=value).exclude(
                 pk=self.instance.pk if self.instance else None).exists():
             raise serializers.ValidationError(
-                'Este número de telemóvel já está em uso.')
+                'Este número de telemóvel já está em uso.', value)
 
         return value
 
@@ -67,16 +81,12 @@ class PerfilSerializer(ModelSerializer):
                 qrcode_url) if qrcode_url else None
 
     def update(self, instance, validated_data):
-        user_data = validated_data.pop('usuario', None)
-        user_serializer = UserSerializer(
-            instance.usuario, data=user_data, partial=True)
-        if user_serializer.is_valid(raise_exception=True):
-            user_serializer.save()
-        return super().update(instance, validated_data)
+        pass
 
 
 class UserRegistrationSerializer(ModelSerializer):
     perfil = PerfilSerializer()
+    password = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = get_user_model()
@@ -105,10 +115,20 @@ class UserRegistrationSerializer(ModelSerializer):
         return value
 
     def validate_password(self, value):
-        if len(value) < 8:
-            raise serializers.ValidationError(
-                'A senha deve ter no mínimo 8 caracteres.')
-        return value
+        # Se não estiver atualizando um usuário, simplesmente retorne o valor
+        if not self.instance:
+            return value
+
+        # Se estiver atualizando e a senha for diferente da armazenada
+        if self.instance and not check_password(value, self.instance.password):
+            # Aqui você pode adicionar validação adicional, como comprimento da senha
+            if len(value) < 8:
+                raise serializers.ValidationError(
+                    'A senha deve conter pelo menos 8 caracteres.')
+            return value
+
+        # Se a senha fornecida for a mesma que a armazenada, ignore a atualização
+        raise serializers.SkipField()
 
     def validate(self, data):
         errors = {}
@@ -128,7 +148,7 @@ class UserRegistrationSerializer(ModelSerializer):
             if get_user_model().objects.exclude(
                     pk=self.instance.pk).filter(email=email).exists():
                 errors['email'] = 'Este email já está em uso.'
-
+        print('Data def validate: ', data)
         # Validação do Nome
         if not data.get('first_name'):
             errors['first_name'] = 'O campo Nome é obrigatório.'
@@ -141,8 +161,8 @@ class UserRegistrationSerializer(ModelSerializer):
         if not data.get('username'):
             errors['username'] = 'O campo username é obrigatório.'
         # Validação do password
-        if not data.get('password'):
-            errors['passwod'] = 'O campo password é obrigatório.'
+        if not self.instance and 'password' not in data:
+            errors['password'] = 'O campo password é obrigatório.'
 
         if errors:
             raise serializers.ValidationError(errors)
@@ -167,27 +187,18 @@ class UserRegistrationSerializer(ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
-        instance.username = validated_data.get('username', instance.username)
-        instance.email = validated_data.get('email', instance.email)
-        instance.first_name = validated_data.get(
-            'first_name', instance.first_name)
-        instance.last_name = validated_data.get(
-            'last_name', instance.last_name)
+        perfil_data = validated_data.pop('perfil', {})
 
-        if 'password' in validated_data:
-            instance.set_password(validated_data['password'])
-
+        # Atualizar os dados do utilizador
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
         instance.save()
 
-        perfil_data = validated_data.get('perfil')
-        if perfil_data:
-            perfil, _ = Perfil.objects.get_or_create(usuario=instance)
-            perfil.data_nascimento = perfil_data.get(
-                'data_nascimento', perfil.data_nascimento)
-            perfil.telemovel = perfil_data.get(
-                'telemovel', perfil.telemovel)
-            perfil.estudante = perfil_data.get(
-                'estudante', perfil.estudante)
-            perfil.save()
+        # Atualizar o perfil do utilizador
+        perfil_instance = getattr(instance, 'perfil', None)
+        if perfil_instance:
+            for attr, value in perfil_data.items():
+                setattr(perfil_instance, attr, value)
+            perfil_instance.save()
 
-            return instance
+        return instance

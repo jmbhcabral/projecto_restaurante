@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import Category, SubCategory, Products
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.serializers import (
+    TokenObtainPairSerializer, TokenRefreshSerializer
+)
 
 
 class ProdutoSerializer(serializers.ModelSerializer):
@@ -88,4 +90,34 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         else:
             raise serializers.ValidationError("ID de usuário não encontrado.")
 
+        # Adicione logs para debug
+        print("Token creation or refresh successful!")
+        print("Access Token Expiry:", data['access'])
+        print("Refresh Token Expiry:", data['refresh'])
+
         return data
+
+
+class MyTokenRefreshSerializer(TokenRefreshSerializer):
+
+    def validate(self, attrs):
+        # Chame o método validate da classe pai para realizar a validação padrão
+        data = super().validate(attrs)
+
+        # O refresh token estará disponível em data.get('refresh')
+        refresh_token = data.get('refresh')
+
+        if refresh_token:
+            # Faça o que você precisa com o refresh token, como imprimir
+            print(f'Refresh token: {refresh_token}')
+        else:
+            # Caso a chave 'refresh' não esteja presente nos dados
+            print('Refresh token not found in data')
+
+        # Exemplo de log
+        self.message('Token refresh successful!')
+
+        return data
+
+    def message(self, message):
+        print(message)
