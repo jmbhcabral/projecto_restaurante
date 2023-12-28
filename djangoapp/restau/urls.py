@@ -468,29 +468,12 @@ urlpatterns = [
         views.movimentos,  # type: ignore
         name='movimentos'),
 
-    # Produtos API
-    # path(
-    #     'produtos/api/v1/',
-    #     views.ProdutosAPIv1ViewSet.as_view(  # type: ignore
-    #         {
-    #             'get': 'list',
-    #             'post': 'create'
-    #         }
-    #     ),
-    #     name='produtos_api_v1'
-    # ),
-    # path(
-    #     'produtos/api/v1/<int:pk>/',
-    #     views.ProdutosAPIv1ViewSet.as_view(  # type: ignore
-    #         {
-    #             'get': 'retrieve',
-    #             'patch': 'partial_update',
-    #             'delete': 'destroy',
-    #         }
-    #     ),
-
-    #     name='detalhe_produtos_api_v1'
-    # ),
+    # User Ementa API
+    path(
+        'ementa/api/v1/user/<int:pk>/',
+        views.UserEmentaAPIView.as_view(),
+        name='ementa_api_v1'
+    ),
     path(
         'produtos/api/v1/categoria/<int:pk>/',
         views.categoria_api_detalhe,  # type: ignore

@@ -854,7 +854,7 @@ class Ementa(models.Model):
         verbose_name='Preço',
     )
 
-    produtos = models.ManyToManyField(Products)
+    produtos = models.ManyToManyField(Products, related_name='ementas')
 
     def __str__(self):
         return self.nome

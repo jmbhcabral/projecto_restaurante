@@ -3,6 +3,7 @@ from .models import Category, SubCategory, Products
 from rest_framework_simplejwt.serializers import (
     TokenObtainPairSerializer, TokenRefreshSerializer
 )
+from .models import Ementa
 
 
 class ProdutoSerializer(serializers.ModelSerializer):
@@ -121,3 +122,16 @@ class MyTokenRefreshSerializer(TokenRefreshSerializer):
 
     def message(self, message):
         print(message)
+
+
+class ProdutosEmentaSerializer(serializers.ModelSerializer):
+    produtos = ProdutoSerializer(
+        many=True,
+        read_only=True,
+    )
+
+    class Meta:
+        model = Ementa
+        fields = [
+            'nome', 'descricao', 'nome_campo_preco_selecionado', 'produtos',
+        ]

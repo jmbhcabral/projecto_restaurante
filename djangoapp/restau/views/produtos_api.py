@@ -19,6 +19,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ModelViewSet
 from ..permissions import IsAcessoRestritoOrReadOnly
+from rest_framework.views import APIView
+from ..serializers import ProdutosEmentaSerializer
+from ..models import Ementa
 
 
 class ProdutosAPIv1Pagination(PageNumberPagination):
@@ -89,3 +92,36 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 class MyTokenRefreshView(TokenRefreshView):
     serializer_class = MyTokenRefreshSerializer
+
+
+class UserEmentaAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        print('user: ', user)
+        print('tipo_fidelidade: ',
+              user.perfil.tipo_fidelidade)
+
+        if not user.is_authenticated:
+            return Response(
+                {'detail': 'Não autorizado'},
+                status=401,
+            )
+        try:
+            ementa = user.perfil.tipo_fidelidade.ementa
+            produtos_ementa = Ementa.objects.filter(
+                id=ementa.id,
+            )
+            print('produtos_ementa: ', produtos_ementa)
+            serializer = ProdutosEmentaSerializer(
+                produtos_ementa,
+                many=True,
+                context={'request': request},
+            )
+
+            # print('serializer.data: ', serializer.data)
+            return Response(serializer.data)
+        except Ementa.DoesNotExist:
+            return Response(
+                {'detail': 'Não existe ementa para este utilizador'},
+                status=404,
+            )

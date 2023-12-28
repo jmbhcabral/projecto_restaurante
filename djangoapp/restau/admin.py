@@ -179,6 +179,6 @@ class ProdutosEmentaAdmin(admin.ModelAdmin):
     list_display = ('ementa', 'produtos_in_ementa',)
 
     def produtos_in_ementa(self, obj):
-        return ", ".join([str(p) for p in obj.produtos.all()])
+        return ", ".join([str(p) for p in obj.produto.all()])
 
     produtos_in_ementa.short_description = 'Produtos na Ementa'

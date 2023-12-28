@@ -5,6 +5,7 @@ from perfil.models import Perfil
 from rest_framework import serializers
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.validators import validate_email as django_validate_email
+from django.utils import timezone
 import logging
 from django.contrib.auth.hashers import check_password
 
@@ -21,11 +22,35 @@ class UserSerializer(serializers.ModelSerializer):
 
 class PerfilSerializer(ModelSerializer):
     qrcode_url = SerializerMethodField()
+    ultima_atualizacao_data_nascimento = serializers.DateTimeField(
+        read_only=True)
+    tipo_fidelidade = serializers.CharField(
+        read_only=True)
 
     class Meta:
         model = Perfil
-        fields = ('data_nascimento',
-                  'telemovel', 'estudante', 'qrcode_url')
+        fields = ('data_nascimento', 'telemovel', 'estudante', 'qrcode_url',
+                  'ultima_atualizacao_data_nascimento', 'tipo_fidelidade'
+                  )
+
+    def validate_data_nascimento(self, value):
+        perfil_instance = self.context.get('perfil_instance')
+        if perfil_instance and perfil_instance.data_nascimento == value:
+            return value
+        agora = timezone.now()
+        print('perfil_instance validate_data_nascimento: ', perfil_instance)
+
+        if perfil_instance:
+            ultima_atualizacao = perfil_instance\
+                .ultima_atualizacao_data_nascimento
+            if ultima_atualizacao:
+                periodo_minimo = ultima_atualizacao + \
+                    timezone.timedelta(days=182.5)  # Aproximadamente 6 meses
+                if agora < periodo_minimo:
+                    raise serializers.ValidationError(
+                        'Só pode ser alterada de 6 em 6 meses.', value)
+
+        return value
 
     def validate_telemovel(self, value):
         perfil_instance = self.context.get('perfil_instance')
@@ -57,7 +82,7 @@ class PerfilSerializer(ModelSerializer):
         if 'telemovel' not in data:
             errors['telemovel'] = 'O campo telemovel é obrigatório.'
         elif len(data['telemovel']) != 9:
-            errors['telemovel'] = 'O campo telemovel é inválido.'
+            errors['telemovel'] = 'O campo telemovel tem de ter 9 digitos.'
 
         # Validação da data de nascimento
         if 'data_nascimento' not in data:
@@ -86,7 +111,7 @@ class PerfilSerializer(ModelSerializer):
 
 class UserRegistrationSerializer(ModelSerializer):
     perfil = PerfilSerializer()
-    password = serializers.CharField(write_only=True, required=False)
+    # password = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = get_user_model()
@@ -132,37 +157,37 @@ class UserRegistrationSerializer(ModelSerializer):
 
     def validate(self, data):
         errors = {}
-
-        # Validação do email
-        email = data.get('email')
-        if email is None or email == '':
-            errors['email'] = 'O campo email é obrigatório.'
-
+        # Validação dos campos obrigatórios
+        if not self.instance:
+            for field in [
+                    'username', 'email', 'first_name',
+                    'last_name', 'password']:
+                if field not in data:
+                    errors[field] = f'O campo {field} é obrigatório.'
+            # Verificar unicidade do username, email, telemovel
+            if 'username' in data and User.objects.filter(
+                    username=data['username']).exists():
+                errors['username'] = 'Este nome de utilizador já está em uso.'
+            if 'email' in data and User.objects.filter(
+                    email=data['email']).exists():
+                errors['email'] = 'Já existe um utilizador com este e-mail.'
+        # Validação para atualização de dados
         else:
-            try:
-                django_validate_email(email)
-            except DjangoValidationError:
-                errors['email'] = 'O email informado é inválido.'
+            # Verificação de campos que podem ser atualizados
+            if 'username' in data and data['username'] != self.instance.username:
+                errors['username'] = 'Já existe um utilizador com esse username.'
+            email = data.get('email')
+            if 'email' in data and email == self.instance.email:
+                errors['email'] = 'Já existe um utilizador com esse email.'
+                try:
+                    django_validate_email(email)
+                except DjangoValidationError:
+                    errors['email'] = 'O email é inválido.'
 
-        if self.instance and self.instance.email != email:
-            if get_user_model().objects.exclude(
-                    pk=self.instance.pk).filter(email=email).exists():
-                errors['email'] = 'Este email já está em uso.'
-        print('Data def validate: ', data)
-        # Validação do Nome
-        if not data.get('first_name'):
-            errors['first_name'] = 'O campo Nome é obrigatório.'
-
-        # Validação do Sobrenome
-        if not data.get('last_name'):
-            errors['last_name'] = 'O campo Sobrenome é obrigatório.'
-
-        # Validação do username
-        if not data.get('username'):
-            errors['username'] = 'O campo username é obrigatório.'
-        # Validação do password
-        if not self.instance and 'password' not in data:
-            errors['password'] = 'O campo password é obrigatório.'
+        password = data.get('password')
+        if 'password' in data and len(password) < 8:
+            errors['password'] = 'A senha deve conter pelo menos 8 caracteres.'
+        print('password: ', password)
 
         if errors:
             raise serializers.ValidationError(errors)
@@ -171,23 +196,48 @@ class UserRegistrationSerializer(ModelSerializer):
 
     def create(self, validated_data):
         perfil_data = validated_data.pop('perfil', None)
+        password = validated_data.pop('password', None)
 
-        user = get_user_model().objects.create_user(    # type: ignore
-            username=validated_data['username'],
-            email=validated_data['email'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name'],
+        # Usar o método get para evitar keyerror
+        username = validated_data.get('username')
+        email = validated_data.get('email')
+        first_name = validated_data.get('first_name')
+        last_name = validated_data.get('last_name')
+        print('perfil_data: ', perfil_data)
+        print('password: ', password)
+        print('username: ', username)
+        print('email: ', email)
+        print('first_name: ', first_name)
+        print('last_name: ', last_name)
+        # Verificar se todos os campos obrigatórios estão presentes
+
+        if not all([username, email, first_name, last_name, password]):
+            raise serializers.ValidationError(
+                'Os campos username, email, first_name, last_name e password são obrigatórios.'
+            )
+
+        user = User.objects.create_user(    # type: ignore
+            username=username,
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
         )
 
-        user.set_password(validated_data['password'])
+        user.set_password(password)
         user.save()
         if perfil_data:
+            perfil_data['ultima_atualizacao_data_nascimento'] = timezone.now()
             Perfil.objects.create(usuario=user, **perfil_data)
 
         return user
 
     def update(self, instance, validated_data):
         perfil_data = validated_data.pop('perfil', {})
+
+        # Atualizar a senha, se estiver presente
+        password = validated_data.pop('password', None)
+        if password is not None:
+            instance.set_password(password)
 
         # Atualizar os dados do utilizador
         for attr, value in validated_data.items():

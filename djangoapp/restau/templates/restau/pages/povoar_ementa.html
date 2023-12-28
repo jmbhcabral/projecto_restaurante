@@ -21,7 +21,21 @@
           
           {% for categoria in categorias %}
               <h3>{{ categoria.nome }}</h3>
-              
+            
+              {% for produto in produtos %}
+              {% if produto.categoria == categoria and not produto.subcategoria %}
+              <!-- Renderizar produtos sem subcategoria --> 
+              <div class="povoar-ementa">
+                <div>
+                  <label for="produto_{{ produto.id }}">{{ produto.nome }}</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="produto_{{ produto.id }}" name="{{ form.produto.name }}" value="{{ produto.id }}" {% if produto.id in produtos_na_ementa %}checked{% endif %}>
+                </div>
+              </div>
+              {% endif %}
+              {% endfor %}
+
               {% for subcategoria in subcategorias %}
               {% if subcategoria.categoria == categoria %}
               <h5>{{ subcategoria.nome }}</h5>
