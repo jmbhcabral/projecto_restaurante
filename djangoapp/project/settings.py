@@ -218,3 +218,12 @@ LOGGING = {
         },
     },
 }
+# TODO: Remover
+# Email configuration local
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Email configuration real
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# Frontend URL
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'change-me')

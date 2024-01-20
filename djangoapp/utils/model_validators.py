@@ -39,6 +39,11 @@ def calcular_pontos(produto, fidelidade):
     ementa = fidelidade.ementa
     preco_field = ementa.nome_campo_preco_selecionado
     preco = getattr(produto, preco_field)
+    if preco is None:
+        raise ValueError(
+            f'O produto {produto} não tem um preço definido no campo '
+            f'{preco_field}'
+        )
     preco_int = int(preco * 100)
     desconto = fidelidade.desconto
     pontos_necessarios = int(preco_int / (desconto / 100))

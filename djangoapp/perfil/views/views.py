@@ -11,6 +11,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from restau.models import ActiveSetup
+from utils.email_confirmation import send_confirmation_email
 
 
 class BasePerfil(View):
@@ -75,11 +76,15 @@ class Criar(BasePerfil):
 
         usuario = self.userform.save(commit=False)
         usuario.set_password(password)
+        usuario.is_active = False
         usuario.save()
 
         perfil = self.perfilform.save(commit=False)
         perfil.usuario = usuario
         perfil.save()
+
+        # send_confirmation_email(usuario)
+        send_confirmation_email(usuario)
 
         if password:
             autentica = authenticate(
@@ -95,7 +100,7 @@ class Criar(BasePerfil):
             self.request,
             'Conta criada com sucesso!')
 
-        return redirect('perfil:conta')
+        return redirect('perfil:criar')
 
 
 @method_decorator(login_required, name='dispatch')

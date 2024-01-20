@@ -148,6 +148,16 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
             produto=produto, fidelidade=fidelidade).first()
 
         preco = getattr(produto, preco_field, None)
+        if preco is None:
+
+            messages.error(
+                request,
+                f'O produto { produto } não tem um'
+                f' preço definido no campo {preco_field}'
+            )
+
+            return redirect(
+                'fidelidade:fidelidade', fidelidade_id)
 
         if produto_fidelidade:
             subcategoria_nome = produto.subcategoria.nome if \
@@ -163,16 +173,16 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                 'visibilidade': produto_fidelidade.visibilidade,
             })
 
-        elif preco is None:
+        # elif preco is None:
 
-            messages.error(
-                request,
-                f'O produto { produto } não tem um'
-                f' preço definido no campo {preco_field}'
-            )
+        #     messages.error(
+        #         request,
+        #         f'O produto { produto } não tem um'
+        #         f' preço definido no campo {preco_field}'
+        #     )
 
-            return redirect(
-                'fidelidade:fidelidade')
+        #     return redirect(
+        #         'fidelidade:fidelidade', fidelidade_id)
         else:
 
             pontos_recompensa, pontos_para_oferta = calcular_pontos(
@@ -180,7 +190,8 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
             initial_data.append({
                 'produto_nome': produto.nome,
                 'categoria': produto.categoria.nome,
-                'subcategoria': produto.subcategoria.nome,
+                'subcategoria': produto.subcategoria.nome if produto
+                .subcategoria else "Sem Subcategoria",
                 'fidelidade': fidelidade.pk,
                 'produto': produto.pk,
                 'pontos_recompensa': pontos_recompensa,

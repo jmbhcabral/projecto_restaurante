@@ -1,7 +1,9 @@
 from django.urls import path
 from fidelidade.views import (
     fidelidades, criar_fidelidade, editar_fidelidade, apagar_fidelidade,
-    fidelidade, pontos_produtos_fidelidade, util_ind_fidelidade)
+    fidelidade, pontos_produtos_fidelidade, util_ind_fidelidade,
+)
+from fidelidade.views.fidel_api import ProdutoFidelidadeAPI, TotalPontosAPIV1
 
 
 app_name = 'fidelidade'
@@ -30,4 +32,16 @@ urlpatterns = [
         'fidelidade/pontos_produtos/<int:fidelidade_id>',
         pontos_produtos_fidelidade,
         name='pontos_produtos_fidelidade'),
+    # API VIEWS
+    path(
+        'fidelidade/api/v1/produtos/<int:pk>/',
+
+        ProdutoFidelidadeAPI.as_view(),
+        name='produtos_fidelidade_api_v1'),
+    path(
+        'fidelidade/api/v1/pontos/<int:pk>/',
+
+        TotalPontosAPIV1.as_view(),
+        name='pontos_fidelidade_api_v1'),
+
 ]

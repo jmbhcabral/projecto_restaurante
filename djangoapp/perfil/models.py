@@ -7,6 +7,7 @@ from utils.model_validators import validar_nif
 import qrcode
 from io import BytesIO
 from django.core.files import File
+import uuid
 
 
 class Perfil(models.Model):
@@ -206,3 +207,28 @@ class Morada(models.Model):
 
     def __str__(self):
         return self.finalidade_morada
+
+
+def generate_uuid():
+    return str(uuid.uuid4())
+
+
+class EmailConfirmationToken(models.Model):
+    class Meta:
+        verbose_name = "EmailConfirmation"
+        verbose_name_plural = "EmailConfirmations"
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="User",
+    )
+    token = models.CharField(max_length=100, default=generate_uuid)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def is_expired(self):
+        # Expira em 48 horas
+        return timezone.now() > self.created_at + timezone.timedelta(hours=48)
+
+    def __str__(self):
+        return self.token

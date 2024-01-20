@@ -102,7 +102,8 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class MyTokenRefreshSerializer(TokenRefreshSerializer):
 
     def validate(self, attrs):
-        # Chame o método validate da classe pai para realizar a validação padrão
+        # Chame o método validate da classe pai para
+        # realizar a validação padrão
         data = super().validate(attrs)
 
         # O refresh token estará disponível em data.get('refresh')
@@ -124,14 +125,76 @@ class MyTokenRefreshSerializer(TokenRefreshSerializer):
         print(message)
 
 
+class ProdutosPorSubcategoriaSerializer(serializers.ModelSerializer):
+    produtos = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SubCategory
+        fields = [
+            'id', 'nome', 'produtos'
+        ]
+
+    def get_produtos(self, subcategoria):
+        produtos = Products.objects.filter(
+            subcategoria=subcategoria,
+            ementas__id=self.context['ementa_id']
+        ).order_by('ordem')
+        return ProdutoSerializer(
+            produtos,
+            many=True,
+            context=self.context
+        ).data
+
+
+class CategoriaComSubcategoriaSerializer(serializers.ModelSerializer):
+    subcategorias = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Category
+        fields = [
+            'id', 'nome', 'subcategorias'
+        ]
+
+    def get_subcategorias(self, categoria):
+        subcategorias = SubCategory.objects.filter(
+            categoria=categoria
+        ).order_by('ordem')
+        return ProdutosPorSubcategoriaSerializer(
+            subcategorias,
+            many=True,
+            context=self.context
+        ).data
+
+
 class ProdutosEmentaSerializer(serializers.ModelSerializer):
-    produtos = ProdutoSerializer(
-        many=True,
-        read_only=True,
-    )
+    categorias = serializers.SerializerMethodField()
 
     class Meta:
         model = Ementa
         fields = [
-            'nome', 'descricao', 'nome_campo_preco_selecionado', 'produtos',
+            'nome', 'descricao', 'nome_campo_preco_selecionado', 'categorias',
         ]
+
+    def get_categorias(self, obj):
+        subcategorias_ids = obj.produtos.all().values_list(
+            'subcategoria', flat=True
+        )
+        categorias = Category.objects.filter(
+            subcategory__id__in=subcategorias_ids
+        ).distinct().order_by('ordem')
+        return CategoriaComSubcategoriaSerializer(
+            categorias,
+            many=True,
+            context={'ementa_id': obj.id, 'request': self.context['request']})\
+            .data
+    # def get_produtos(self, obj):
+    #     # Recupera os produtos e os ordena
+    #     produtos_ordenados = obj.produtos.all().order_by(
+    #         'categoria__ordem',
+    #         'subcategoria__ordem',
+    #         'ordem'
+    #     )
+    #     return ProdutoSerializer(
+    #         produtos_ordenados,
+    #         many=True,
+    #         context=self.context).data
