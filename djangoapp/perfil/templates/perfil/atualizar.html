@@ -2,12 +2,14 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <section class="conta">
-        <div class="conta-menu"> 
-            <a href="{% url "perfil:conta" %}">Conta</a>
-            <a href="{% url "perfil:atualizar" %}"><strong>Atualizar dados</strong></a>
-            <a href="" class="">Alterar Password</a>
-            <a href="{% url "perfil:cartao_cliente" %}" class="">Cartão cliente</a>
-            <a href="{% url "perfil:vantagens" %}" class="">Vantagens</a>
+        <div class="conta-menu">
+            <ul>
+                <li><a href="{% url "perfil:conta" %}">Conta</a></li>
+                <li><a href="{% url "perfil:atualizar" %}"><strong>Atualizar dados</strong></a></li>
+                <li><a href="{% url "perfil:change_password" %}" class="">Alterar Password</a></li>
+                <li><a href="{% url "perfil:cartao_cliente" %}" class="">Cartão cliente</a></li>
+                <li><a href="{% url "perfil:vantagens" %}" class="">Vantagens</a></li>
+            </ul>
         </div>
         <div class="conta-content">
             <p>Atualize os campos abaixo.</p>

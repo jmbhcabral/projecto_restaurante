@@ -1,5 +1,6 @@
 from django.urls import path
 from restau import views
+from restau.views.versao_api_view import UltimaVersaoAPIView
 from restau.views import (
     MyTokenObtainPairView, MyTokenRefreshView
 )
@@ -17,7 +18,7 @@ app_name = 'restau'
 produto_api_v1_router = SimpleRouter()
 produto_api_v1_router.register(
     'produtos/api/v1',
-    views.ProdutosAPIv1ViewSet,  # type: ignore
+    views.ProdutosAPIv1ViewSet,
     basename='produtos-api'
 )
 # se não tiver outras urls sem ser de api
@@ -33,6 +34,11 @@ urlpatterns = [
         'restau/pages/encomendas/',
         views.encomendas,  # type: ignore
         name='encomendas'
+    ),
+    path(
+        'restau/pages/programa_fidelidade/',
+        views.programa_fidelidade,  # type: ignore
+        name='programa_fidelidade'
     ),
     path(
         'restau/pages/admin_home/',
@@ -467,7 +473,12 @@ urlpatterns = [
         'restau/pages/movimentos/<int:utilizador_id>/',
         views.movimentos,  # type: ignore
         name='movimentos'),
-
+    # Versão API
+    path(
+        'restau/api/mobile_app/',
+        UltimaVersaoAPIView.as_view(),
+        name='ultima_versao_api'
+    ),
     # User Ementa API
     path(
         'ementa/api/v1/user/<int:pk>/',

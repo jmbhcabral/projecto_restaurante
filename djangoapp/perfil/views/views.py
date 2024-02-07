@@ -12,6 +12,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from restau.models import ActiveSetup
 from utils.email_confirmation import send_confirmation_email
+from perfil.models import EmailConfirmationToken, PasswordResetToken
+from utils.reset_password_email import reset_password_email
+from django.conf import settings
+from perfil.forms import (ResetPasswordForm, RequestResetPasswordForm,
+                          ChangePasswordForm)
 
 
 class BasePerfil(View):
@@ -107,6 +112,17 @@ class Criar(BasePerfil):
 class Atualizar(BasePerfil):
     template_name = 'perfil/atualizar.html'
 
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        # Aqui ajustamos o userform para o contexto de atualização
+        if self.request.user.is_authenticated:
+            self.context['userform'] = perfil_forms.UserForm(
+                data=self.request.POST or None,
+                instance=self.request.user,
+                usuario=self.request.user,
+                updating=True,  # Agora estamos passando explicitamente que é uma atualização
+            )
+
     def get(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return redirect('perfil:criar')
@@ -118,7 +134,7 @@ class Atualizar(BasePerfil):
             return self.renderizar
 
         username = self.userform.cleaned_data.get('username')
-        password = self.userform.cleaned_data.get('password')
+        # password = self.userform.cleaned_data.get('password')
         email = self.userform.cleaned_data.get('email')
         first_name = self.userform.cleaned_data.get('first_name')
         last_name = self.userform.cleaned_data.get('last_name')
@@ -131,8 +147,8 @@ class Atualizar(BasePerfil):
 
             usuario.username = username
 
-            if password:
-                usuario.set_password(password)
+            # if password:
+            #     usuario.set_password(password)
 
             usuario.email = email
             usuario.first_name = first_name
@@ -157,20 +173,55 @@ class Atualizar(BasePerfil):
             )
             return redirect('perfil:criar')
 
-        if password:
-            autentica = authenticate(
-                self.request,
-                username=usuario,
-                password=password
-            )
+        # if password:
+        #     autentica = authenticate(
+        #         self.request,
+        #         username=usuario,
+        #         password=password
+        #     )
 
-            if autentica:
-                login(self.request, user=usuario)
+        #     if autentica:
+        #         login(self.request, user=usuario)
 
         messages.success(
             self.request,
             'Conta atualizada com sucesso!')
 
+        return redirect('perfil:conta')
+
+
+class ChangePasswordView(BasePerfil):
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+
+        if self.request.user.is_authenticated:
+            self.template_name = 'perfil/change_password.html' if self.request.user.is_authenticated else 'perfil/criar.html'
+
+        self.context = {
+            'active_setup': self.context['active_setup'],
+            'form': perfil_forms.ChangePasswordForm(
+                data=self.request.POST or None,
+            )
+        }
+
+    def get(self, *args, **kwargs):
+        return render(self.request, self.template_name, self.context)
+
+    def post(self, *args, **kwargs):
+        form = self.context['form']
+        if not form.is_valid():
+            return render(self.request, self.template_name, self.context)
+
+        password = form.cleaned_data.get('password')
+        user = self.request.user
+        user.set_password(password)
+        user.save()
+
+        messages.success(
+            self.request,
+            'Senha alterada com sucesso!'
+        )
         return redirect('perfil:conta')
 
 
@@ -351,3 +402,171 @@ class Vantagens(View):
         if not self.request.user.is_authenticated:
             return redirect('perfil:criar')
         return render(self.request, self.template_name, self.context)
+
+
+class ConfirmarEmail(View):
+    def get(self, request, token):
+        # Tenta encontrar o token no banco de dados
+        token = get_object_or_404(
+            EmailConfirmationToken, token=token
+        )
+        print('token: ', token)
+        print('token.user.is_active: ', token.user.is_active)
+        # verifica se o token já foi utilizado ou expirou
+        print('token.is_expired(): ', token.is_expired())
+        if token.user.is_active or token.is_expired():
+            messages.error(
+                request,
+                'Este link já foi utilizado ou expirou!'
+            )
+            return redirect('perfil:criar')
+
+        # Ativa o usuário e salva no banco de dados
+        token.user.is_active = True
+        print('token.user.is_active: ', token.user.is_active)
+        token.user.save()
+
+        # Deleta o token do banco de dados
+        # token.delete()
+
+        messages.success(
+            request,
+            'Email confirmado com sucesso!'
+        )
+        return redirect('perfil:criar')
+
+
+class RequestResetPasswordView(View):
+    template_name = 'perfil/request_reset_password.html'
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+
+        active_setup = ActiveSetup.objects \
+            .order_by('-id') \
+            .first()
+
+        self.context = {
+            'active_setup': active_setup,
+            'form': RequestResetPasswordForm() if not self.request.user.is_authenticated else None,
+        }
+
+    def get(self, request):
+        # form = RequestResetPasswordForm()
+        # renderizar o template com o formulário para digitar o email
+        return render(self.request, self.template_name, self.context)
+
+    def post(self, request):
+        email = request.POST.get('email')
+        user = User.objects.filter(email=email).first()
+        form = RequestResetPasswordForm(request.POST)
+
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            reset_password_email(user)
+            messages.success(
+                request,
+                'Email enviado com sucesso!'
+            )
+            return redirect('perfil:request_reset_password')
+        else:
+            messages.error(
+                request,
+                'Erro ao enviar o email!'
+            )
+            return redirect('perfil:request_reset_password')
+
+
+class ResetPasswordView(View):
+    # template_name = 'perfil/reset_password.html/{token}'
+
+    def setup(self, *args, **kwargs):
+
+        super().setup(*args, **kwargs)
+
+        active_setup = ActiveSetup.objects \
+            .order_by('-id') \
+            .first()
+
+        self.context = {
+            'active_setup': active_setup,
+        }
+
+    def get(self, request, token):
+
+        # Tenta encontrar o token no banco de dados
+        print('token: ', token)
+        token = get_object_or_404(
+            PasswordResetToken, token=token
+        )
+        if request.user.is_authenticated:
+            messages.error(
+                request,
+                'Você já está logado!'
+            )
+            return redirect('perfil:conta')
+
+        # verifica se o token já foi utilizado ou expirou
+        if token.is_expired() or token.used:
+            messages.error(
+                request,
+                'Este link já foi utilizado ou expirou!'
+            )
+            return redirect('perfil:request_reset_password')
+
+        form = ResetPasswordForm()
+
+        # renderizar o template com o formulário para digitar a nova senha
+        return render(
+            request,
+            'perfil/reset_password.html',
+            {
+                'active_setup': self.context['active_setup'],
+                'form': form,
+                'token': token
+            }
+        )
+
+    def post(self, request, token):
+        # Tenta encontrar o token no banco de dados
+        reset_token = get_object_or_404(
+            PasswordResetToken, token=token, used=False
+        )
+
+        # verifica se o token já foi utilizado ou expirou
+        if reset_token.is_expired():
+            messages.error(
+                request,
+                'Este link já foi utilizado ou expirou!'
+            )
+            return redirect('perfil:request_reset_password')
+
+        # Atualiza a senha do usuário e salva no banco de dados
+        form = ResetPasswordForm(request.POST)
+        if form.is_valid():
+            new_password = request.POST.get('password')
+            user = reset_token.user
+            user.set_password(new_password)
+            user.save()
+            reset_token.used = True
+            reset_token.save()
+            # Redireciona para a página de login
+            messages.success(
+                request,
+                'Senha alterada com sucesso!'
+            )
+            return redirect('perfil:criar')
+        else:
+            messages.error(
+                request,
+                'Erro ao alterar a senha!'
+            )
+            return render(
+                request,
+                'perfil/reset_password.html',
+                {
+                    'active_setup': self.context['active_setup'],
+                    'form': form,
+                    'token': token
+                }
+            )

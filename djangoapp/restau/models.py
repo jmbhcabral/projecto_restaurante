@@ -880,3 +880,34 @@ class ProdutosEmenta(models.Model):
 
     def __str__(self):
         return self.ementa.nome
+
+
+class VersaoApp(models.Model):
+    class Meta:
+        verbose_name = 'Gerenciar Versão'
+        verbose_name_plural = 'Gerenciar Versões'
+
+    numero_versao = models.CharField(
+        max_length=10,
+        verbose_name='Versão',
+        blank=True,
+        null=True,
+        default='',
+    )
+
+    url_download = models.URLField(verbose_name='URL Download')
+
+    notas_versao = models.TextField(
+        max_length=200,
+        verbose_name='Notas da Versão',
+        blank=True,
+        null=True,
+        default='',
+    )
+
+    data_lancamento = models.DateTimeField(
+        verbose_name='Data de Lançamento',
+    )
+
+    def __str__(self):
+        return self.numero_versao

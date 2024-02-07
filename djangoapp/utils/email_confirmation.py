@@ -12,7 +12,7 @@ def send_confirmation_email(user):
         'Confirmação de email',
         f'Olá {user.username},\n\n'
         'Para confirmar o seu email, por favor clique no link abaixo:\n\n'
-        f'{settings.FRONTEND_URL}/confirmacao-email/{token}\n\n'
+        f'{settings.FRONTEND_URL}/confirmacao_email/{token}\n\n'
         'Obrigado!',
         settings.EMAIL_HOST_USER,
         [user.email],

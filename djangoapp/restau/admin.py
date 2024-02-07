@@ -5,6 +5,7 @@ from restau.models import (
     ProdutosEmenta, Fotos, ActiveSetup, ImagemLogo, ImagemTopo, Intro,
     IntroImagem, FraseInspiradora, ImagemFraseCima, FraseCima, FraseBaixo,
     ImagemFraseBaixo, ImagemPadrao, ContactosSite, GoogleMaps, Horario,
+    VersaoApp
 )
 
 
@@ -182,3 +183,13 @@ class ProdutosEmentaAdmin(admin.ModelAdmin):
         return ", ".join([str(p) for p in obj.produto.all()])
 
     produtos_in_ementa.short_description = 'Produtos na Ementa'
+
+
+@admin.register(VersaoApp)
+class VersaoAppAdmin(admin.ModelAdmin):
+    list_display = ('id', 'numero_versao', 'notas_versao', 'data_lancamento')
+    list_display_links = ('id', 'numero_versao',
+                          'notas_versao', 'data_lancamento')
+
+    def has_add_permission(self, request):
+        return not VersaoApp.objects.exists()

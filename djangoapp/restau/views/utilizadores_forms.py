@@ -22,6 +22,7 @@ def compras_utilizador(request, utilizador_id):
             compras = form.save(commit=False)
             compras.utilizador = user
             compras.fidelidade = user.perfil.tipo_fidelidade
+            print('compras: ', compras)
             compras.save()
             return redirect(
                 'restau:compras_utilizador',
@@ -72,6 +73,11 @@ def ofertas_utilizador(request, utilizador_id):
                 ofertas.utilizador = user
                 ofertas.fidelidade = user.perfil.tipo_fidelidade
                 ofertas.save()
+            else:
+                messages.error(
+                    request,
+                    'Pontos insuficientes para realizar a oferta.'
+                )
             return redirect(
                 'restau:ofertas_utilizador',
                 utilizador_id=utilizador_id

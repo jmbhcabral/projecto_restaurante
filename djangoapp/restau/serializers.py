@@ -3,7 +3,7 @@ from .models import Category, SubCategory, Products
 from rest_framework_simplejwt.serializers import (
     TokenObtainPairSerializer, TokenRefreshSerializer
 )
-from .models import Ementa
+from .models import Ementa, VersaoApp
 
 
 class ProdutoSerializer(serializers.ModelSerializer):
@@ -187,14 +187,11 @@ class ProdutosEmentaSerializer(serializers.ModelSerializer):
             many=True,
             context={'ementa_id': obj.id, 'request': self.context['request']})\
             .data
-    # def get_produtos(self, obj):
-    #     # Recupera os produtos e os ordena
-    #     produtos_ordenados = obj.produtos.all().order_by(
-    #         'categoria__ordem',
-    #         'subcategoria__ordem',
-    #         'ordem'
-    #     )
-    #     return ProdutoSerializer(
-    #         produtos_ordenados,
-    #         many=True,
-    #         context=self.context).data
+
+
+class VersaoAppSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VersaoApp
+        fields = [
+            'numero_versao', 'url_download', 'notas_versao', 'data_lancamento'
+        ]

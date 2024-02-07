@@ -2,21 +2,29 @@
 {% block content %}
     <section class="conta">
         <div class="conta-menu">
-            <a href="{% url 'perfil:conta' %}"><strong>Conta</strong></a>
-            <a href="{% url 'perfil:atualizar' %}" class="">Atualizar dados</a>
-            <a href="" class="">Alterar Password</a>
-            <a href="{% url 'perfil:cartao_cliente' %}" class="">Cartão cliente</a>
-            <a href="{% url 'perfil:vantagens' %}" class="">Vantagens</a>
+            <ul>
+                <li><a href="{% url 'perfil:conta' %}"><strong>Conta</strong></a></li>
+                <li><a href="{% url 'perfil:atualizar' %}" class="">Atualizar dados</a></li>
+                <li><a href="{% url 'perfil:change_password' %}" class="">Alterar Password</a></li>
+                <li><a href="{% url 'perfil:cartao_cliente' %}" class="">Cartão cliente</a></li>
+                <li><a href="{% url 'perfil:vantagens' %}" class="">Vantagens</a></li>
+            </ul>
         </div>
         <div class="conta-content">
             <p>Olá {{ user.first_name }}, bemvindo á sua area de utilizador.
             Aqui pode alterar os seus dados, ver as suas vantagens e muito mais.
             </p>
+            {% if total_pontos > 0 %}
             <p>
                 Tem na sua conta fidelidade {{ total_pontos }} pontos.
                 Recebeu {{total_recompensas}} pontos de recompensa.
                 Gastou {{total_ofertas}} pontos.
             </p>
+            {% else %}
+            <p>
+                Ainda não tem pontos na sua conta fidelidade.
+            </p>
+            {% endif %}
         </div>
         
     </section>

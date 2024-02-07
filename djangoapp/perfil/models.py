@@ -228,7 +228,37 @@ class EmailConfirmationToken(models.Model):
 
     def is_expired(self):
         # Expira em 48 horas
-        return timezone.now() > self.created_at + timezone.timedelta(hours=48)
+        tempo_expiracao = self.created_at + timezone.timedelta(hours=48)
+        print('created_at', self.created_at)
+        print('timezone.now()', timezone.now())
+        print('tempo_expiracao', tempo_expiracao)
+        return tempo_expiracao < timezone.now()
+
+    def __str__(self):
+        return self.token
+
+
+class PasswordResetToken(models.Model):
+    class Meta:
+        verbose_name = "PasswordResetToken"
+        verbose_name_plural = "PasswordResetTokens"
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="User",
+    )
+    token = models.CharField(max_length=100, default=generate_uuid)
+    created_at = models.DateTimeField(default=timezone.now)
+    used = models.BooleanField(default=False)
+
+    def is_expired(self):
+        # Expira em 24 horas
+        tempo_expiracao = self.created_at + timezone.timedelta(hours=24)
+        print('created_at', self.created_at)
+        print('timezone.now()', timezone.now())
+        print('tempo_expiracao', tempo_expiracao)
+        return tempo_expiracao < timezone.now()
 
     def __str__(self):
         return self.token

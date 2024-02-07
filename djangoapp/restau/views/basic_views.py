@@ -52,3 +52,15 @@ def index(request):
          'horarios_ordenados': horarios_ordenados,
          },
     )
+
+
+def programa_fidelidade(request):
+
+    active_setup = ActiveSetup.objects.get()
+
+    return render(
+        request,
+        'restau/pages/programa_fidelidade.html',
+        {'active_setup': active_setup,
+         },
+    )

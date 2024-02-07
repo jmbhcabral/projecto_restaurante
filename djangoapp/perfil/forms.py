@@ -135,9 +135,19 @@ class UserForm(forms.ModelForm):
         # help_text='Deixe em branco para não alterar.'
     )
 
-    def __init__(self, usuario=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        usuario = kwargs.pop('usuario', None)
+        updating = kwargs.pop('updating', False)
+        super(UserForm, self).__init__(*args, **kwargs)
+
         self.usuario = usuario
+
+        if updating:
+            # se estiver a atualizar remover os campos de password
+            if 'password' in self.fields:
+                del self.fields['password']
+            if 'password2' in self.fields:
+                del self.fields['password2']
 
         if usuario:
             self.fields['username'].widget.attrs['readonly'] = True
@@ -214,3 +224,112 @@ class UserForm(forms.ModelForm):
         if self.usuario and 'username' in self.changed_data:
             validation_error_msgs['username'] = 'O utilizador não pode \
             ser alterado.'
+
+
+class ChangePasswordForm(forms.Form):
+    password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(),
+        label='Palavra-passe',
+        help_text='Escolha Password.'
+    )
+
+    password2 = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(),
+        label='Confirmação Palavra-passe',
+        help_text='Confirme Password.'
+    )
+
+    def clean(self, *args, **kwargs):
+        cleaned_data = super().clean()
+        validation_error_msgs = {}
+
+        password_data = cleaned_data.get('password')
+        password2_data = cleaned_data.get('password2')
+
+        error_msg_passwords_not_match = 'As palavras-passe não coincidem.'
+        error_msg_password_short = (
+            'A palavra-passe deve ter no mínimo 6 caracteres.'
+        )
+        if password_data:
+            if len(password_data) < 6:
+                validation_error_msgs['password'] = \
+                    error_msg_password_short
+
+            if password_data != password2_data:
+                validation_error_msgs['password'] = \
+                    error_msg_passwords_not_match
+                validation_error_msgs['password2'] = \
+                    error_msg_passwords_not_match
+
+        if validation_error_msgs:
+            print(validation_error_msgs)
+            raise (forms.ValidationError(validation_error_msgs))
+
+
+class RequestResetPasswordForm(forms.Form):
+    email = forms.EmailField(
+        required=True,
+        label='Endereço de email',
+        help_text='Seu endereço de email.'
+    )
+
+    def clean(self, *args, **kwargs):
+        cleaned_data = super().clean()
+        validation_error_msgs = {}
+
+        email_data = cleaned_data.get('email')
+
+        error_msg_email_not_exists = 'Este email não existe.'
+
+        email_db = User.objects.filter(email=email_data).first()
+
+        if not email_db:
+            validation_error_msgs['email'] = error_msg_email_not_exists
+
+        if validation_error_msgs:
+            raise (forms.ValidationError(validation_error_msgs))
+        return cleaned_data
+
+
+class ResetPasswordForm(forms.Form):
+    password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(),
+        label='Palavra-passe',
+        help_text='Escolha Password.'
+    )
+
+    password2 = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(),
+        label='Confirmação Palavra-passe',
+        help_text='Confirme Password.'
+    )
+
+    def clean(self, *args, **kwargs):
+        cleaned_data = super().clean()
+        validation_error_msgs = {}
+
+        password_data = cleaned_data.get('password')
+        password2_data = cleaned_data.get('password2')
+
+        error_msg_passwords_not_match = 'As palavras-passe não coincidem.'
+        error_msg_password_short = (
+            'A palavra-passe deve ter no mínimo 6 caracteres.'
+        )
+        if password_data:
+            if len(password_data) < 6:
+                validation_error_msgs['password'] = \
+                    error_msg_password_short
+
+            if password_data != password2_data:
+                validation_error_msgs['password'] = \
+                    error_msg_passwords_not_match
+                validation_error_msgs['password2'] = \
+                    error_msg_passwords_not_match
+
+        if validation_error_msgs:
+            print(validation_error_msgs)
+            raise (forms.ValidationError(validation_error_msgs))

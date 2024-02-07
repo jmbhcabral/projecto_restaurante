@@ -8,6 +8,7 @@ from django.core.validators import validate_email as django_validate_email
 from django.utils import timezone
 import logging
 from django.contrib.auth.hashers import check_password
+from utils.email_confirmation import send_confirmation_email
 
 logger = logging.getLogger(__name__)
 
@@ -221,10 +222,15 @@ class UserRegistrationSerializer(ModelSerializer):
             email=email,
             first_name=first_name,
             last_name=last_name,
+            is_active=False,
         )
 
         user.set_password(password)
         user.save()
+
+        # Enviar email de ativação
+        send_confirmation_email(user)
+
         if perfil_data:
             perfil_data['ultima_atualizacao_data_nascimento'] = timezone.now()
             Perfil.objects.create(usuario=user, **perfil_data)

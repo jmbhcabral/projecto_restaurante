@@ -2,11 +2,13 @@
 {% block content %}
     <section class="conta">
         <div class="conta-menu">
-            <a href="{% url 'perfil:conta' %}">Conta</a>
-            <a href="{% url 'perfil:atualizar' %}" class="">Atualizar dados</a>
-            <a href="" class="">Alterar Password</a>
-            <a href="{% url 'perfil:cartao_cliente' %}" class=""><strong>Cartão cliente</strong></a>
-            <a href="{% url 'perfil:vantagens' %}" class="">Vantagens</a>
+            <ul>
+                <li><a href="{% url 'perfil:conta' %}">Conta</a></li>
+                <li><a href="{% url 'perfil:atualizar' %}" class="">Atualizar dados</a></li>
+                <li><a href="{% url 'perfil:change_password' %}" class="">Alterar Password</a></li>
+                <li><a href="{% url 'perfil:cartao_cliente' %}" class=""><strong>Cartão cliente</strong></a></li>
+                <li><a href="{% url 'perfil:vantagens' %}" class="">Vantagens</a></li>
+            </ul>
         </div>
         <div class="conta-content">
             <p>{{ user.username }}</p>

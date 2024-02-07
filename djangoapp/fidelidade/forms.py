@@ -174,6 +174,14 @@ class ComprasFidelidadeForm(forms.ModelForm):
         required=False,
     )
 
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        pontos_obtidos = cleaned_data.get('pontos_adicionados')
+        desconto = cleaned_data.get('fidelidade').desconto
+        pontos_adicionados = round(pontos_obtidos * desconto / 100, 2)
+        print('pontos_adicionados: ', pontos_adicionados)
+        cleaned_data['pontos_adicionados'] = pontos_adicionados
+
     def __init__(self, *args, **kwargs):
         fidelidade_id = kwargs.pop('fidelidade_id', None)
         utilizador_pk = kwargs.pop('utilizador_pk', None)

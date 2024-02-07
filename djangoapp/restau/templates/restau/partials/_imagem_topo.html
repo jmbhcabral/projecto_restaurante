@@ -1,14 +1,14 @@
 {% if active_setup %}
-{% if active_setup.active_imagem_topo %}
-    <img class="imagem-topo" src="{{active_setup.active_imagem_topo.imagem.url }}" loading="lazy" alt="{{ active_setup.active_imagem_topo.imagem.nome }}">
-{% else %}
-    <h1>Extreme Way</h1>
-{% endif %}
+    {% if active_setup.active_imagem_topo %}
+        <img class="imagem-topo" src="{{active_setup.active_imagem_topo.imagem.url }}" loading="lazy" alt="{{ active_setup.active_imagem_topo.imagem.nome }}">
+    {% else %}
+        <h1>Extreme Way</h1>
+    {% endif %}
 {% endif %}
 <main class="section-content-wide section-gap front-content">
     <section class="section-gap white-bg top-background">
         <div class="separator"></div>
-        <h1 class="center">Hamburgueria artesanal</h1>
+            <h1 class="center">Hamburgueria artesanal</h1>
         <div class="separator "></div>
         {% include "restau/partials/_messages.html" %}
     </section>
