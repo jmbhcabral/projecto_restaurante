@@ -41,12 +41,9 @@ def adicionar_foto(request):
 
 
 def povoar_galeria(request):
-    # fotos = Fotos.objects.all().order_by('id')
-
     form_action = reverse('restau:povoar_galeria')
 
     if request.method == 'POST':
-        print('request.POST: ', request.POST)
         formset = FotosFormSet(
             request.POST,
             request.FILES,
@@ -77,7 +74,6 @@ def povoar_galeria(request):
             return redirect('restau:povoar_galeria')
 
         else:
-            print('formset is not valid')
             print('formset.errors: ', formset.errors)
 
         context = {

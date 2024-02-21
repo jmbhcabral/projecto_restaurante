@@ -8,7 +8,6 @@ import qrcode
 from io import BytesIO
 from django.core.files import File
 import uuid
-import json
 
 
 class Perfil(models.Model):
@@ -228,9 +227,6 @@ class EmailConfirmationToken(models.Model):
     def is_expired(self):
         # Expira em 48 horas
         tempo_expiracao = self.created_at + timezone.timedelta(hours=48)
-        print('created_at', self.created_at)
-        print('timezone.now()', timezone.now())
-        print('tempo_expiracao', tempo_expiracao)
         return tempo_expiracao < timezone.now()
 
     def __str__(self):
@@ -254,9 +250,6 @@ class PasswordResetToken(models.Model):
     def is_expired(self):
         # Expira em 24 horas
         tempo_expiracao = self.created_at + timezone.timedelta(hours=24)
-        print('created_at', self.created_at)
-        print('timezone.now()', timezone.now())
-        print('tempo_expiracao', tempo_expiracao)
         return tempo_expiracao < timezone.now()
 
     def __str__(self):

@@ -92,11 +92,6 @@ class RegisterUserView(viewsets.ModelViewSet):
         perfil_instance = Perfil.objects.filter(
             usuario=user_instance).first()
 
-        print('user_instance', user_instance)
-        print('request.data', request.data)
-        print('request.user', request.user)
-        print('request.user.id', request.user.id)
-
         # Passando a instância para o serializador
         serializer = UserRegistrationSerializer(
             user_instance,
@@ -108,14 +103,10 @@ class RegisterUserView(viewsets.ModelViewSet):
             }
         )
 
-        print('serializer', serializer)
-
         if serializer.is_valid():
             serializer.save()
-            print('serializer.data', serializer.data)
             return Response(serializer.data)
         else:
-            print('serializer.errors', serializer.errors)
             return Response(
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST

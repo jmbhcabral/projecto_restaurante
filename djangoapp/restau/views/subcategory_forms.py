@@ -20,9 +20,7 @@ def criar_subcategoria(request):
         }
 
         if form.is_valid():
-            print(f'form is valid: {form.is_valid()}')
             subcategoria = form.save()
-            print('form saved')
             return redirect('restau:atualizar_subcategoria',
                             subcategoria_id=subcategoria.id)
 
@@ -146,9 +144,7 @@ def ordenar_subcategorias(request):
         }
 
         if subformset.is_valid():
-            print(f'Subformset is valid: {subformset.is_valid()}')
             subformset.save()  # Salva o formset diretamente
-            print('Subformset saved')
             return redirect('restau:ordenar_subcategorias',)
 
         else:
@@ -166,11 +162,7 @@ def ordenar_subcategorias(request):
         'subformset': subformset,
         'form_action': form_action,
     }
-    print('-------------------------------------')
-    print('-------------Debugging---------------')
-    print('-------------------------------------')
-    print('-------------------------------------')
-    print(context)
+
     return render(
         request,
         'restau/pages/ordenar_subcategorias.html',

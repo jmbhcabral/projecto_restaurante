@@ -187,16 +187,10 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                 'pontos_para_oferta': pontos_para_oferta,
                 'visibilidade': False,
             })
-    print('initial data: ', initial_data)
-
-    print('aqui-get')
 
     if request.method == 'POST':
-        print('request is post:', request.POST)
         formset = ProdutoFidelidadeIndividualFormSet(
             request.POST,)
-        print('aqui-post')
-        print('post formset: ', formset)
 
         if formset.is_valid():
             for form in formset:
@@ -206,9 +200,7 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                     print('produto atual: ', produto_atual.nome)
 
                 if form.has_changed():
-                    print('form changed')
                     produto = form.cleaned_data['produto']
-                    print('produto:', produto)
                     fidelidade = form.cleaned_data['fidelidade']
                     pontos_recompensa = form.cleaned_data['pontos_recompensa']
                     pontos_para_oferta = (
@@ -237,7 +229,6 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
 
         else:
             print('formset: ', formset)
-            print('AQUI')
             print('formset is not valid')
             for e in formset.errors:
                 print('ERRO:', e)
@@ -270,7 +261,6 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
             'subcategorias': subcategorias,
             'ementa': ementa,
             'produtos': produtos,
-            # 'produto': produto,
             'formset': formset,
             'form_action': form_action,
         }

@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
-from perfil.models import Perfil
 from fidelidade.forms import ComprasFidelidadeForm, OfertasFidelidadeForm
 from fidelidade.models import ComprasFidelidade, OfertasFidelidade
 from django.db import models
@@ -22,7 +21,6 @@ def compras_utilizador(request, utilizador_id):
             compras = form.save(commit=False)
             compras.utilizador = user
             compras.fidelidade = user.perfil.tipo_fidelidade
-            print('compras: ', compras)
             compras.save()
             return redirect(
                 'restau:compras_utilizador',
@@ -56,16 +54,10 @@ def ofertas_utilizador(request, utilizador_id):
         'utilizador': user,
         'fidelidade': user.perfil.tipo_fidelidade.id,
     }
-    print('initial_data: ', initial_data)
 
     if request.method == 'POST':
         form = OfertasFidelidadeForm(request.POST, initial=initial_data)
-        print('form_valid: ', form.is_valid())
-        print('Initial data: ', initial_data)
-        print('User: ', user)
-        print('User perfil: ', user.perfil)
-        print('User perfil tipo fidelidade: ', user.perfil.tipo_fidelidade)
-        print('Form: ', form)
+
         if form.is_valid():
             ofertas = form.save(commit=False)
             if ofertas.pontos_gastos is not None and \

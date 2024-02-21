@@ -62,9 +62,6 @@ class BasePerfil(View):
         self.userform = self.context['userform']
         self.perfilform = self.context['perfilform']
 
-        # if self.request.user.is_authenticated:
-        #     self.template_name = 'perfil/atualizar.html'
-
         self.renderizar = render(self.request, self.template_name,
                                  self.context)
 
@@ -143,13 +140,8 @@ class Atualizar(BasePerfil):
         if self.request.user.is_authenticated:
             usuario = get_object_or_404(
                 User, username=self.request.user.username)
-            print(usuario.username)
 
             usuario.username = username
-
-            # if password:
-            #     usuario.set_password(password)
-
             usuario.email = email
             usuario.first_name = first_name
             usuario.last_name = last_name
@@ -157,7 +149,6 @@ class Atualizar(BasePerfil):
 
             if not self.perfil:
                 self.perfilform.cleaned_data['usuario'] = usuario
-                print(self.perfilform.cleaned_data)
                 perfil = perfil_models.Perfil(**self.perfilform.cleaned_data)
                 perfil.save()
 
@@ -172,16 +163,6 @@ class Atualizar(BasePerfil):
                 'Não foi possivel atualizar o perfil!'
             )
             return redirect('perfil:criar')
-
-        # if password:
-        #     autentica = authenticate(
-        #         self.request,
-        #         username=usuario,
-        #         password=password
-        #     )
-
-        #     if autentica:
-        #         login(self.request, user=usuario)
 
         messages.success(
             self.request,
@@ -284,17 +265,14 @@ class Conta(BasePerfil):
         total_recompensas = fidelidade_models.ComprasFidelidade.objects.filter(
             utilizador=self.request.user).aggregate(
             total_pontos_ganhos=models.Sum('pontos_adicionados'))
-        print('total_recompensas: ', total_recompensas)
         total_ofertas = fidelidade_models.OfertasFidelidade.objects.filter(
             utilizador=self.request.user).aggregate(
             total_pontos_gastos=models.Sum('pontos_gastos'))
-        print('total_ofertas: ', total_ofertas)
         total_recompensas_decimal = (
             total_recompensas['total_pontos_ganhos'] or 0)
         total_ofertas_decimal = total_ofertas['total_pontos_gastos'] or 0
 
         total_pontos = total_recompensas_decimal - total_ofertas_decimal
-        print('total_pontos: ', total_pontos)
 
         self.context = {
             'active_setup': active_setup,
@@ -391,10 +369,7 @@ class ConfirmarEmail(View):
         token = get_object_or_404(
             EmailConfirmationToken, token=token
         )
-        print('token: ', token)
-        print('token.user.is_active: ', token.user.is_active)
         # verifica se o token já foi utilizado ou expirou
-        print('token.is_expired(): ', token.is_expired())
         if token.user.is_active or token.is_expired():
             messages.error(
                 request,
@@ -404,7 +379,6 @@ class ConfirmarEmail(View):
 
         # Ativa o usuário e salva no banco de dados
         token.user.is_active = True
-        print('token.user.is_active: ', token.user.is_active)
         token.user.save()
 
         # Deleta o token do banco de dados
@@ -433,7 +407,6 @@ class RequestResetPasswordView(View):
         }
 
     def get(self, request):
-        # form = RequestResetPasswordForm()
         # renderizar o template com o formulário para digitar o email
         return render(self.request, self.template_name, self.context)
 
@@ -459,7 +432,6 @@ class RequestResetPasswordView(View):
 
 
 class ResetPasswordView(View):
-    # template_name = 'perfil/reset_password.html/{token}'
 
     def setup(self, *args, **kwargs):
 
@@ -476,7 +448,6 @@ class ResetPasswordView(View):
     def get(self, request, token):
 
         # Tenta encontrar o token no banco de dados
-        print('token: ', token)
         token = get_object_or_404(
             PasswordResetToken, token=token
         )
@@ -585,9 +556,7 @@ class MovimentosCliente(BasePerfil):
             total_ofertas=models.Sum('pontos_gastos'))
         total_compras_decimal = (
             total_compras['total_compras'] or 0)
-        print('total_compras_decimal: ', total_compras_decimal)
         total_ofertas_decimal = total_ofertas['total_ofertas'] or 0
-        print('total_ofertas_decimal: ', total_ofertas_decimal)
         total_pontos = total_compras_decimal - total_ofertas_decimal
 
         # Combinar as consultas

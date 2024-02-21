@@ -108,22 +108,16 @@ def escolher_logo(request,):
     form_action = reverse('restau:escolher_logo')
 
     if request.method == 'POST':
-        print('request.POST: ', request.POST)
-
         imagem_id = request.POST.get('imagem_id', None)
-        print('imagem_id: ', imagem_id)
 
         if imagem_id:
             try:
                 ImagemLogo.objects.update(is_visible=False)
-                # ImagemLogo.objects.filter(id=imagem_id).update(is_visible=True)
                 logo = ImagemLogo.objects.get(id=imagem_id)
                 logo.is_visible = True
                 logo.save()
 
                 active_setup = ActiveSetup.objects.first()
-                print("Logo object:", logo)
-                print("Active Setup object:", active_setup)
 
                 if active_setup:
                     active_setup.active_imagem_logo = logo  # type: ignore
@@ -225,10 +219,7 @@ def escolher_imagem_topo(request,):
     form_action = reverse('restau:escolher_imagem_topo')
 
     if request.method == 'POST':
-        print('request.POST: ', request.POST)
-
         imagem_id = request.POST.get('imagem_id', None)
-        print('imagem_id: ', imagem_id)
 
         if imagem_id:
             try:
@@ -238,8 +229,6 @@ def escolher_imagem_topo(request,):
                 imagem.save()
 
                 active_setup = ActiveSetup.objects.first()
-                print("Logo object:", imagem)
-                print("Active Setup object:", active_setup)
 
                 if active_setup:
                     active_setup.active_imagem_topo = imagem  # type: ignore
@@ -292,7 +281,6 @@ def criar_intro(request):
 
 
 def apagar_intro(request, ):
-    print('REQUEST: ', request.POST)
 
     form_action = reverse('restau:apagar_intro')
     if request.method == 'POST':
@@ -335,10 +323,7 @@ def escolher_intro(request,):
     form_action = reverse('restau:escolher_intro')
 
     if request.method == 'POST':
-        print('request.POST: ', request.POST)
-
         texto_id = request.POST.get('texto_id', None)
-        print('texto_id: ', texto_id)
 
         if texto_id:
             try:
@@ -348,8 +333,6 @@ def escolher_intro(request,):
                 texto.save()
 
                 active_setup = ActiveSetup.objects.first()
-                print("Logo object:", texto)
-                print("Active Setup object:", active_setup)
 
                 if active_setup:
                     active_setup.active_intro = (  # type: ignore
@@ -454,10 +437,7 @@ def escolher_intro_imagem(request,):
     form_action = reverse('restau:escolher_intro_imagem')
 
     if request.method == 'POST':
-        print('request.POST: ', request.POST)
-
         imagem_id = request.POST.get('imagem_id', None)
-        print('imagem_id: ', imagem_id)
 
         if imagem_id:
             try:
@@ -467,8 +447,6 @@ def escolher_intro_imagem(request,):
                 imagem.save()
 
                 active_setup = ActiveSetup.objects.first()
-                print("Logo object:", imagem)
-                print("Active Setup object:", active_setup)
 
                 if active_setup:
                     active_setup.active_intro_imagem = imagem  # type: ignore
@@ -564,10 +542,7 @@ def escolher_frase_cima(request,):
     form_action = reverse('restau:escolher_frase_cima')
 
     if request.method == 'POST':
-        print('request.POST: ', request.POST)
-
         texto_id = request.POST.get('texto_id', None)
-        print('texto_id: ', texto_id)
 
         if texto_id:
             try:
@@ -577,8 +552,6 @@ def escolher_frase_cima(request,):
                 texto.save()
 
                 active_setup = ActiveSetup.objects.first()
-                print("Logo object:", texto)
-                print("Active Setup object:", active_setup)
 
                 if active_setup:
                     active_setup.active_frase_cima = (  # type: ignore
@@ -684,10 +657,7 @@ def escolher_imagem_frase_cima(request,):
     form_action = reverse('restau:escolher_imagem_frase_cima')
 
     if request.method == 'POST':
-        print('request.POST: ', request.POST)
-
         imagem_id = request.POST.get('imagem_id', None)
-        print('texto_id: ', imagem_id)
 
         if imagem_id:
             try:
@@ -697,8 +667,6 @@ def escolher_imagem_frase_cima(request,):
                 imagem.save()
 
                 active_setup = ActiveSetup.objects.first()
-                print("Logo object:", imagem)
-                print("Active Setup object:", active_setup)
 
                 if active_setup:
                     active_setup.active_imagem_frase_cima = (  # type: ignore
@@ -797,10 +765,7 @@ def escolher_frase_central(request,):
     form_action = reverse('restau:escolher_frase_central')
 
     if request.method == 'POST':
-        print('request.POST: ', request.POST)
-
         texto_id = request.POST.get('texto_id', None)
-        print('texto_id: ', texto_id)
 
         if texto_id:
             try:
@@ -810,8 +775,6 @@ def escolher_frase_central(request,):
                 texto.save()
 
                 active_setup = ActiveSetup.objects.first()
-                print("Logo object:", texto)
-                print("Active Setup object:", active_setup)
 
                 if active_setup:
                     active_setup.active_frase_inspiradora = (  # type: ignore
@@ -910,10 +873,7 @@ def escolher_frase_baixo(request,):
     form_action = reverse('restau:escolher_frase_baixo')
 
     if request.method == 'POST':
-        print('request.POST: ', request.POST)
-
         texto_id = request.POST.get('texto_id', None)
-        print('texto_id: ', texto_id)
 
         if texto_id:
             try:
@@ -923,8 +883,6 @@ def escolher_frase_baixo(request,):
                 texto.save()
 
                 active_setup = ActiveSetup.objects.first()
-                print("Logo object:", texto)
-                print("Active Setup object:", active_setup)
 
                 if active_setup:
                     active_setup.active_frase_baixo = (  # type: ignore
@@ -1030,10 +988,7 @@ def escolher_imagem_frase_baixo(request,):
     form_action = reverse('restau:escolher_imagem_frase_baixo')
 
     if request.method == 'POST':
-        print('request.POST: ', request.POST)
-
         imagem_id = request.POST.get('imagem_id', None)
-        print('texto_id: ', imagem_id)
 
         if imagem_id:
             try:
@@ -1043,8 +998,6 @@ def escolher_imagem_frase_baixo(request,):
                 imagem.save()
 
                 active_setup = ActiveSetup.objects.first()
-                print("Logo object:", imagem)
-                print("Active Setup object:", active_setup)
 
                 if active_setup:
                     active_setup.active_imagem_frase_baixo = (  # type: ignore
@@ -1150,10 +1103,7 @@ def escolher_imagem_padrao(request,):
     form_action = reverse('restau:escolher_imagem_padrao')
 
     if request.method == 'POST':
-        print('request.POST: ', request.POST)
-
         imagem_id = request.POST.get('imagem_id', None)
-        print('texto_id: ', imagem_id)
 
         if imagem_id:
             try:
@@ -1163,8 +1113,6 @@ def escolher_imagem_padrao(request,):
                 imagem.save()
 
                 active_setup = ActiveSetup.objects.first()
-                print("Logo object:", imagem)
-                print("Active Setup object:", active_setup)
 
                 if active_setup:
                     active_setup.active_imagem_padrao = (  # type: ignore
@@ -1195,7 +1143,6 @@ def escolher_imagem_padrao(request,):
 
 def criar_contatos_site(request):
     contatos = ContactosSite.objects.all().first()
-    print('contatos: ', contatos)
     form_action = reverse('restau:criar_contatos_site')
     if request.method == 'POST':
         form = ContactosSiteForm(request.POST, request.FILES)
@@ -1253,7 +1200,6 @@ def editar_contatos_site(request, contato_id):
 
 def criar_google_maps(request):
     local = GoogleMaps.objects.all().first()
-    print('locais: ', local)
     form_action = reverse('restau:criar_google_maps')
     if request.method == 'POST':
         form = GoogleMapsForm(request.POST, request.FILES)
@@ -1311,7 +1257,6 @@ def editar_google_maps(request, map_id):
 
 def criar_horario(request):
     horario = Horario.objects.all().first()
-    print('Horario: ', horario)
     form_action = reverse('restau:criar_horario')
     if request.method == 'POST':
         form = HorarioForm(request.POST, request.FILES)

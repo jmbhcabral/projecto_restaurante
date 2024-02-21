@@ -5,8 +5,7 @@ from perfil.models import Perfil
 from fidelidade.models import ComprasFidelidade, OfertasFidelidade
 from django.db import models
 from operator import attrgetter
-from datetime import datetime, timedelta
-import json
+from datetime import datetime
 
 
 def admin_utilizadores(request):
@@ -16,9 +15,7 @@ def admin_utilizadores(request):
         resultado_completo = f'CEW-{query}'
         try:
             perfil = Perfil.objects.get(numero_cliente=resultado_completo)
-            print('Perfil:', perfil)
             if perfil.tipo_fidelidade is None:
-                print('Tipo fidelidade is None')
                 messages.error(
                     request,
                     f'Cliente {resultado_completo} não tem fidelidade atribuida')
@@ -26,10 +23,6 @@ def admin_utilizadores(request):
                     'restau:admin_utilizadores')
             else:
                 usuario = User.objects.get(pk=perfil.usuario.id)
-                print('Tipo fidelidade is not None')
-                print('fidelidade id: ', perfil.tipo_fidelidade.id)
-                print('Utilizador id: ', perfil.usuario.id)
-                print('Utilizador master id: ', usuario.id)
                 return redirect(
                     'restau:admin_utilizador',
                     utilizador_pk=usuario.pk)
@@ -81,8 +74,6 @@ def admin_utilizador(request, utilizador_pk):
         'restau/pages/admin_utilizador.html',
         context
     )
-
-    # return render(request, 'restau/pages/admin_utilizador.html')
 
 
 def movimentos(request, utilizador_id):

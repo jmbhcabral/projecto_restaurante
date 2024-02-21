@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from fidelidade.models import Fidelidade, ComprasFidelidade, OfertasFidelidade
 from fidelidade.forms import ComprasFidelidadeForm, OfertasFidelidadeForm
-from perfil.models import Perfil
 from django.contrib import messages
 from django.db import models
 from django.contrib.auth.models import User
@@ -15,8 +14,7 @@ def fidelidades(request):
         return zip_longest(*args, fillvalue=fillvalue)
 
     fidelidades = Fidelidade.objects.all()
-    for fidel in fidelidades:
-        print('fidelidade: ', fidel)
+
     fidelidades_grouped = list(grouper(fidelidades, 5))
 
     context = {
@@ -91,15 +89,10 @@ def util_ind_fidelidade(request, utilizador_pk):
             }
             ofertas_form = OfertasFidelidadeForm(
                 request.POST, initial=initial_data_ofertas)
-            print('ofertas_form: ', ofertas_form.is_valid())
             cleaned_data = ofertas_form.cleaned_data
-            print('ofertas cleaned_data: ', cleaned_data)
 
             if ofertas_form.is_valid():
-                print('ofertas_form.is_valid')
                 ofertas = ofertas_form.save(commit=False)
-                print('total pontos: ', total_pontos)
-                print('ofertas.pontos_gastos: ', ofertas.pontos_gastos)
                 if ofertas.pontos_gastos is not None and \
                         total_pontos >= ofertas.pontos_gastos:
                     ofertas.fidelidade_id = user.perfil.tipo_fidelidade.id
@@ -111,14 +104,9 @@ def util_ind_fidelidade(request, utilizador_pk):
                         utilizador_pk=utilizador_pk
                     )
                 else:
-                    print('ofertas_form.errors: ', ofertas_form.errors)
                     messages.error(
                         request,
                         'Preencha o campo pontos gastos com um valor válido')
-                    # return redirect(
-                    #     'fidelidade:util_ind_fidelidade',
-                    #     utilizador_pk=utilizador_pk
-                    # )
             else:
                 print('ofertas_form.errors: ', ofertas_form.errors)
     context = {

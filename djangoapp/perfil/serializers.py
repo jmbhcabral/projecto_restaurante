@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from perfil.models import Perfil
-# from django.contrib.auth.models import User
 from rest_framework import serializers
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.validators import validate_email as django_validate_email
@@ -39,7 +38,6 @@ class PerfilSerializer(ModelSerializer):
         if perfil_instance and perfil_instance.data_nascimento == value:
             return value
         agora = timezone.now()
-        print('perfil_instance validate_data_nascimento: ', perfil_instance)
 
         if perfil_instance:
             ultima_atualizacao = perfil_instance\
@@ -56,13 +54,10 @@ class PerfilSerializer(ModelSerializer):
     def validate_telemovel(self, value):
         perfil_instance = self.context.get('perfil_instance')
         # Ignora a validação se estiver atualizando o perfil atual
-        print('perfil_instance validate_telemovel: ', perfil_instance)
         if perfil_instance and perfil_instance.telemovel == value:
             return value
 
-        print('existe telemovel: ', Perfil.objects.filter(telemovel=value).exclude(
             pk=perfil_instance.pk if perfil_instance else None).exists())
-        print('telemovel: ', value)
 
         if perfil_instance:
             print('Self.instance.pk: ', perfil_instance.pk)
@@ -112,7 +107,6 @@ class PerfilSerializer(ModelSerializer):
 
 class UserRegistrationSerializer(ModelSerializer):
     perfil = PerfilSerializer()
-    # password = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = get_user_model()
@@ -147,13 +141,15 @@ class UserRegistrationSerializer(ModelSerializer):
 
         # Se estiver atualizando e a senha for diferente da armazenada
         if self.instance and not check_password(value, self.instance.password):
-            # Aqui você pode adicionar validação adicional, como comprimento da senha
+            # Aqui você pode adicionar validação adicional, como comprimento 
+            # da senha
             if len(value) < 8:
                 raise serializers.ValidationError(
                     'A senha deve conter pelo menos 8 caracteres.')
             return value
 
-        # Se a senha fornecida for a mesma que a armazenada, ignore a atualização
+        # Se a senha fornecida for a mesma que a armazenada, ignore a 
+        # atualização
         raise serializers.SkipField()
 
     def validate(self, data):
@@ -188,7 +184,6 @@ class UserRegistrationSerializer(ModelSerializer):
         password = data.get('password')
         if 'password' in data and len(password) < 8:
             errors['password'] = 'A senha deve conter pelo menos 8 caracteres.'
-        print('password: ', password)
 
         if errors:
             raise serializers.ValidationError(errors)
@@ -204,14 +199,8 @@ class UserRegistrationSerializer(ModelSerializer):
         email = validated_data.get('email')
         first_name = validated_data.get('first_name')
         last_name = validated_data.get('last_name')
-        print('perfil_data: ', perfil_data)
-        print('password: ', password)
-        print('username: ', username)
-        print('email: ', email)
-        print('first_name: ', first_name)
-        print('last_name: ', last_name)
+        
         # Verificar se todos os campos obrigatórios estão presentes
-
         if not all([username, email, first_name, last_name, password]):
             raise serializers.ValidationError(
                 'Os campos username, email, first_name, last_name e password são obrigatórios.'

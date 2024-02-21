@@ -124,7 +124,6 @@ class ProdutoFidelidadeIndividualForm(forms.ModelForm):
         super(ProdutoFidelidadeIndividualForm, self).__init__(*args, **kwargs)
         if fidelidade_id:
             fidelidade_instance = Fidelidade.objects.get(pk=fidelidade_id)
-            print('Fidelidade_capturada_form: ', fidelidade_instance)
             self.fields['fidelidade'].queryset = Fidelidade.objects.filter(
                 ementa__fidelidade__pk=fidelidade_id)
 
@@ -179,8 +178,6 @@ class ComprasFidelidadeForm(forms.ModelForm):
         compra = cleaned_data.get('compra')
         desconto = cleaned_data.get('fidelidade').desconto
         pontos_adicionados = round(compra * desconto / 100, 2)
-        print('compra: ', compra)
-        print('pontos_adicionados: ', pontos_adicionados)
         cleaned_data['pontos_adicionados'] = pontos_adicionados
 
     def __init__(self, *args, **kwargs):
@@ -189,14 +186,12 @@ class ComprasFidelidadeForm(forms.ModelForm):
         super(ComprasFidelidadeForm, self).__init__(*args, **kwargs)
         if fidelidade_id:
             fidelidade_instance = Fidelidade.objects.get(pk=fidelidade_id)
-            print('Fidelidade_capturada_form: ', fidelidade_instance)
             self.fields['fidelidade'].queryset = Fidelidade.objects.filter(
                 ementa__fidelidade__pk=fidelidade_id)
 
             self.fields['fidelidade'].initial = fidelidade_instance
         if utilizador_pk:
             utilizador_instance = User.objects.get(pk=utilizador_pk)
-            print('Utilizador_capturado_form: ', utilizador_instance)
             self.fields['utilizador'].queryset = User.objects.filter(
                 perfil__pk=utilizador_pk)
 
@@ -239,7 +234,6 @@ class OfertasFidelidadeForm(forms.ModelForm):
         super(OfertasFidelidadeForm, self).__init__(*args, **kwargs)
         if fidelidade_id:
             fidelidade_instance = Fidelidade.objects.get(pk=fidelidade_id)
-            print('Fidelidade_capturada_form: ', fidelidade_instance)
             self.fields['fidelidade'].queryset = Fidelidade.objects.filter(
                 ementa__fidelidade__pk=fidelidade_id)
 

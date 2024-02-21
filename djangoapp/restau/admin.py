@@ -163,9 +163,6 @@ class FotosAdmin(admin.ModelAdmin):
 
     image_thumb.short_description = 'Miniatura'  # type: ignore
 
-    # outra opção:
-    # setattr(image_thumb, 'short_description', 'Miniatura')
-
 
 @admin.register(Ementa)
 class EmentaAdmin(admin.ModelAdmin):

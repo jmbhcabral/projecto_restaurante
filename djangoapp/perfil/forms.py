@@ -125,14 +125,12 @@ class UserForm(forms.ModelForm):
         required=False,
         widget=forms.PasswordInput(),
         label='Palavra-passe',
-        # help_text='Deixe em branco para não alterar.'
     )
 
     password2 = forms.CharField(
         required=False,
         widget=forms.PasswordInput(),
         label='Confirmação Palavra-passe',
-        # help_text='Deixe em branco para não alterar.'
     )
 
     def __init__(self, *args, **kwargs):
@@ -264,7 +262,6 @@ class ChangePasswordForm(forms.Form):
                     error_msg_passwords_not_match
 
         if validation_error_msgs:
-            print(validation_error_msgs)
             raise (forms.ValidationError(validation_error_msgs))
 
 
@@ -331,5 +328,4 @@ class ResetPasswordForm(forms.Form):
                     error_msg_passwords_not_match
 
         if validation_error_msgs:
-            print(validation_error_msgs)
             raise (forms.ValidationError(validation_error_msgs))

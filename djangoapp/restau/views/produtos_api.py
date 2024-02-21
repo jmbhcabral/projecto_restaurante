@@ -49,9 +49,6 @@ class ProdutosAPIv1ViewSet(ModelViewSet):
         return super().get_permissions()
 
     def list(self, request, *args, **kwargs):
-        print('request: ', request.user)
-        print('request: ', request.user.is_authenticated)
-
         return super().list(request, *args, **kwargs)
 
 
@@ -94,9 +91,6 @@ class MyTokenRefreshView(TokenRefreshView):
 class UserEmentaAPIView(APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
-        print('user: ', user)
-        print('tipo_fidelidade: ',
-              user.perfil.tipo_fidelidade)
 
         if not user.is_authenticated:
             return Response(
@@ -108,14 +102,12 @@ class UserEmentaAPIView(APIView):
             produtos_ementa = Ementa.objects.filter(
                 id=ementa.id,
             )
-            print('produtos_ementa: ', produtos_ementa)
             serializer = ProdutosEmentaSerializer(
                 produtos_ementa,
                 many=True,
                 context={'request': request},
             )
 
-            # print('serializer.data: ', serializer.data)
             return Response(serializer.data)
         except Ementa.DoesNotExist:
             return Response(

@@ -22,7 +22,6 @@
                     {% for produto in produtos %}
                         {% if produto.id == form.produto.initial %}
                     <div>  
-                        {% comment %} <p>{{ form.fidelidade.label_tag }}</p> {% endcomment %}
                         <p>{{ form.fidelidade }}</p>
                         <p>{{ form.fidelidade.errors }}</p>
                     </div>              

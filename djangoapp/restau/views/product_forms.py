@@ -132,9 +132,7 @@ def ordenar_produtos(request):
             'form_action': form_action,
         }
         if formset.is_valid():
-            print(f'formset is valid: {formset.is_valid()}')
             formset.save()
-            print('formset saved')
             return redirect('restau:ordenar_produtos')
 
         else:

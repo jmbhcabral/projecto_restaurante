@@ -1,7 +1,6 @@
 from django.db import models
 from restau.models import Products, Ementa
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
 from utils.model_validators import calcular_pontos
 
 

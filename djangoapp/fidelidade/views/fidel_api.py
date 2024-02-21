@@ -17,9 +17,6 @@ class ProdutoFidelidadeAPI(APIView):
         Lista todos os produtos de fidelidade
         """
         user = request.user
-        print('user', user)
-        print('user.is_authenticated', user.is_authenticated)
-        print('user.id', user.id)
 
         if not user.is_authenticated:
             return Response(
@@ -38,15 +35,12 @@ class ProdutoFidelidadeAPI(APIView):
             serializer = ProdutoFidelidadeIndividualSerializer(
                 produtos_fidelidade, many=True)
             data = serializer.data
-            print('data', data)
 
             # Restruturar dados para serem apresentados no frontend
             categorias = defaultdict(lambda: defaultdict(list))
             for item in data:
                 categoria = item['nome_categoria']
-                print('categoria', categoria)
                 subcategoria = item.get('nome_subcategoria')
-                print('subcategoria', subcategoria)
                 if categoria:  # Verificar se existe categoria
                     produto = {
                         'nome_produto': item['nome_produto'],
@@ -108,8 +102,6 @@ class TotalPontosAPIV1(APIView):
         Lista o total de pontos de fidelidade
         """
         user = request.user
-        print('user', user)
-        print('user.is_authenticated', user.is_authenticated)
 
         if not user.is_authenticated:
             return Response(
@@ -123,10 +115,8 @@ class TotalPontosAPIV1(APIView):
                 user, 'perfil') else None
             compras_fidelidade = ComprasFidelidade.objects.filter(
                 fidelidade=tipo_fidelidade, utilizador=user)
-            print('compras_fidelidade', compras_fidelidade)
             ofertas_fidelidade = OfertasFidelidade.objects.filter(
                 fidelidade=tipo_fidelidade, utilizador=user)
-            print('ofertas_fidelidade', ofertas_fidelidade)
 
             total_compras = compras_fidelidade.count()
             total_ofertas = ofertas_fidelidade.count()

@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from .models import (Fidelidade, ProdutoFidelidadeIndividual,
-                     ComprasFidelidade, OfertasFidelidade)
+from .models import ProdutoFidelidadeIndividual
 
 
 class ProdutoFidelidadeIndividualSerializer(serializers.ModelSerializer):

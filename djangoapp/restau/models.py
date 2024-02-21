@@ -163,7 +163,6 @@ class ImagemTopo(models.Model):
             imagem_changed = current_imagem_name != self.imagem.name
 
         if imagem_changed:
-            print('resizing')
             resize_image(self.imagem, 900)
             super().save(*args, **kwargs)
 
@@ -223,7 +222,6 @@ class IntroImagem(models.Model):
             imagem_changed = current_imagem_name != self.imagem.name
 
         if imagem_changed:
-            print('resizing')
             resize_image(self.imagem, 1200)
             super().save(*args, **kwargs)
 
@@ -306,7 +304,6 @@ class ImagemFraseCima(models.Model):
             imagem_changed = current_imagem_name != self.imagem.name
 
         if imagem_changed:
-            print('resizing')
             resize_image(self.imagem, 300)
             super().save(*args, **kwargs)
 
@@ -366,7 +363,6 @@ class ImagemFraseBaixo(models.Model):
             imagem_changed = current_imagem_name != self.imagem.name
 
         if imagem_changed:
-            print('resizing')
             resize_image(self.imagem, 300)
             super().save(*args, **kwargs)
 
@@ -403,7 +399,6 @@ class ImagemPadrao(models.Model):
             imagem_changed = current_imagem_name != self.imagem.name
 
         if imagem_changed:
-            print('resizing')
             resize_image(self.imagem, 500)
             super().save(*args, **kwargs)
 
@@ -819,7 +814,6 @@ class Products(models.Model):
             imagem_changed = current_imagem_name != self.imagem.name
 
         if imagem_changed:
-            print('resizing')
             resize_image(self.imagem, 500)
 
     def __str__(self):
