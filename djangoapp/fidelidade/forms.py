@@ -148,7 +148,7 @@ class ComprasFidelidadeForm(forms.ModelForm):
         model = ComprasFidelidade
         fields = [
             'fidelidade', 'utilizador',
-            'pontos_adicionados',
+            'compra', 'pontos_adicionados',
         ]
 
     fidelidade = forms.ModelChoiceField(
@@ -163,22 +163,23 @@ class ComprasFidelidadeForm(forms.ModelForm):
         required=False,
     )
 
-    pontos_adicionados = forms.DecimalField(
+    compra = forms.DecimalField(
         widget=forms.NumberInput(
             attrs={
                 'placeholder': 'digite aqui',
             }
         ),
-        label='Pontos Adicionados',
-        help_text='Pontos Adicionados.',
+        label='Compra',
+        help_text='Compra.',
         required=False,
     )
 
     def clean(self):
         cleaned_data = self.cleaned_data
-        pontos_obtidos = cleaned_data.get('pontos_adicionados')
+        compra = cleaned_data.get('compra')
         desconto = cleaned_data.get('fidelidade').desconto
-        pontos_adicionados = round(pontos_obtidos * desconto / 100, 2)
+        pontos_adicionados = round(compra * desconto / 100, 2)
+        print('compra: ', compra)
         print('pontos_adicionados: ', pontos_adicionados)
         cleaned_data['pontos_adicionados'] = pontos_adicionados
 

@@ -6,6 +6,7 @@ from fidelidade.models import ComprasFidelidade, OfertasFidelidade
 from django.db import models
 from operator import attrgetter
 from datetime import datetime, timedelta
+import json
 
 
 def admin_utilizadores(request):
@@ -13,7 +14,6 @@ def admin_utilizadores(request):
 
     if query is not None:
         resultado_completo = f'CEW-{query}'
-
         try:
             perfil = Perfil.objects.get(numero_cliente=resultado_completo)
             print('Perfil:', perfil)

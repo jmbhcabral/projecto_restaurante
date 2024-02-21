@@ -1,25 +1,29 @@
-{% extends 'restau/base_front.html' %}
+{% extends 'restau/base_front_perfil.html' %}
 {% block content %}
+<main class="section-content-wide section-gap front-content">
+    <section class="section-gap-conta white-bg top-background">
+        <div class="separator"></div>
+            <h1 class="center">Hamburgueria artesanal</h1>
+        <div class="separator "></div>
+        {% include "restau/partials/_messages.html" %}
+    </section>
     <section class="conta">
-        <div class="conta-menu">
-            <ul>
-                <li><a href="{% url 'perfil:conta' %}"><strong>Conta</strong></a></li>
-                <li><a href="{% url 'perfil:atualizar' %}" class="">Atualizar dados</a></li>
-                <li><a href="{% url 'perfil:change_password' %}" class="">Alterar Password</a></li>
-                <li><a href="{% url 'perfil:cartao_cliente' %}" class="">Cartão cliente</a></li>
-                <li><a href="{% url 'perfil:vantagens' %}" class="">Vantagens</a></li>
-            </ul>
-        </div>
+        {% include "perfil/partials/_conta_menu.html" %}
         <div class="conta-content">
-            <p>Olá {{ user.first_name }}, bemvindo á sua area de utilizador.
+            <p>Olá {{ user.first_name }}, bem-vindo á sua area de utilizador.
             Aqui pode alterar os seus dados, ver as suas vantagens e muito mais.
             </p>
             {% if total_pontos > 0 %}
             <p>
+                Tem na sua conta fidelidade {{ total_pontos|floatformat:2 }} pontos.
+                Recebeu {{total_recompensas|floatformat:2}} pontos de recompensa.
+                Gastou {{total_ofertas|floatformat:2}} pontos.
+            </p>
+            {% elif total_pontos < 0 %}
+            <p>
                 Tem na sua conta fidelidade {{ total_pontos }} pontos.
                 Recebeu {{total_recompensas}} pontos de recompensa.
                 Gastou {{total_ofertas}} pontos.
-            </p>
             {% else %}
             <p>
                 Ainda não tem pontos na sua conta fidelidade.

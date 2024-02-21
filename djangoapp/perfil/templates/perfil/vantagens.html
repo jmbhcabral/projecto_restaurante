@@ -1,15 +1,7 @@
 {% extends 'restau/base_front.html' %}
 {% block content %}
     <section class="conta">
-        <div class="conta-menu">
-            <ul>
-                <li><a href="{% url 'perfil:conta' %}">Conta</a></li>
-                <li><a href="{% url 'perfil:atualizar' %}" class="">Atualizar dados</a></li>
-                <li><a href="{% url 'perfil:change_password' %}" class="">Alterar Password</a></li>
-                <li><a href="{% url 'perfil:cartao_cliente' %}" class="">Cartão cliente</a></li>
-                <li><a href="{% url 'perfil:vantagens' %}" class=""><strong>Vantagens</strong></a></li>
-            </ul>
-        </div>
+        {% include "perfil/partials/_conta_menu.html" %}
         <div class="conta-content">
             <div>
             <h4>Vantagens</h4>

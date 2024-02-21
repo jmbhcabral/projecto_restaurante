@@ -172,17 +172,6 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                 'pontos_para_oferta': produto_fidelidade.pontos_para_oferta,
                 'visibilidade': produto_fidelidade.visibilidade,
             })
-
-        # elif preco is None:
-
-        #     messages.error(
-        #         request,
-        #         f'O produto { produto } não tem um'
-        #         f' preço definido no campo {preco_field}'
-        #     )
-
-        #     return redirect(
-        #         'fidelidade:fidelidade', fidelidade_id)
         else:
 
             pontos_recompensa, pontos_para_oferta = calcular_pontos(

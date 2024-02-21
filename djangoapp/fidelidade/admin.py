@@ -27,13 +27,18 @@ class ProdutoFidelidadeIndividualAdmin(admin.ModelAdmin):
 @admin.register(ComprasFidelidade)
 class ComprasFidelidadeAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'fidelidade', 'utilizador', 'pontos_adicionados', 'criado_em')
-    search_fields = ('id', 'fidelidade__nome',
-                     'utilizador__username', 'pontos_adicionados', 'criado_em')
-    list_filter = ('id', 'fidelidade__nome',
-                   'utilizador__username', 'pontos_adicionados', 'criado_em')
-    ordering = ('id', 'fidelidade__nome',
-                'utilizador__username', 'pontos_adicionados', 'criado_em')
+        'id', 'fidelidade', 'utilizador', 'compra', 'pontos_adicionados',
+        'criado_em'
+    )
+    search_fields = ('id', 'fidelidade__nome', 'utilizador__username',
+                     'compra', 'pontos_adicionados', 'criado_em'
+                     )
+    list_filter = ('id', 'fidelidade__nome', 'utilizador__username', 'compra',
+                   'pontos_adicionados', 'criado_em'
+                   )
+    ordering = ('id', 'fidelidade__nome', 'utilizador__username', 'compra',
+                'pontos_adicionados', 'criado_em'
+                )
 
 
 @admin.register(OfertasFidelidade)

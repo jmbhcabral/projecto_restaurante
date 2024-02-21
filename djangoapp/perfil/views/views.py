@@ -273,36 +273,37 @@ class Conta(BasePerfil):
         if not self.request.user.is_authenticated:
             return redirect('perfil:criar')
 
+    def get(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('perfil:criar')
+
         active_setup = ActiveSetup.objects \
             .order_by('-id') \
             .first()
 
-        def get(self, *args, **kwargs):
-            if not self.request.user.is_authenticated:
-                return redirect('perfil:criar')
+        total_recompensas = fidelidade_models.ComprasFidelidade.objects.filter(
+            utilizador=self.request.user).aggregate(
+            total_pontos_ganhos=models.Sum('pontos_adicionados'))
+        print('total_recompensas: ', total_recompensas)
+        total_ofertas = fidelidade_models.OfertasFidelidade.objects.filter(
+            utilizador=self.request.user).aggregate(
+            total_pontos_gastos=models.Sum('pontos_gastos'))
+        print('total_ofertas: ', total_ofertas)
+        total_recompensas_decimal = (
+            total_recompensas['total_pontos_ganhos'] or 0)
+        total_ofertas_decimal = total_ofertas['total_pontos_gastos'] or 0
 
-            total_recompensas = fidelidade_models.ComprasFidelidade.objects.filter(
-                utilizador=self.request.user).aggregate(
-                total_pontos_ganhos=models.Sum('pontos_adicionados'))
+        total_pontos = total_recompensas_decimal - total_ofertas_decimal
+        print('total_pontos: ', total_pontos)
 
-            total_ofertas = fidelidade_models.OfertasFidelidade.objects.filter(
-                utilizador=self.request.user).aggregate(
-                total_pontos_gastos=models.Sum('pontos_gastos'))
+        self.context = {
+            'active_setup': active_setup,
+            'total_pontos': total_pontos,
+            'total_recompensas': total_recompensas_decimal,
+            'total_ofertas': total_ofertas_decimal,
+        }
 
-            total_recompensas_decimal = (
-                total_recompensas['total_pontos_ganhos'] or 0)
-            total_ofertas_decimal = total_ofertas['total_pontos_gastos'] or 0
-
-            total_pontos = total_recompensas_decimal - total_ofertas_decimal
-
-            self.context = {
-                'active_setup': active_setup,
-                'total_pontos': total_pontos,
-                'total_recompensas': total_recompensas_decimal,
-                'total_ofertas': total_ofertas_decimal,
-            }
-
-            return render(self.request, self.template_name, self.context)
+        return render(self.request, self.template_name, self.context)
 
 
 # class Deletar(View):
@@ -332,26 +333,6 @@ class CartaoCliente(View):
             .order_by('-id') \
             .first()
 
-        # user = self.request.user
-
-        # if not user.is_authenticated:
-        #     return redirect('perfil:criar')
-
-        # perfil = user.perfil
-        # tipo_fidelidade = perfil.tipo_fidelidade
-
-        # lista_fidelidade = ProdutoFidelidadeIndividual.objects \
-        #     .filter(fidelidade=tipo_fidelidade) \
-        #     .select_related('produto') \
-        #     .order_by(
-        #         'produto__categoria', 'produto__subcategoria', 'produto__ordem'
-        #     )
-
-        # self.context = {
-        #     'main_logo': main_logo,
-        #     'main_image': main_image,
-        #     'lista_fidelidade': lista_fidelidade,
-        # }
         perfil = perfil_models.Perfil.objects.filter(
             usuario=self.request.user).first()
 
@@ -570,3 +551,83 @@ class ResetPasswordView(View):
                     'token': token
                 }
             )
+
+
+class MovimentosCliente(BasePerfil):
+    template_name = 'perfil/movimentos_cliente.html'
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+
+        active_setup = ActiveSetup.objects \
+            .order_by('-id') \
+            .first()
+
+        user = self.request.user
+
+        if not user.is_authenticated:
+            return redirect('perfil:criar')
+
+        perfil = user.perfil
+        tipo_fidelidade = perfil.tipo_fidelidade
+
+        compras_fidelidade = fidelidade_models.ComprasFidelidade.objects.filter(
+            utilizador=self.request.user).order_by('-criado_em')
+
+        # Calcular a diferença entre as compras e as ofertas
+        ofertas_fidelidade = fidelidade_models.OfertasFidelidade.objects.filter(
+            utilizador=self.request.user).order_by('-criado_em')
+        total_compras = fidelidade_models.ComprasFidelidade.objects.filter(
+            utilizador=self.request.user).aggregate(
+            total_compras=models.Sum('pontos_adicionados'))
+        total_ofertas = fidelidade_models.OfertasFidelidade.objects.filter(
+            utilizador=self.request.user).aggregate(
+            total_ofertas=models.Sum('pontos_gastos'))
+        total_compras_decimal = (
+            total_compras['total_compras'] or 0)
+        print('total_compras_decimal: ', total_compras_decimal)
+        total_ofertas_decimal = total_ofertas['total_ofertas'] or 0
+        print('total_ofertas_decimal: ', total_ofertas_decimal)
+        total_pontos = total_compras_decimal - total_ofertas_decimal
+
+        # Combinar as consultas
+        movimentos = []
+
+        for compra in compras_fidelidade:
+            movimentos.append(
+                {
+                    'data': compra.criado_em.strftime('%Y-%m-%d'),
+                    'tipo': 'Compra',
+                    'valor': compra.compra,
+                    'pontos': compra.pontos_adicionados,
+                    'cor': 'black',
+                }
+            )
+
+        for oferta in ofertas_fidelidade:
+            movimentos.append(
+                {
+                    'data': oferta.criado_em.strftime('%Y-%m-%d'),
+                    'tipo': 'Oferta',
+                    'valor': '-----',
+                    'pontos': '-' + str(oferta.pontos_gastos),
+                    'cor': 'red',
+                }
+            )
+
+        # Ordenar os movimentos por data decrescente
+        movimentos.sort(key=lambda x: x['data'], reverse=True)
+
+        self.context = {
+            'active_setup': active_setup,
+            'compras_fidelidade': compras_fidelidade,
+            'ofertas_fidelidade': ofertas_fidelidade,
+            'tipo_fidelidade': tipo_fidelidade,
+            'total_pontos': total_pontos,
+            'movimentos': movimentos,
+        }
+
+    def get(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('perfil:criar')
+        return render(self.request, self.template_name, self.context)

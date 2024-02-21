@@ -8,6 +8,7 @@ import qrcode
 from io import BytesIO
 from django.core.files import File
 import uuid
+import json
 
 
 class Perfil(models.Model):
@@ -99,14 +100,9 @@ class Perfil(models.Model):
             self.tipo_fidelidade = fidelidade_obj
 
         # Crie um QRCode com base nas informações do perfil
-        dados_perfil = (
-            f"Username: {self.usuario}",
-            f"Email: {self.usuario.email}",
-            f"Numero Cliente: {self.numero_cliente}",
-            f"Data Nascimento: {self.data_nascimento}",
-            f"Telemovel: {self.telemovel}",
-        )
+        numero_cliente_puro = ''.join(filter(str.isdigit, self.numero_cliente))
 
+        # Configuração do Qr Code
         qr = qrcode.QRCode(
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -114,7 +110,8 @@ class Perfil(models.Model):
             border=4,
         )
 
-        qr.add_data(dados_perfil)
+        # Adicionando os dados JSON ao Qr Code
+        qr.add_data(numero_cliente_puro)
         qr.make(fit=True)
 
         # Crie uma imagem QRCode
@@ -123,8 +120,10 @@ class Perfil(models.Model):
         # Salve a imagem QRCode no campo qr_code
         img_io = BytesIO()
         img_qr.save(img_io, 'PNG')
+        # Usando o número de cliente como nome do ficheiro
+        filename = f'qrcode_{self.numero_cliente}.png'
         self.qr_code.save(
-            f'qrcode_{self.usuario}.png', File(img_io), save=False)
+            filename, File(img_io), save=False)
 
         super().save(*args, **kwargs)
 

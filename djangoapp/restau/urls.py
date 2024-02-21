@@ -31,6 +31,11 @@ urlpatterns = [
         name='index'
     ),
     path(
+        'restau/pages/politicadeprivacidade/',
+        views.politicadeprivacidade,  # type: ignore
+        name='politicadeprivacidade'
+    ),
+    path(
         'restau/pages/encomendas/',
         views.encomendas,  # type: ignore
         name='encomendas'

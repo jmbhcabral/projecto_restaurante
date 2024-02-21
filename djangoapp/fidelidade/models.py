@@ -76,6 +76,11 @@ class ComprasFidelidade(models.Model):
         default=None,
     )
 
+    compra = models.DecimalField(
+        max_digits=10, decimal_places=3, null=True, blank=True,
+        verbose_name='Compra',
+    )
+
     pontos_adicionados = models.DecimalField(
         max_digits=10, decimal_places=3, null=True, blank=True,
         verbose_name='Pontos Adicionados',
@@ -106,7 +111,7 @@ class OfertasFidelidade(models.Model):
 
     pontos_gastos = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True,
-        verbose_name='Pontos Adicionados',
+        verbose_name='Pontos Gastos',
     )
 
     criado_em = models.DateTimeField(auto_now_add=True)

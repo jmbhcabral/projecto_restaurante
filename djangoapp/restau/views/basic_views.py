@@ -64,3 +64,15 @@ def programa_fidelidade(request):
         {'active_setup': active_setup,
          },
     )
+
+
+def politicadeprivacidade(request):
+
+    active_setup = ActiveSetup.objects.get()
+
+    return render(
+        request,
+        'restau/pages/politica_privacidade.html',
+        {'active_setup': active_setup,
+         },
+    )

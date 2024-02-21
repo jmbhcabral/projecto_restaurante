@@ -1,21 +1,17 @@
-{% extends 'restau/base_front.html' %}
+{% extends 'restau/base_front_perfil.html' %}
 {% block content %}
+<main class="section-content-wide section-gap front-content main-content">
+    <section class="section-gap-conta white-bg top-background">
+        <div class="separator"></div>
+            <h1 class="center">Hamburgueria artesanal</h1>
+        <div class="separator "></div>
+        {% include "restau/partials/_messages.html" %}
+    </section>
     <section class="conta">
-        <div class="conta-menu">
-            <ul>
-                <li><a href="{% url 'perfil:conta' %}">Conta</a></li>
-                <li><a href="{% url 'perfil:atualizar' %}" class="">Atualizar dados</a></li>
-                <li><a href="{% url 'perfil:change_password' %}" class="">Alterar Password</a></li>
-                <li><a href="{% url 'perfil:cartao_cliente' %}" class=""><strong>Cartão cliente</strong></a></li>
-                <li><a href="{% url 'perfil:vantagens' %}" class="">Vantagens</a></li>
-            </ul>
-        </div>
+        {% include "perfil/partials/_conta_menu.html" %}
         <div class="conta-content">
-            <p>{{ user.username }}</p>
-            <p>{{ user.first_name }}</p>
-            <p>{{ user.last_name }}</p>
-            <p>{{ user.email }}</p>
-            <p>{{ perfil.telemovel }}</p>
+            <h4 class="center">Cartão Cliente</h4>
+            <p class="center">Nº Cliente: {{ perfil.numero_cliente }}</p>
             <p><img src="{{ perfil.qr_code.url }}" alt="Qrcode"></p>
         </div>
         

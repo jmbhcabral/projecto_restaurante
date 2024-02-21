@@ -1,16 +1,15 @@
-{% extends 'restau/base_front.html' %}
+{% extends 'restau/base_front_perfil.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
+<main class="section-content-wide section-gap front-content">
+    <section class="section-gap-conta white-bg top-background">
+        <div class="separator"></div>
+            <h1 class="center">Hamburgueria artesanal</h1>
+        <div class="separator "></div>
+        {% include "restau/partials/_messages.html" %}
+    </section>
     <section class="conta">
-        <div class="conta-menu">
-            <ul>
-                <li><a href="{% url "perfil:conta" %}">Conta</a></li>
-                <li><a href="{% url "perfil:atualizar" %}"><strong>Atualizar dados</strong></a></li>
-                <li><a href="{% url "perfil:change_password" %}" class="">Alterar Password</a></li>
-                <li><a href="{% url "perfil:cartao_cliente" %}" class="">Cartão cliente</a></li>
-                <li><a href="{% url "perfil:vantagens" %}" class="">Vantagens</a></li>
-            </ul>
-        </div>
+        {% include "perfil/partials/_conta_menu.html" %}
         <div class="conta-content">
             <p>Atualize os campos abaixo.</p>
             <form action="" method="POST">

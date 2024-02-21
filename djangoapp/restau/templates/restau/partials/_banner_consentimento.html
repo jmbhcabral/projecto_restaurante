@@ -1,0 +1,39 @@
+<div class="cookeis-banner" id="consentimentoCookies">
+    <span>Este site usa cookies para garantir que você obtenha a melhor experiência. Clique em ACEITO para consentir a utilização de todos os cookies.</span>
+    <span><a href="{% url 'restau:politicadeprivacidade' %}">Ver política de privacidade</a></span>
+    <button class="button-cookies" id="aceitarCookies">Aceito</button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var consentimento = getCookie("consentimentoCookies");
+        if (consentimento != "aceite") {
+            document.getElementById('consentimentoCookies').style.display = 'flex';
+        }
+        document.getElementById('aceitarCookies').addEventListener('click', function () {
+            setCookie("consentimentoCookies", "aceite", 365);
+            document.getElementById('consentimentoCookies').style.display = 'none';
+        });
+    });
+    
+    function setCookie(nome, valor, dias) {
+        var expira = "";
+        if (dias) {
+            var data = new Date();
+            data.setTime(data.getTime() + (dias*24*60*60*1000));
+            expira = "; expira=" + data.toUTCString();
+        }
+        document.cookie = nome + "=" + valor + expira + "; path=/";
+    }
+    
+    function getCookie(nome) {
+        var nomeEQ = nome + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nomeEQ) == 0) return c.substring(nomeEQ.length,c.length);
+        }
+        return null;
+    }
+</script>

@@ -133,6 +133,7 @@ class TotalPontosAPIV1(APIView):
 
             detalhes_compras = [
                 {
+                    "compra": compra.compra,
                     "pontos_adicionados": compra.pontos_adicionados,
                     "criado_em": compra.criado_em,
                 }

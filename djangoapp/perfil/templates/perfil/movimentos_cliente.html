@@ -1,0 +1,39 @@
+{% extends 'restau/base_front_perfil.html' %}
+{% block content %}
+<main class="section-content-wide section-gap front-content main-content">
+    <section class="section-gap-conta white-bg top-background">
+        <div class="separator"></div>
+            <h1 class="center">Hamburgueria artesanal</h1>
+        <div class="separator "></div>
+        {% include "restau/partials/_messages.html" %}
+    </section>
+    <section class="conta">
+        {% include "perfil/partials/_conta_menu.html" %}
+        <div class="conta-content">
+            <h4 class="center">Movimentos</h4>
+            <p>Pontos disponiveis: {{ total_pontos|floatformat:2 }} Pts</p>
+            <div class="grid-table">
+                <div class="grid-row grid-header">
+                  <div class="grid-cell">Data</div>
+                  <div class="grid-cell">Tipo</div>
+                  <div class="grid-cell-right">Compra</div>
+                  <div class="grid-cell-right">Pontos</div>
+                </div>
+                {% for movimento in movimentos %}
+                <div class="grid-row" style="color: {{ movimento.cor }}">
+                    <div class="grid-cell">{{ movimento.data }}</div>
+                    <div class="grid-cell">{{ movimento.tipo }}</div>
+                    {% if movimento.valor > 0 %}
+                    <div class="grid-cell-right">{{ movimento.valor|floatformat:2 }}€</div>
+                    {% else %}
+                    <div class="grid-cell-right">{{ movimento.valor }}</div>
+                    {% endif %}
+                    <div class="grid-cell-right">{{ movimento.pontos|floatformat:2 }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>   
+    </section>
+</main>
+    
+{% endblock content %}

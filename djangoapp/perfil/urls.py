@@ -23,12 +23,15 @@ urlpatterns = [
          views.Vantagens.as_view(), name='vantagens'),
     path('perfil/conta/cartao_cliente/',
          views.CartaoCliente.as_view(), name='cartao_cliente'),
+    path('perfil/conta/movimentos/',
+         views.MovimentosCliente.as_view(), name='movimentos_cliente'),
     # Reset password
     path('perfil/request_reset_password/',
          views.RequestResetPasswordView.as_view(),
          name='request_reset_password'),
     path('perfil/reset_password/<str:token>/', views.ResetPasswordView.as_view(),
          name='reset_password'),
+    # Change password
     path('perfil/change_password/', views.ChangePasswordView.as_view(),
          name='change_password'),
 ]
