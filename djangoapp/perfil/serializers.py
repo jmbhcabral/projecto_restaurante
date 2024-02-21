@@ -57,8 +57,6 @@ class PerfilSerializer(ModelSerializer):
         if perfil_instance and perfil_instance.telemovel == value:
             return value
 
-            pk=perfil_instance.pk if perfil_instance else None).exists())
-
         if perfil_instance:
             print('Self.instance.pk: ', perfil_instance.pk)
         else:
@@ -141,15 +139,13 @@ class UserRegistrationSerializer(ModelSerializer):
 
         # Se estiver atualizando e a senha for diferente da armazenada
         if self.instance and not check_password(value, self.instance.password):
-            # Aqui você pode adicionar validação adicional, como comprimento 
-            # da senha
+            # Aqui você pode adicionar validação adicional, como comprimento da senha
             if len(value) < 8:
                 raise serializers.ValidationError(
                     'A senha deve conter pelo menos 8 caracteres.')
             return value
 
-        # Se a senha fornecida for a mesma que a armazenada, ignore a 
-        # atualização
+        # Se a senha fornecida for a mesma que a armazenada, ignore a atualização
         raise serializers.SkipField()
 
     def validate(self, data):
@@ -199,8 +195,8 @@ class UserRegistrationSerializer(ModelSerializer):
         email = validated_data.get('email')
         first_name = validated_data.get('first_name')
         last_name = validated_data.get('last_name')
-        
         # Verificar se todos os campos obrigatórios estão presentes
+
         if not all([username, email, first_name, last_name, password]):
             raise serializers.ValidationError(
                 'Os campos username, email, first_name, last_name e password são obrigatórios.'
