@@ -9,15 +9,23 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-from django.contrib.messages import constants
-import os
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
+import os
+from django.contrib.messages import constants
+from dotenv import load_dotenv
+load_dotenv()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR.parent / 'data' / 'web'
+
+# Caminho específico para o arquivo .env
+dotenv_path = BASE_DIR.parent / 'dotenv_files' / '.env'
+
+# Carregar as variáveis de ambiente a partir do arquivo .env especificado
+load_dotenv(dotenv_path=dotenv_path)
 
 
 # Quick-start development settings - unsuitable for production

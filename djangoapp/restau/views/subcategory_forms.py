@@ -20,9 +20,9 @@ def criar_subcategoria(request):
         }
 
         if form.is_valid():
-            subcategoria = form.save()
-            return redirect('restau:atualizar_subcategoria',
-                            subcategoria_id=subcategoria.id)
+            form.save()
+            return redirect('restau:criar_subcategoria'
+                            )
 
         else:
             print(f'form: {form.errors}')

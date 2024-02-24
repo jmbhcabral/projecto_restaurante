@@ -25,9 +25,9 @@ def criar_categoria(request):
         }
 
         if form.is_valid():
-            categoria = form.save()
+            form.save()
             return redirect(
-                'restau:criar_categoria', categoria_id=categoria.id
+                'restau:criar_categoria'
             )
 
         else:

@@ -24,7 +24,10 @@ def index(request):
         .order_by('ordem') \
 
 
-    active_setup = ActiveSetup.objects.get()
+    try:
+        active_setup = ActiveSetup.objects.get()
+    except ActiveSetup.DoesNotExist:
+        active_setup = None
 
     horarios = Horario.objects.all()
 

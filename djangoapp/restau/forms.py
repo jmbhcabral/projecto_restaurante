@@ -46,12 +46,12 @@ class SubCategoryForm(forms.ModelForm):
 
         if instance and instance.nome == nome:
             return cleaned_data
-        if Products.objects.filter(nome=nome).exists():
+        if SubCategory.objects.filter(nome=nome).exists():
 
             self.add_error(
                 'nome',
                 ValidationError(
-                    'O produto já existe.',
+                    'A subcategoria já existe.',
                     code='invalid'
                 )
             )
@@ -96,12 +96,12 @@ class CategoryForm(forms.ModelForm):
 
         if instance and instance.nome == nome:
             return cleaned_data
-        if Products.objects.filter(nome=nome).exists():
+        if Category.objects.filter(nome=nome).exists():
 
             self.add_error(
                 'nome',
                 ValidationError(
-                    'O produto já existe.',
+                    'A categoria já existe.',
                     code='invalid'
                 )
             )
