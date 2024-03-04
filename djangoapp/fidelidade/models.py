@@ -117,3 +117,52 @@ class OfertasFidelidade(models.Model):
 
     def __str__(self):
         return f" {self.fidelidade} - {self.utilizador} "
+
+
+class Perguntas(models.Model):
+    class Meta:
+        verbose_name = 'Pergunta'
+        verbose_name_plural = 'Perguntas'
+
+    pergunta = models.CharField(max_length=200, verbose_name='Pergunta')
+
+    def __str__(self):
+        return self.pergunta
+
+
+class Respostas(models.Model):
+    class Meta:
+        verbose_name = 'Resposta'
+        verbose_name_plural = 'Respostas'
+
+    pergunta = models.ForeignKey(
+        Perguntas,
+        on_delete=models.CASCADE,
+        verbose_name='Pergunta',
+    )
+
+    resposta = models.CharField(max_length=200, verbose_name='Resposta')
+
+    def __str__(self):
+        return self.resposta
+
+
+class RespostaFidelidade(models.Model):
+    class Meta:
+        verbose_name = 'Resposta Fidelidade'
+        verbose_name_plural = 'Respostas Fidelidade'
+
+    resposta = models.ForeignKey(
+        Respostas,
+        on_delete=models.CASCADE,
+        verbose_name='Resposta',
+    )
+
+    tipo_fidelidade = models.ForeignKey(
+        Fidelidade,
+        on_delete=models.CASCADE,
+        verbose_name='Tipo Fidelidade',
+    )
+
+    def __str__(self):
+        return f"{self.resposta} - {self.tipo_fidelidade}"

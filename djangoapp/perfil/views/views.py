@@ -1,4 +1,6 @@
 from django.contrib import messages
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 from django.db import models
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
@@ -100,7 +102,7 @@ class Criar(BasePerfil):
 
         messages.success(
             self.request,
-            'Conta criada com sucesso!')
+            'Conta criada com sucesso!\nVerifique o seu email para ativar a conta!')
 
         return redirect('perfil:criar')
 
@@ -215,7 +217,22 @@ class Login(View):
                 self.request,
                 'Usuário ou senha inválidos!'
             )
+            print('is not username or password: Usuário ou senha inválidos!')
             return redirect('perfil:criar')
+
+        user = User.objects.filter(username=username).first()
+
+        if user:
+            if not user.is_active:
+                resend_link = reverse('perfil:resend_confirmation_email', kwargs={
+                                      'username': username})
+                error_message = f'Verifique o seu email para ativar a conta!\nOu <a href="{resend_link}">clique aqui</a> para reenviar o email de confirmação!'
+                messages.error(
+                    self.request, mark_safe(error_message)
+
+                )
+
+                return redirect('perfil:criar')
 
         usuario = authenticate(
             self.request,
@@ -227,6 +244,7 @@ class Login(View):
                 self.request,
                 'Usuário ou senha inválidos!'
             )
+            print('is not usuario: Usuário ou senha inválidos!')
             return redirect('perfil:criar')
 
         login(self.request, user=usuario)
@@ -387,6 +405,17 @@ class ConfirmarEmail(View):
         messages.success(
             request,
             'Email confirmado com sucesso!'
+        )
+        return redirect('perfil:criar')
+
+
+class ResendConfirmationEmail(View):
+    def get(self, request, username):
+        user = get_object_or_404(User, username=username)
+        send_confirmation_email(user)
+        messages.success(
+            request,
+            'Email de confirmação reenviado com sucesso. Por favor, verifique seu email.'
         )
         return redirect('perfil:criar')
 

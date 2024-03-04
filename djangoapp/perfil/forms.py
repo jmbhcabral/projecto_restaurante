@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from perfil.models import Perfil
+from fidelidade.models import Respostas
 from . import models
 from django.utils import timezone
 
@@ -50,6 +51,10 @@ class PerfilForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['estudante'].choices = [
+            (resposta.id, resposta.resposta)
+            for resposta in Respostas.objects.all()
+        ]
         for field in self.fields.values():
             if field.required:
                 field.label_suffix = ' <span class="label-asterisk">**</span>'

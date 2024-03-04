@@ -1,7 +1,9 @@
 from django.contrib import admin
 from fidelidade.models import (
     Fidelidade, ProdutoFidelidadeIndividual,
-    ComprasFidelidade, OfertasFidelidade)
+    ComprasFidelidade, OfertasFidelidade, Perguntas, Respostas,
+    RespostaFidelidade
+)
 
 
 @admin.register(Fidelidade)
@@ -51,3 +53,27 @@ class OfertasFidelidadeAdmin(admin.ModelAdmin):
                    'utilizador__username', 'pontos_gastos', 'criado_em')
     ordering = ('id', 'fidelidade__nome',
                 'utilizador__username', 'pontos_gastos', 'criado_em')
+
+
+@admin.register(Perguntas)
+class PerguntasAdmin(admin.ModelAdmin):
+    list_display = ('id', 'pergunta')
+    search_fields = ('id', 'pergunta')
+    list_filter = ('id', 'pergunta')
+    ordering = ('id', 'pergunta')
+
+
+@admin.register(Respostas)
+class RespostasAdmin(admin.ModelAdmin):
+    list_display = ('id', 'pergunta', 'resposta')
+    search_fields = ('id', 'pergunta__pergunta', 'resposta')
+    list_filter = ('id', 'pergunta__pergunta', 'resposta')
+    ordering = ('id', 'pergunta__pergunta', 'resposta')
+
+
+@admin.register(RespostaFidelidade)
+class RespostaFidelidadeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'resposta', 'tipo_fidelidade')
+    search_fields = ('id', 'resposta__resposta', 'tipo_fidelidade__nome')
+    list_filter = ('id', 'resposta__resposta', 'tipo_fidelidade__nome')
+    ordering = ('id', 'resposta__resposta', 'tipo_fidelidade__nome')

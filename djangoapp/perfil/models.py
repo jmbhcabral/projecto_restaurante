@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from fidelidade.models import Fidelidade
+from fidelidade.models import Fidelidade, RespostaFidelidade
 from django.utils import timezone
 from django.forms import ValidationError
 from utils.model_validators import validar_nif
@@ -43,17 +43,10 @@ class Perfil(models.Model):
         verbose_name="Número Cliente",
     )
     estudante = models.CharField(
-        max_length=50,
+        max_length=255,
         blank=True,
         null=True,
         verbose_name="Estudante",
-
-        choices=(
-            ('escola_sec_ramada', 'Sim, na Esc. Sec. Ramada'),
-            ('agrup_vasco_santana', 'Sim no Agrup. Vasco Santana'),
-            ('outra_escola', 'Sim, noutra escola'),
-            ('nao', 'Não'),
-        ),
         help_text='Se estudante, indique a escola onde estuda.',
     )
     tipo_fidelidade = models.ForeignKey(
@@ -89,14 +82,14 @@ class Perfil(models.Model):
 
             self.numero_cliente = f'CEW-{novo_numero}'
 
-        if self.estudante == 'escola_sec_ramada' or \
-                self.estudante == 'agrup_vasco_santana':
-            fidelidade_obj = Fidelidade.objects.get(nome='Estudante')
-            self.tipo_fidelidade = fidelidade_obj
+        if self.estudante:
+            fidelidade_obj = RespostaFidelidade.objects.get(
+                resposta=self.estudante)
+            print('fidelidade_obj', fidelidade_obj)
+            self.tipo_fidelidade = fidelidade_obj.tipo_fidelidade
 
         else:
-            fidelidade_obj = Fidelidade.objects.get(nome='Artesanal')
-            self.tipo_fidelidade = fidelidade_obj
+            self.tipo_fidelidade = None
 
         # Crie um QRCode com base nas informações do perfil
         numero_cliente_puro = ''.join(filter(str.isdigit, self.numero_cliente))
