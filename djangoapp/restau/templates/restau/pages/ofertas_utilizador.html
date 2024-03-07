@@ -4,6 +4,9 @@
         {% include "restau/partials/_utilizador_menu.html" %}
             <div class="conta-content">
                 <h2>**********</h2>
+                <span><strong>Utilizador: {{ user.username }}</strong></span>
+                <span><strong>Total Pontos: {{ total_pontos|floatformat:2 }}€</strong></span>
+                <span><strong>Total Pontos Disponíveis: {{ total_pontos_disponiveis|floatformat:2 }}€</strong></span>
                 <div class="content">
                     <form 
                     action="#" 

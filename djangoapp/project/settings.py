@@ -16,14 +16,6 @@ from django.contrib.messages import constants
 from dotenv import load_dotenv
 load_dotenv()
 
-print('Email_host : ', os.getenv('EMAIL_HOST'))
-print('Email_host_user : ', os.getenv('EMAIL_HOST_USER'))
-print('Email_host_password : ', os.getenv('EMAIL_HOST_PASSWORD'))
-print('Email_port : ', os.getenv('EMAIL_PORT'))
-print('Email_use_ssl : ', os.getenv('EMAIL_USE_SSL'))
-print('Email_backend : ', os.getenv('EMAIL_BACKEND'))
-print('Frontend_url : ', os.getenv('FRONTEND_URL'))
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

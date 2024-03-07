@@ -219,7 +219,7 @@ class EmailConfirmationToken(models.Model):
 
     def is_expired(self):
         # Expira em 48 horas
-        tempo_expiracao = self.created_at + timezone.timedelta(hours=48)
+        tempo_expiracao = self.created_at + timezone.timedelta(seconds=60)
         return tempo_expiracao < timezone.now()
 
     def __str__(self):

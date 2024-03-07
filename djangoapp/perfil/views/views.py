@@ -1,6 +1,8 @@
 from django.contrib import messages
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from datetime import datetime, timedelta
+from django.utils import timezone
 from django.db import models
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
@@ -217,7 +219,7 @@ class Login(View):
                 self.request,
                 'Usuário ou senha inválidos!'
             )
-            print('is not username or password: Usuário ou senha inválidos!')
+
             return redirect('perfil:criar')
 
         user = User.objects.filter(username=username).first()
@@ -226,7 +228,7 @@ class Login(View):
             if not user.is_active:
                 resend_link = reverse('perfil:resend_confirmation_email', kwargs={
                                       'username': username})
-                error_message = f'Verifique o seu email para ativar a conta!\nOu <a href="{resend_link}">clique aqui</a> para reenviar o email de confirmação!'
+                error_message = f'Verifique o seu email para ativar a conta!\nOu <a href="{resend_link}" style="text-decoration: underline;">clique aqui</a> para reenviar o email de confirmação!'
                 messages.error(
                     self.request, mark_safe(error_message)
 
@@ -244,7 +246,6 @@ class Login(View):
                 self.request,
                 'Usuário ou senha inválidos!'
             )
-            print('is not usuario: Usuário ou senha inválidos!')
             return redirect('perfil:criar')
 
         login(self.request, user=usuario)
@@ -388,10 +389,19 @@ class ConfirmarEmail(View):
             EmailConfirmationToken, token=token
         )
         # verifica se o token já foi utilizado ou expirou
-        if token.user.is_active or token.is_expired():
+        if token.user.is_active:
             messages.error(
                 request,
-                'Este link já foi utilizado ou expirou!'
+                'Este link já foi utilizado!'
+            )
+            return redirect('perfil:criar')
+
+        if token.is_expired():
+            resend_link = reverse('perfil:resend_confirmation_email', kwargs={
+                'username': token.user.username})
+            error_message = f'Este link já expirou! \n<a href="{resend_link}" style="text-decoration: underline;">clique aqui</a> para reenviar o email de confirmação!'
+            messages.error(
+                self.request, mark_safe(error_message)
             )
             return redirect('perfil:criar')
 
@@ -589,16 +599,30 @@ class MovimentosCliente(BasePerfil):
         total_pontos = total_compras_decimal - total_ofertas_decimal
 
         # Combinar as consultas
+        agora = timezone.localtime()
+        inicio_para_uso_de_pontos_hoje = agora.replace(
+            hour=11, minute=30, second=0, microsecond=0)
+
         movimentos = []
 
         for compra in compras_fidelidade:
+            criado_em_local = timezone.localtime(compra.criado_em)
+            # Verifica se a compra foi feita antes do início do dia de hoje
+            if criado_em_local < inicio_para_uso_de_pontos_hoje:
+                # Se sim os pontos estaram disponíveis para uso
+                disponivel_amanha = agora.date() > criado_em_local.date()
+            else:
+                # Se a compra foi feita depois do início do dia de hoje
+                # os pontos estarão disponíveis para uso amanhã
+                disponivel_amanha = agora.date() > (criado_em_local.date() + timedelta(days=1))
+
             movimentos.append(
                 {
-                    'data': compra.criado_em.strftime('%Y-%m-%d'),
+                    'data': criado_em_local.strftime('%Y-%m-%d'),
                     'tipo': 'Compra',
                     'valor': compra.compra,
                     'pontos': compra.pontos_adicionados,
-                    'cor': 'black',
+                    'cor': 'black' if disponivel_amanha else 'orange',
                 }
             )
 
@@ -624,6 +648,39 @@ class MovimentosCliente(BasePerfil):
             'total_pontos': total_pontos,
             'movimentos': movimentos,
         }
+
+        # Ajustar a data e hora para o fuso horário local
+        agora = timezone.localtime()
+
+        # Define o início do dia de hoje para uso de pontos
+        inicio_do_dia_de_hoje = agora.replace(
+            hour=0, minute=0, second=0, microsecond=0)
+
+        # Define o limite para considerar pontos disponíveis(11:30 de hoje)
+        limite_pontos_disponiveis = agora.replace(
+            hour=1, minute=30, second=0, microsecond=0)
+
+        # Determina a data de referência para filtrar compras
+        if agora < limite_pontos_disponiveis:
+            # Se ainda não são 11:30, ajusta a referência para o inicio de anteontem
+            data_referencia = inicio_do_dia_de_hoje - timedelta(days=2)
+        else:
+            # Se já passou das 11:30, ajusta a referência para o início de ontem
+            data_referencia = inicio_do_dia_de_hoje - timedelta(days=1)
+
+        # Filtrar as compras até a data de referência para calcular pontos disponíveis
+        total_compras_ate_referencia = fidelidade_models.ComprasFidelidade.objects.filter(
+            utilizador=self.request.user,
+            criado_em__lt=data_referencia
+        ).aggregate(
+            total_compras=models.Sum('pontos_adicionados'))['total_compras'] or 0
+
+        # Calcular total pontos disponiveis
+        total_pontos_disponiveis = total_compras_ate_referencia - total_ofertas_decimal
+        # Adicionar o total de pontos disponíveis ao contexto
+        self.context.update({
+            'total_pontos_disponiveis': total_pontos_disponiveis,
+        })
 
     def get(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
