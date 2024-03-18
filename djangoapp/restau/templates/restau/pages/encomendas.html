@@ -1,81 +1,38 @@
 {% extends 'restau/base_front.html' %}
 {% block content %}
-    <section class="section-gap white-bg top-background">
-        <h1 class="left">Ementa</h1>
-        {% for categoria in categorias %}
-            <h3>{{ categoria.nome }}</h3>
-            {% for produto in produtos %}
-                {% if produto.categoria == categoria and not produto.subcategoria %}
-                    {% if not produto.imagem %}
-                        <div class="product-frame">
-                            <div class="product-image">
-                                <img src="{{ active_setup.active_imagem_padrao.imagem.url }}" alt="Default">
-                            </div>
-                            <div class="product-details">
-                                <h3 class="product-name">{{ produto.nome }}</h3>
-                                <p class="product-description">{{ produto.descricao_curta }}</p>
-                                <div class="product-price-section">
-                                    <div class="product-price">Preço: <span class="price">{{ produto.preco_dinamico }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="product-frame">
-                            <div class="product-image">
-                                <img src="{{ produto.imagem.url }}" alt="Product Image">
-                            </div>
-                            <div class="product-details">
-                                <h3 class="product-name">{{ produto.nome }}</h3>
-                                <p class="product-description">{{ produto.descricao_curta }}</p>
-                                <div class="product-price-section">
-                                    <div class="product-price">Preço: <span class="price">{{ produto.preco_dinamico|floatformat:2 }}</span></div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
+<section class="section-gap white-bg top-background">
+    <h1 class="left">Ementa</h1>
+    {% for categoria, dados in categorias.items %}
+        <div class="categoria">
+            <h2>{{ categoria.nome }}</h2>
+            {% for subcategoria, produtos in dados.subcategorias.items %}
+                {% if subcategoria %}
+                    <div class="subcategoria">
+                        <h3>{{ subcategoria.nome }}</h3>
+                    </div>
                 {% endif %}
-            {% endfor %}
-            {% for subcategoria in subcategorias %}
-                {% if subcategoria.categoria == categoria %}
-                    <h4>{{ subcategoria.nome }}</h4>
-                    {% for produto in produtos %}
-                        {% if produto.categoria == categoria and produto.subcategoria == subcategoria %}
-                            {% if not produto.imagem %}
-                                <div class="product-frame">
-                                    <div class="product-image">
-                                        <img src="{{ active_setup.active_imagem_padrao.imagem.url }}" alt="Default">
-                                    </div>
-                                    <div class="product-details">
-                                        <h3 class="product-name">{{ produto.nome }}</h3>
-                                        <p class="product-description">{{ produto.descricao_curta }}</p>
-                                        <div class="product-price-section">
-                                            <div class="product-price">Preço: <span class="price">{{ produto.preco_dinamico }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% else %}
-                                <div class="product-frame">
-                                    <div class="product-image">
-                                        <img src="{{ produto.imagem.url }}" alt="Product Image">
-                                    </div>
-                                    <div class="product-details">
-                                        <h3 class="product-name">{{ produto.nome }}</h3>
-                                        <p class="product-description">{{ produto.descricao_curta }}</p>
-                                            <div class="product-price-section">
-                                                <div class="product-price">Preço: <span class="price">{{ produto.preco_dinamico|floatformat:2 }}</span>
-                                                </div>
-                                            </div>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% endif %}
+                {% for produto in produtos %}
+                <div class="product-frame">
+                    {% if produto.imagem %}
+                    <div class="product-image">
+                        <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
+                    </div>
+                    {% else %}
+                    <div class="product-image">
+                        <img src="{{ active_setup.active_imagem_padrao.imagem.url }}" alt="Imagem padrão">
+                    </div>
+                    {% endif %}
+                    <div class="product-details">
+                        <h3 class="product-name">{{ produto.nome }}</h3>
+                        <p class="product-description">Descrição: {{ produto.descricao_curta }}</p>
+                        <div class="product-price-section">
+                            <p class="product-price">Preço: <span class="price">{{ produto.preco_dinamico }}</span></p>
+                        </div>
+                    </div>
+                </div>
                     {% endfor %}
-                {% endif %}    
             {% endfor %}
-        {% endfor %}
-    </section>
-</main> 
+        </div>
+    {% endfor %}
+</section>
 {% endblock content %}
-    

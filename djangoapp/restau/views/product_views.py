@@ -2,52 +2,43 @@ from django.shortcuts import render, get_object_or_404
 from restau.models import (
     Products, Category, SubCategory, ActiveSetup,)
 from django.db.models import Prefetch
+from collections import defaultdict
 
 
 def encomendas(request):
     active_setup = ActiveSetup.objects.first()
 
-    categorias = Category.objects \
-        .all() \
-        .order_by('ordem')
-    subcategorias = SubCategory.objects \
-        .all() \
-        .order_by('ordem')
+    if not active_setup or not active_setup.active_ementa:
+        return render(request, 'restau/pages/encomendas.html', {'active_setup': active_setup, 'categorias': []})
 
-    ementa = active_setup.active_ementa
-    campo_preco = ementa.nome_campo_preco_selecionado
+    campo_preco = active_setup.active_ementa.nome_campo_preco_selecionado
+    produtos_ementa = active_setup.active_ementa.produtos.filter(visibilidade=True).select_related(
+        'categoria', 'subcategoria').order_by('categoria', 'subcategoria')
 
-    if active_setup and active_setup.active_ementa:
-        produtos_ementa = active_setup.active_ementa.produtos \
-            .all() \
-            .order_by('categoria', 'subcategoria', 'ordem')
+    categorias_dict = {}
+    for produto in produtos_ementa:
+        preco_dinamico = getattr(produto, campo_preco, 'Preço não definido')
+        produto.preco_dinamico = preco_dinamico
 
-        produtos_ementa = produtos_ementa.prefetch_related(
-            Prefetch('categoria', queryset=categorias),
-            Prefetch('subcategoria', queryset=subcategorias)
-        )
+        cat = produto.categoria
+        subcat = produto.subcategoria
 
-        for produto in produtos_ementa:
-            preco = getattr(produto, campo_preco, None)
-            if preco is not None:
-                produto.preco_dinamico = preco
-            else:
-                produto.preco_dinamico = 'Preço não definido'
+        if cat not in categorias_dict:
+            categorias_dict[cat] = {'subcategorias': defaultdict(list)}
 
-    else:
-        produtos_ementa = Products.objects.none()
+        categorias_dict[cat]['subcategorias'][subcat].append(produto)
+
+    # Convertendo defaultdict para dict normal para evitar problemas no template
+    for cat in categorias_dict.keys():
+        categorias_dict[cat]['subcategorias'] = dict(
+            categorias_dict[cat]['subcategorias'])
 
     context = {
         'active_setup': active_setup,
-        'produtos': produtos_ementa,
-        'categorias': categorias,
-        'subcategorias': subcategorias,
+        'categorias': categorias_dict,
     }
-    return render(
-        request,
-        'restau/pages/encomendas.html',
-        context,
-    )
+
+    return render(request, 'restau/pages/encomendas.html', context)
 
 
 def produtos(request):
