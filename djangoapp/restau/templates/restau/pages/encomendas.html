@@ -24,7 +24,8 @@
                     {% endif %}
                     <div class="product-details">
                         <h3 class="product-name">{{ produto.nome }}</h3>
-                        <p class="product-description">Descrição: {{ produto.descricao_curta }}</p>
+                        <h5 class="product-description">Descrição:</h5>
+                        <span class="product-description">{{ produto.descricao_curta }}</span>
                         <div class="product-price-section">
                             <p class="product-price">Preço: <span class="price">{{ produto.preco_dinamico }}</span></p>
                         </div>

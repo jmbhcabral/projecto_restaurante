@@ -7,13 +7,20 @@ from collections import defaultdict
 
 def encomendas(request):
     active_setup = ActiveSetup.objects.first()
+    if active_setup:
+        if active_setup.active_imagem_padrao:
+            image = active_setup.active_imagem_padrao.imagem.url
+            print('imagem url: ', image)
+        else:
+            image = 'Não tem imagem padrao'
+            print('imagem url: ', image)
 
     if not active_setup or not active_setup.active_ementa:
         return render(request, 'restau/pages/encomendas.html', {'active_setup': active_setup, 'categorias': []})
 
     campo_preco = active_setup.active_ementa.nome_campo_preco_selecionado
     produtos_ementa = active_setup.active_ementa.produtos.filter(visibilidade=True).select_related(
-        'categoria', 'subcategoria').order_by('categoria', 'subcategoria')
+        'categoria', 'subcategoria').order_by('categoria', 'subcategoria', 'ordem')
 
     categorias_dict = {}
     for produto in produtos_ementa:
