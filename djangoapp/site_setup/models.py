@@ -38,6 +38,11 @@ class SiteSetup(models.Model):
     show_takeaway = models.BooleanField(default=True)
     show_delivery = models.BooleanField(default=True)
 
+    head_title = models.CharField(
+        max_length=65,
+        blank=True,
+        default='Teste',)
+
     favicon = models.ImageField(
         upload_to='assets/favicon/%Y/%m/',
         blank=True, default='',

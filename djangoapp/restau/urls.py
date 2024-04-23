@@ -465,7 +465,7 @@ urlpatterns = [
         name='admin_utilizador'
     ),
     path(
-        'restau/pages/compras_utilizador/<int:utilizador_id>/',
+        'restau/pages/compras_utilizador/<int:utilizador_pk>/',
         views.compras_utilizador,  # type: ignore
         name='compras_utilizador'
     ),

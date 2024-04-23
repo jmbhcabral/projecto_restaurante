@@ -8,7 +8,7 @@ from operator import attrgetter
 from datetime import datetime
 
 
-def admin_utilizadores(request):
+def admin_utilizadores(request, *args, **kwargs):
     query = request.GET.get('query', None)
 
     if query is not None:
@@ -24,7 +24,7 @@ def admin_utilizadores(request):
             else:
                 usuario = User.objects.get(pk=perfil.usuario.id)
                 return redirect(
-                    'restau:admin_utilizador',
+                    'restau:compras_utilizador',
                     utilizador_pk=usuario.pk)
         except Perfil.DoesNotExist:
             messages.error(

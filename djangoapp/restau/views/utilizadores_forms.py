@@ -8,8 +8,8 @@ from django.utils import timezone
 from datetime import timedelta, datetime
 
 
-def compras_utilizador(request, utilizador_id):
-    user = get_object_or_404(User, id=utilizador_id)
+def compras_utilizador(request, utilizador_pk):
+    user = get_object_or_404(User, id=utilizador_pk)
 
     initial_data = {
         'utilizador': user,
@@ -26,7 +26,7 @@ def compras_utilizador(request, utilizador_id):
             compras.save()
             return redirect(
                 'restau:compras_utilizador',
-                utilizador_id=utilizador_id
+                utilizador_pk=utilizador_pk
             )
     context = {
         'form': ComprasFidelidadeForm(initial=initial_data),
