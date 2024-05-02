@@ -20,45 +20,60 @@ def compras_utilizador(request, utilizador_pk):
 
     if request.method == 'POST':
         qr_data = request.POST.get('dados', '')
-        dados_qr = interpretar_dados(qr_data)
-        valor_compra = dados_qr.get('O', '')
-        chave_g_valor = dados_qr.get('G', '')
+        if qr_data and len(qr_data) > 20:
+            dados_qr = interpretar_dados(qr_data)
+            valor_compra = dados_qr.get('O', '')
+            chave_g_valor = dados_qr.get('G', '')
 
-        # Verificar se a chave G já foi usada
-        if ComprasFidelidade.objects.filter(chave_g=chave_g_valor).exists():
+            # Verificar se a chave G já foi usada
+            if ComprasFidelidade.objects.filter(chave_g=chave_g_valor).exists():
+                messages.error(
+                    request,
+                    'Uma compra com este código já foi registada.'
+                )
+                form = ComprasFidelidadeForm(
+                    request.POST, initial=initial_data)
+
+                return redirect(
+                    'restau:compras_utilizador',
+                    utilizador_pk=utilizador_pk
+                )
+            else:
+                form = ComprasFidelidadeForm(
+                    request.POST, initial=initial_data)
+
+                if form.is_valid():
+                    compra_fidelidade = form.save(commit=False)
+                    compra_fidelidade.utilizador = user
+                    compra_fidelidade.fidelidade = user.perfil.tipo_fidelidade
+                    if valor_compra:
+                        compra_fidelidade.compra = valor_compra
+                    if chave_g_valor:
+                        compra_fidelidade.chave_g = chave_g_valor
+                    compra_fidelidade.pontos_adicionados = round(
+                        float(compra_fidelidade.compra) *
+                        compra_fidelidade.fidelidade.desconto / 100, 2)
+                    compra_fidelidade.save()
+                    messages.success(
+                        request,
+                        'Compra registada com sucesso.'
+                    )
+
+                    return redirect(
+                        'restau:admin_utilizadores',
+                    )
+        elif len(qr_data) < 20:
             messages.error(
                 request,
-                'Uma compra com este código já foi registada.'
+                'Erro ao ler o código QR.'
             )
-            form = ComprasFidelidadeForm(request.POST, initial=initial_data)
+            form = ComprasFidelidadeForm(
+                request.POST, initial=initial_data)
 
             return redirect(
                 'restau:compras_utilizador',
                 utilizador_pk=utilizador_pk
             )
-        else:
-            form = ComprasFidelidadeForm(request.POST, initial=initial_data)
-
-            if form.is_valid():
-                compra_fidelidade = form.save(commit=False)
-                compra_fidelidade.utilizador = user
-                compra_fidelidade.fidelidade = user.perfil.tipo_fidelidade
-                if valor_compra:
-                    compra_fidelidade.compra = valor_compra
-                if chave_g_valor:
-                    compra_fidelidade.chave_g = chave_g_valor
-                compra_fidelidade.pontos_adicionados = round(
-                    float(compra_fidelidade.compra) *
-                    compra_fidelidade.fidelidade.desconto / 100, 2)
-                compra_fidelidade.save()
-                messages.success(
-                    request,
-                    'Compra registada com sucesso.'
-                )
-
-                return redirect(
-                    'restau:admin_utilizadores',
-                )
     else:
         form = ComprasFidelidadeForm(initial=initial_data)
 
