@@ -1,9 +1,11 @@
 from django import forms
+from decimal import Decimal
 from django.contrib.auth.models import User
 from fidelidade.models import (
     Fidelidade, ProdutoFidelidadeIndividual, Products,
     ComprasFidelidade, OfertasFidelidade)
 from django.core.exceptions import ValidationError
+from utils.scanner_input_interpreter import interpretar_dados
 
 
 class FidelidadeForm(forms.ModelForm):
@@ -147,7 +149,7 @@ class ComprasFidelidadeForm(forms.ModelForm):
         model = ComprasFidelidade
         fields = [
             'fidelidade', 'utilizador',
-            'compra', 'pontos_adicionados',
+            'compra',
         ]
 
     fidelidade = forms.ModelChoiceField(
@@ -169,16 +171,9 @@ class ComprasFidelidadeForm(forms.ModelForm):
             }
         ),
         label='Compra',
-        help_text='Compra.',
+        # help_text='Compra.',
         required=False,
     )
-
-    def clean(self):
-        cleaned_data = self.cleaned_data
-        compra = cleaned_data.get('compra')
-        desconto = cleaned_data.get('fidelidade').desconto
-        pontos_adicionados = round(compra * desconto / 100, 2)
-        cleaned_data['pontos_adicionados'] = pontos_adicionados
 
     def __init__(self, *args, **kwargs):
         fidelidade_id = kwargs.pop('fidelidade_id', None)

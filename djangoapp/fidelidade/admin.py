@@ -30,16 +30,16 @@ class ProdutoFidelidadeIndividualAdmin(admin.ModelAdmin):
 class ComprasFidelidadeAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'fidelidade', 'utilizador', 'compra', 'pontos_adicionados',
-        'criado_em'
+        'criado_em', 'chave_g',
     )
     search_fields = ('id', 'fidelidade__nome', 'utilizador__username',
-                     'compra', 'pontos_adicionados', 'criado_em'
+                     'compra', 'pontos_adicionados', 'criado_em', 'chave_g',
                      )
     list_filter = ('id', 'fidelidade__nome', 'utilizador__username', 'compra',
-                   'pontos_adicionados', 'criado_em'
+                   'pontos_adicionados', 'criado_em', 'chave_g',
                    )
     ordering = ('id', 'fidelidade__nome', 'utilizador__username', 'compra',
-                'pontos_adicionados', 'criado_em'
+                'pontos_adicionados', 'criado_em', 'chave_g',
                 )
 
 

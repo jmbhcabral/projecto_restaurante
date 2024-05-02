@@ -6,6 +6,7 @@ from fidelidade.models import ComprasFidelidade, OfertasFidelidade
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta, datetime
+from utils.scanner_input_interpreter import interpretar_dados
 
 
 def compras_utilizador(request, utilizador_pk):
@@ -14,25 +15,57 @@ def compras_utilizador(request, utilizador_pk):
     initial_data = {
         'utilizador': user,
         'fidelidade': user.perfil.tipo_fidelidade.id,
+        'qr_data': '',
     }
 
     if request.method == 'POST':
-        form = ComprasFidelidadeForm(request.POST, initial=initial_data)
+        qr_data = request.POST.get('dados', '')
+        dados_qr = interpretar_dados(qr_data)
+        valor_compra = dados_qr.get('O', '')
+        chave_g_valor = dados_qr.get('G', '')
 
-        if form.is_valid():
-            compras = form.save(commit=False)
-            compras.utilizador = user
-            compras.fidelidade = user.perfil.tipo_fidelidade
-            compras.save()
+        # Verificar se a chave G já foi usada
+        if ComprasFidelidade.objects.filter(chave_g=chave_g_valor).exists():
+            messages.error(
+                request,
+                'Uma compra com este código já foi registada.'
+            )
+            form = ComprasFidelidadeForm(request.POST, initial=initial_data)
+
             return redirect(
                 'restau:compras_utilizador',
                 utilizador_pk=utilizador_pk
             )
+        else:
+            form = ComprasFidelidadeForm(request.POST, initial=initial_data)
+
+            if form.is_valid():
+                compra_fidelidade = form.save(commit=False)
+                compra_fidelidade.utilizador = user
+                compra_fidelidade.fidelidade = user.perfil.tipo_fidelidade
+                if valor_compra:
+                    compra_fidelidade.compra = valor_compra
+                if chave_g_valor:
+                    compra_fidelidade.chave_g = chave_g_valor
+                compra_fidelidade.pontos_adicionados = round(
+                    float(compra_fidelidade.compra) *
+                    compra_fidelidade.fidelidade.desconto / 100, 2)
+                compra_fidelidade.save()
+                messages.success(
+                    request,
+                    'Compra registada com sucesso.'
+                )
+
+                return redirect(
+                    'restau:admin_utilizadores',
+                )
+    else:
+        form = ComprasFidelidadeForm(initial=initial_data)
+
     context = {
         'form': ComprasFidelidadeForm(initial=initial_data),
         'utilizador': user,
         'perfil': user.perfil,
-        # 'fidelidade': user.perfil.tipo_fidelidade,
     }
 
     return render(request, 'restau/pages/compras_utilizador.html', context)
@@ -93,15 +126,22 @@ def ofertas_utilizador(request, utilizador_id):
                 ofertas.utilizador = user
                 ofertas.fidelidade = user.perfil.tipo_fidelidade
                 ofertas.save()
+                messages.success(
+                    request,
+                    'Oferta registada com sucesso.'
+                )
+                return redirect(
+                    'restau:admin_utilizadores'
+                )
             else:
                 messages.error(
                     request,
                     'Pontos insuficientes para realizar a oferta.'
                 )
-            return redirect(
-                'restau:ofertas_utilizador',
-                utilizador_id=utilizador_id
-            )
+                return redirect(
+                    'restau:ofertas_utilizador',
+                    utilizador_id=utilizador_id
+                )
         else:
             print('form.errors: ', form.errors)
     context = {
