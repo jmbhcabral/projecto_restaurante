@@ -48,11 +48,26 @@ def compras_utilizador(request, utilizador_pk):
                     compra_fidelidade.fidelidade = user.perfil.tipo_fidelidade
                     if valor_compra:
                         compra_fidelidade.compra = valor_compra
+                    else:
+                        compra_fidelidade.compra = 0
                     if chave_g_valor:
                         compra_fidelidade.chave_g = chave_g_valor
-                    compra_fidelidade.pontos_adicionados = round(
-                        float(compra_fidelidade.compra) *
-                        compra_fidelidade.fidelidade.desconto / 100, 2)
+                    try:
+                        compra_fidelidade.pontos_adicionados = round(
+                            float(compra_fidelidade.compra) *
+                            compra_fidelidade.fidelidade.desconto / 100, 2)
+                    except (TypeError, ValueError):
+                        compra_fidelidade.pontos_adicionados = 0
+
+                        messages.error(
+                            request,
+                            'Erro ao calcular os pontos adicionados.'
+                        )
+                        return redirect(
+                            'restau:compras_utilizador',
+                            utilizador_pk=utilizador_pk
+                        )
+
                     compra_fidelidade.save()
                     messages.success(
                         request,
@@ -60,7 +75,8 @@ def compras_utilizador(request, utilizador_pk):
                     )
 
                     return redirect(
-                        'restau:admin_utilizadores',
+                        'restau:compras_utilizador',
+                        utilizador_pk=utilizador_pk
                     )
         elif len(qr_data) < 20:
             messages.error(
