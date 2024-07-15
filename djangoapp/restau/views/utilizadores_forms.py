@@ -1,3 +1,4 @@
+import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -5,8 +6,9 @@ from fidelidade.forms import ComprasFidelidadeForm, OfertasFidelidadeForm
 from fidelidade.models import ComprasFidelidade, OfertasFidelidade
 from django.db import models
 from django.utils import timezone
-from datetime import timedelta, datetime
 from utils.scanner_input_interpreter import interpretar_dados
+
+logger = logging.getLogger(__name__)
 
 
 def compras_utilizador(request, utilizador_pk):
@@ -20,81 +22,57 @@ def compras_utilizador(request, utilizador_pk):
 
     if request.method == 'POST':
         qr_data = request.POST.get('dados', '')
-        if qr_data and len(qr_data) > 20:
-            dados_qr = interpretar_dados(qr_data)
-            valor_compra = dados_qr.get('O', '')
-            chave_g_valor = dados_qr.get('G', '')
+        if qr_data:
+            if len(qr_data) > 20:
+                try:
+                    dados_qr = interpretar_dados(qr_data)
+                    valor_compra = dados_qr.get('O', '')
+                    chave_g_valor = dados_qr.get('G', '')
 
-            # Verificar se a chave G já foi usada
-            if ComprasFidelidade.objects.filter(chave_g=chave_g_valor).exists():
-                messages.error(
-                    request,
-                    'Uma compra com este código já foi registada.'
-                )
-                form = ComprasFidelidadeForm(
-                    request.POST, initial=initial_data)
-
-                return redirect(
-                    'restau:compras_utilizador',
-                    utilizador_pk=utilizador_pk
-                )
-            else:
-                form = ComprasFidelidadeForm(
-                    request.POST, initial=initial_data)
-
-                if form.is_valid():
-                    compra_fidelidade = form.save(commit=False)
-                    compra_fidelidade.utilizador = user
-                    compra_fidelidade.fidelidade = user.perfil.tipo_fidelidade
-                    if valor_compra:
-                        compra_fidelidade.compra = valor_compra
-                    else:
-                        compra_fidelidade.compra = 0
-                    if chave_g_valor:
-                        compra_fidelidade.chave_g = chave_g_valor
-                    try:
-                        compra_fidelidade.pontos_adicionados = round(
-                            float(compra_fidelidade.compra) *
-                            compra_fidelidade.fidelidade.desconto / 100, 2)
-                    except (TypeError, ValueError):
-                        compra_fidelidade.pontos_adicionados = 0
-
+                    # Verificar se a chave G já foi usada
+                    if ComprasFidelidade.objects.filter(chave_g=chave_g_valor).exists():
                         messages.error(
-                            request,
-                            'Erro ao calcular os pontos adicionados.'
-                        )
-                        return redirect(
-                            'restau:compras_utilizador',
-                            utilizador_pk=utilizador_pk
-                        )
+                            request, 'Uma compra com este código já foi registada.')
+                        logger.warning(
+                            "LOGGER: Compra duplicada para chave G: %s", chave_g_valor)
+                    else:
+                        form = ComprasFidelidadeForm(
+                            request.POST, initial=initial_data)
+                        if form.is_valid():
+                            compra_fidelidade = form.save(commit=False)
+                            compra_fidelidade.utilizador = user
+                            compra_fidelidade.fidelidade = user.perfil.tipo_fidelidade
+                            compra_fidelidade.compra = valor_compra if valor_compra else 0
+                            compra_fidelidade.chave_g = chave_g_valor if chave_g_valor else ''
 
-                    compra_fidelidade.save()
-                    messages.success(
-                        request,
-                        'Compra registada com sucesso.'
-                    )
+                            try:
+                                compra_fidelidade.pontos_adicionados = round(
+                                    float(compra_fidelidade.compra) * compra_fidelidade.fidelidade.desconto / 100, 2)
+                            except (TypeError, ValueError) as e:
+                                compra_fidelidade.pontos_adicionados = 0
+                                logger.error(
+                                    "LOGGER: Erro ao calcular pontos adicionados: %s", e)
+                                messages.error(
+                                    request, 'Erro ao calcular os pontos adicionados.')
 
-                    return redirect(
-                        'restau:compras_utilizador',
-                        utilizador_pk=utilizador_pk
-                    )
-        elif len(qr_data) < 20:
-            messages.error(
-                request,
-                'Erro ao ler o código QR.'
-            )
-            form = ComprasFidelidadeForm(
-                request.POST, initial=initial_data)
-
-            return redirect(
-                'restau:compras_utilizador',
-                utilizador_pk=utilizador_pk
-            )
+                            compra_fidelidade.save()
+                            logger.info(
+                                'LOGGER: Compra registada com sucesso.')
+                            messages.success(
+                                request, 'Compra registada com sucesso.')
+                except Exception as e:
+                    logger.error("LOGGER: Erro ao processar dados QR: %s", e)
+                    messages.error(
+                        request, 'Erro ao processar os dados do QR.')
+            else:
+                messages.error(request, 'Erro ao ler o código QR.')
+                logger.warning("LOGGER: Código QR inválido: %s", qr_data)
+        return redirect('restau:compras_utilizador', utilizador_pk=utilizador_pk)
     else:
         form = ComprasFidelidadeForm(initial=initial_data)
 
     context = {
-        'form': ComprasFidelidadeForm(initial=initial_data),
+        'form': form,
         'utilizador': user,
         'perfil': user.perfil,
     }
