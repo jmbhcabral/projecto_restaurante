@@ -17,11 +17,17 @@
                         <input type="submit" value="Submeter">
                     </form> 
                     <script>
-                        document.addEventListener('DOMContentLoaded', function () {
+                        document.addEventListener('DOMContentLoaded', function() {
                             var qrDataField = document.getElementById('id_qr_data');
                             if (qrDataField) {
                                 qrDataField.focus();
                             }
+    
+                            const form = document.querySelector("form");
+                            form.addEventListener("submit", function(event) {
+                                const submitButton = form.querySelector("input[type='submit']");
+                                submitButton.disabled = true;
+                            });
                         });
                     </script> 
                 </div>
