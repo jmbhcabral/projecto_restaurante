@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from fidelidade.forms import ComprasFidelidadeForm, OfertasFidelidadeForm
 from fidelidade.models import ComprasFidelidade, OfertasFidelidade
-from django.db import models
+from django.db import models, IntegrityError
 from django.utils import timezone
 from utils.scanner_input_interpreter import interpretar_dados
 
@@ -55,11 +55,18 @@ def compras_utilizador(request, utilizador_pk):
                                 messages.error(
                                     request, 'Erro ao calcular os pontos adicionados.')
 
-                            compra_fidelidade.save()
-                            logger.info(
-                                'LOGGER: Compra registada com sucesso.')
-                            messages.success(
-                                request, 'Compra registada com sucesso.')
+                            try:
+                                compra_fidelidade.save()
+                                logger.info(
+                                    'LOGGER: Compra registada com sucesso.')
+                                messages.success(
+                                    request, 'Compra registada com sucesso.')
+                            except IntegrityError as e:
+                                messages.error(
+                                    request, 'Uma compra com este código já foi registada.')
+                                logger.error(
+                                    "LOGGER: Tentativa de registrar compra duplicada para chave G: %s - %s", chave_g_valor, e)
+
                 except Exception as e:
                     logger.error("LOGGER: Erro ao processar dados QR: %s", e)
                     messages.error(
