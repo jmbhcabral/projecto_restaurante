@@ -29,8 +29,14 @@ def compras_utilizador(request, utilizador_pk):
                     valor_compra = dados_qr.get('O', '')
                     chave_g_valor = dados_qr.get('G', '')
 
+                    if not valor_compra or not chave_g_valor:
+                        messages.error(
+                            request, 'Erro ao ler Qrcode.')
+                        logger.warning(
+                            "LOGGER: Erro ao ler Qrcode, valor: %s, chave G: %s", valor_compra, chave_g_valor)
+
                     # Verificar se a chave G já foi usada
-                    if ComprasFidelidade.objects.filter(chave_g=chave_g_valor).exists():
+                    elif ComprasFidelidade.objects.filter(chave_g=chave_g_valor).exists():
                         messages.error(
                             request, 'Uma compra com este código já foi registada.')
                         logger.warning(
