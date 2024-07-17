@@ -3,7 +3,7 @@ from django.core.mail import send_mail
 from django.contrib import messages
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from django.utils import timezone
 from django.db import models
 from django.shortcuts import render, get_object_or_404, redirect
@@ -84,7 +84,7 @@ class Criar(BasePerfil):
         password = self.userform.cleaned_data.get('password')
         first_name = self.userform.cleaned_data.get('first_name')
         last_name = self.userform.cleaned_data.get('last_name')
-        perfil_data = self.perfilform.cleaned_data
+        perfil_data = self.convert_dates_to_str(self.perfilform.cleaned_data)
         token = str(uuid.uuid4())
 
         # Armazenar os dados na sessão
@@ -121,6 +121,13 @@ class Criar(BasePerfil):
             [email],
             fail_silently=False,
         )
+
+    def convert_dates_to_str(self, data):
+        """Convert date objects to strings in the data dictionary."""
+        for key, value in data.items():
+            if isinstance(value, date):
+                data[key] = value.isoformat()
+        return data
 
 
 @method_decorator(login_required, name='dispatch')
