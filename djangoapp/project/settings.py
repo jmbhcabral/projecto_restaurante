@@ -222,8 +222,8 @@ EMAIL_HOST = os.getenv('EMAIL_HOST', 'change-me')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', 'change-me'))
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'change-me')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'change-me')
-EMAIL_USE_TLS = bool(os.getenv('EMAIL_USE_TLS', 0))
-EMAIL_USE_SSL = bool(os.getenv('EMAIL_USE_SSL', 0))
+EMAIL_USE_TLS = bool(os.getenv('EMAIL_USE_TLS', None))
+EMAIL_USE_SSL = bool(os.getenv('EMAIL_USE_SSL', None))
 
 
 # Frontend URL

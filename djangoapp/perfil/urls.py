@@ -13,8 +13,8 @@ users_api_v1.register(
 
 urlpatterns = [
     path('perfil/', views.Criar.as_view(), name='criar'),
-    path('confirmacao_email/<str:token>/', views.ConfirmarEmail.as_view(),
-         name='confirmacao_email'),
+    path('confirmar_email/<uuid:token>/', views.ConfirmarEmail.as_view(),
+         name='confirmar_email'),
     path('perfil/reenvio_confirmacao_email/<str:username>/', views.ResendConfirmationEmail.as_view(),
          name='resend_confirmation_email'),
     path('perfil/atualizar/', views.Atualizar.as_view(), name='atualizar'),

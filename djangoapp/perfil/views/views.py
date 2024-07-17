@@ -1,3 +1,4 @@
+import uuid
 from django.contrib import messages
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -78,29 +79,27 @@ class Criar(BasePerfil):
         if not self.userform.is_valid() or not self.perfilform.is_valid():
             return self.renderizar
 
+        username = self.userform.cleaned_data.get('username')
+        email = self.userform.cleaned_data.get('email')
         password = self.userform.cleaned_data.get('password')
+        first_name = self.userform.cleaned_data.get('first_name')
+        last_name = self.userform.cleaned_data.get('last_name')
+        perfil_data = self.perfilform.cleaned_data
+        token = str(uuid.uuid4())
 
-        usuario = self.userform.save(commit=False)
-        usuario.set_password(password)
-        usuario.is_active = False
-        usuario.save()
+        # Armazenar os dados na sessão
+        self.request.session['temp_user'] = {
+            'username': username,
+            'email': email,
+            'password': password,
+            'first_name': first_name,
+            'last_name': last_name,
+            'perfil_data': perfil_data,
+            'token': token,
+        }
 
-        perfil = self.perfilform.save(commit=False)
-        perfil.usuario = usuario
-        perfil.save()
-
-        # send_confirmation_email(usuario)
-        send_confirmation_email(usuario)
-
-        if password:
-            autentica = authenticate(
-                self.request,
-                username=usuario,
-                password=password
-            )
-
-            if autentica:
-                login(self.request, user=usuario)
+        # Enviar email de confirmação
+        self.send_confirmation_email(email, username, token)
 
         messages.success(
             self.request,
@@ -384,33 +383,32 @@ class Vantagens(View):
 
 class ConfirmarEmail(View):
     def get(self, request, token):
-        # Tenta encontrar o token no banco de dados
-        token = get_object_or_404(
-            EmailConfirmationToken, token=token
-        )
+        # Tenta encontrar o token na sessao
+        temp_user = request.session.get('temp_user', None)
+
         # verifica se o token já foi utilizado ou expirou
-        if token.user.is_active:
+        if not temp_user or temp_user.get('token') != token:
             messages.error(
                 request,
-                'Este link já foi utilizado!'
+                'Este link já foi utilizado ou está expirado!'
             )
             return redirect('perfil:criar')
 
-        if token.is_expired():
-            resend_link = reverse('perfil:resend_confirmation_email', kwargs={
-                'username': token.user.username})
-            error_message = f'Este link já expirou! \n<a href="{resend_link}" style="text-decoration: underline;">clique aqui</a> para reenviar o email de confirmação!'
-            messages.error(
-                self.request, mark_safe(error_message)
-            )
-            return redirect('perfil:criar')
+        # Cria um novo usuário
+        user = User.objects.create_user(
+            username=temp_user['username'],
+            email=temp_user['email'],
+            password=temp_user['password'],
+            first_name=temp_user['first_name'],
+            last_name=temp_user['last_name'],
+        )
 
-        # Ativa o usuário e salva no banco de dados
-        token.user.is_active = True
-        token.user.save()
-
-        # Deleta o token do banco de dados
-        # token.delete()
+        # Cria um perfil para o usuário
+        perfil_data = temp_user['perfil_data']
+        perfil = perfil_models.Perfil.objects.create(
+            usuario=user,
+            **perfil_data
+        )
 
         messages.success(
             request,
