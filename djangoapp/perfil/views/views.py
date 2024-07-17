@@ -1,4 +1,5 @@
 import uuid
+from django.core.mail import send_mail
 from django.contrib import messages
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -16,8 +17,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from restau.models import ActiveSetup
-from utils.email_confirmation import send_confirmation_email
-from perfil.models import EmailConfirmationToken, PasswordResetToken
+from perfil.models import PasswordResetToken
 from utils.reset_password_email import reset_password_email
 from django.conf import settings
 from perfil.forms import (ResetPasswordForm, RequestResetPasswordForm,
@@ -106,6 +106,21 @@ class Criar(BasePerfil):
             'Conta criada com sucesso!\nVerifique o seu email para ativar a conta!')
 
         return redirect('perfil:criar')
+
+    def send_confirmation_email(self, email, username, token):
+        confirm_url = reverse('perfil:confirmar_email', args=[token])
+        full_url = f"{self.request.scheme}://{self.request.get_host()}{confirm_url}"
+
+        send_mail(
+            'Confirmação de email',
+            f'Olá {username},\n\n'
+            'Para confirmar o seu email, por favor clique no link abaixo:\n\n'
+            f'{full_url}\n\n'
+            'Obrigado!',
+            settings.EMAIL_HOST_USER,
+            [email],
+            fail_silently=False,
+        )
 
 
 @method_decorator(login_required, name='dispatch')
