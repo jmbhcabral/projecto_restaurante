@@ -4,6 +4,7 @@ from perfil.models import Perfil
 from fidelidade.models import Respostas
 from . import models
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 
 
 class PerfilForm(forms.ModelForm):
@@ -55,9 +56,12 @@ class PerfilForm(forms.ModelForm):
             (resposta.id, resposta.resposta)
             for resposta in Respostas.objects.all()
         ]
-        for field in self.fields.values():
+        for field_name, field in self.fields.items():
             if field.required:
-                field.label_suffix = ' <span class="label-asterisk">**</span>'
+                field.label_suffix = mark_safe(
+                    '<span class="asteriskField">*</span>')
+            else:
+                field.label_suffix = ''
 
     def clean(self, *args, **kwargs):
         data = self.data
@@ -127,13 +131,13 @@ class UserForm(forms.ModelForm):
     )
 
     password = forms.CharField(
-        required=False,
+        required=True,
         widget=forms.PasswordInput(),
         label='Palavra-passe',
     )
 
     password2 = forms.CharField(
-        required=False,
+        required=True,
         widget=forms.PasswordInput(),
         label='Confirmação Palavra-passe',
     )
@@ -154,6 +158,13 @@ class UserForm(forms.ModelForm):
 
         if usuario:
             self.fields['username'].widget.attrs['readonly'] = True
+
+        for field_name, field in self.fields.items():
+            if field.required:
+                field.label_suffix = mark_safe(
+                    ' <span class="asteriskField">*</span>')
+            else:
+                field.label_suffix = ''
 
     def clean(self, *args, **kwargs):
         data = self.data
@@ -333,4 +344,5 @@ class ResetPasswordForm(forms.Form):
                     error_msg_passwords_not_match
 
         if validation_error_msgs:
+            message.error(request, 'Erro ao alterar a palavra-passe.')
             raise (forms.ValidationError(validation_error_msgs))

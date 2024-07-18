@@ -1139,7 +1139,7 @@ body.frontend {
   color: hsl(var(--clr-black));
 }
 
-/* prefil */
+/* perfil */
 .section-gap-conta {
   padding: var(--spacing-bgst);
 }
@@ -1428,4 +1428,20 @@ body.frontend {
   font-family: 'Material Icons';
   font-size: 4em;
   color: hsl(var(--clr-black));
+}
+
+.input-group {
+  position: relative;
+}
+.input-group .input-group-text {
+  background: none;
+  border: none;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+.input-group .form-control {
+  padding-right: 2.5rem;
 }

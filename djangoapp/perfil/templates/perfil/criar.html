@@ -1,13 +1,21 @@
-{% extends 'restau/base_front.html' %}
-{% load crispy_forms_tags %}
+{% extends 'restau/base_front_perfil.html' %}
 {% block content %}
+<main class="section-content-wide section-gap front-content">
+    <section class="section-gap-conta white-bg top-background">
+        <div class="separator"></div>
+            <h1 class="center">Hamburgueria artesanal</h1>
+        <div class="separator "></div>
+        {% include "restau/partials/_messages.html" %}
+    </section>
     <section>
-        <div class="login-register-content">
+        <div class="center-form">
+            <div class="form-container">
+        {% comment %} <div class="login-register-content"> {% endcomment %}
             {% if not request.user.is_authenticated %}
             <div class="section-gap">
                 <div class="col section-gap">
-                    <h4>Login</h4>
-                    <p>Se já se registou, entre com usuário e senha.</p>
+                    <h2>Login</h2>
+                    <h5>Se já se registou, entre com usuário e senha.</h5>
                     <form method="POST" action="{% url 'perfil:login' %}">
                         {% csrf_token %}
                         <div class="form-group">
@@ -16,7 +24,14 @@
                         </div>
                         <div class="form-group">
                             <label for="exampleInputPassword1">Palavra-passe:</label>
-                            <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Digite a sua palavra-passe">
+                            <div class="input-group">
+                                <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Digite a sua palavra-passe">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-eye toggle-password" style="cursor: pointer;"></i>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-primary btn-block">Entrar</button>
                     </form>   
@@ -27,14 +42,64 @@
                 {% endif %}
                 <div class="col section-gap">
                     {% block tituloregistar %}
-                    <h4>Registrar</h4>
-                    <p>Se ainda não se registou, preencha os campos abaixo.</p>
+                    <h2>Registrar</h2>
+                    <h5>Se ainda não se registou, preencha os campos abaixo.</h5>
+                    <span>Os campos assinalados com </span><span style="color: red;">*</span> <span>são obrigatórios.</span>
                     {% endblock  %}
                     <form action="" method="POST">
                         {% csrf_token %}
-                        {{ userform|crispy }}
-                        {{ perfilform|crispy }}
-                        <div class="row">
+                        {{ userform.non_field_errors }}
+                        <div class="form-group">
+                            {{ userform.username.label_tag }}
+                            {{ userform.username }}
+                        </div>
+                        <div class="form-group">
+                            {{ userform.first_name.label_tag }}
+                            {{ userform.first_name }}
+                        </div>
+                        <div class="form-group">
+                            {{ userform.last_name.label_tag }}
+                            {{ userform.last_name }}
+                        </div>
+                        <div class="form-group">
+                            {{ userform.email.label_tag }}
+                            {{ userform.email }}
+                        </div>
+                        <div class="form-group">
+                            {{ userform.password.label_tag }}
+                            <div class="input-group">
+                                {{ userform.password }}
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-eye toggle-password" style="cursor: pointer;"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            {{ userform.password2.label_tag }}
+                            <div class="input-group">
+                                {{ userform.password2 }}
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-eye toggle-password" style="cursor: pointer;"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            {{ perfilform.data_nascimento.label_tag|safe }}
+                            {{ perfilform.data_nascimento }}
+                        </div>
+                        <div class="form-group">
+                            {{ perfilform.telemovel.label_tag|safe }}
+                            {{ perfilform.telemovel }}
+                        </div>
+                        <div class="form-group">
+                            {{ perfilform.estudante.label_tag|safe }}
+                            {{ perfilform.estudante }}
+                        </div>
+                        <div class="row section-gap">
                             <div class="col">
                                 <button type="submit" class="btn btn-primary">Registrar</button>
                             </div>
@@ -43,7 +108,25 @@
                 </div>
             </div>
         </div>
+        </div>
     </section>
 </main>
-    
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.toggle-password').click(function() {
+            var input = $(this).closest('.input-group').find('input');
+            var icon = $(this);
+            if (input.attr('type') === 'password') {
+                input.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                input.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+    });
+</script>
 {% endblock content %}

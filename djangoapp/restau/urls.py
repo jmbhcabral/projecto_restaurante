@@ -50,6 +50,11 @@ urlpatterns = [
         views.admin_home,  # type: ignore
         name='admin_home'
     ),
+    path(
+        'restau/pages/admin_home_login/',
+        views.admin_home_login,  # type: ignore
+        name='admin_home_login'
+    ),
     # product
     path(
         'restau/pages/produtos/',

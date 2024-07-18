@@ -22,6 +22,8 @@ from utils.reset_password_email import reset_password_email
 from django.conf import settings
 from perfil.forms import (ResetPasswordForm, RequestResetPasswordForm,
                           ChangePasswordForm)
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
 
 
 class BasePerfil(View):
@@ -76,36 +78,54 @@ class BasePerfil(View):
 
 class Criar(BasePerfil):
     def post(self, *args, **kwargs):
-        if not self.userform.is_valid() or not self.perfilform.is_valid():
-            return self.renderizar
 
-        username = self.userform.cleaned_data.get('username')
-        email = self.userform.cleaned_data.get('email')
-        password = self.userform.cleaned_data.get('password')
-        first_name = self.userform.cleaned_data.get('first_name')
-        last_name = self.userform.cleaned_data.get('last_name')
-        perfil_data = self.convert_dates_to_str(self.perfilform.cleaned_data)
-        token = str(uuid.uuid4())
+        if self.userform.is_valid() and self.perfilform.is_valid():
+            username = self.userform.cleaned_data.get('username')
+            email = self.userform.cleaned_data.get('email')
+            password = self.userform.cleaned_data.get('password')
+            first_name = self.userform.cleaned_data.get('first_name')
+            last_name = self.userform.cleaned_data.get('last_name')
+            perfil_data = self.convert_dates_to_str(
+                self.perfilform.cleaned_data)
+            token = str(uuid.uuid4())
 
-        # Armazenar os dados na sessão
-        self.request.session['temp_user'] = {
-            'username': username,
-            'email': email,
-            'password': password,
-            'first_name': first_name,
-            'last_name': last_name,
-            'perfil_data': perfil_data,
-            'token': token,
-        }
+            # Armazenar os dados na sessão
+            self.request.session['temp_user'] = {
+                'username': username,
+                'email': email,
+                'password': password,
+                'first_name': first_name,
+                'last_name': last_name,
+                'perfil_data': perfil_data,
+                'token': token,
+            }
 
-        # Enviar email de confirmação
-        self.send_confirmation_email(email, username, token)
+            # Enviar email de confirmação
+            self.send_confirmation_email(email, username, token)
 
-        messages.success(
+            messages.success(
+                self.request,
+                'Conta criada com sucesso!\nVerifique o seu email para ativar a conta!')
+
+            return redirect('perfil:criar')
+
+        # Se o formulário não for válido, exibir os erros
+        for form in [self.userform, self.perfilform]:
+            # exibe os erros de cada campo sem exibir o campo para exibir os
+            # campos substituir o values() por items()
+            for errors in form.errors.values():
+                for error in errors:
+                    messages.error(
+                        self.request,
+                        error
+                    )
+        messages.error(
             self.request,
-            'Conta criada com sucesso!\nVerifique o seu email para ativar a conta!')
-
-        return redirect('perfil:criar')
+            'O formulário contém erros!'
+        )
+        # Redefine o contexto e re-renderiza a página com os erros
+        self.setup(*args, **kwargs)
+        return self.renderizar
 
     def send_confirmation_email(self, email, username, token):
         confirm_url = reverse('perfil:confirmar_email', args=[token])
@@ -196,6 +216,7 @@ class Atualizar(BasePerfil):
         return redirect('perfil:conta')
 
 
+@method_decorator(login_required, name='dispatch')
 class ChangePasswordView(BasePerfil):
 
     def setup(self, *args, **kwargs):
@@ -211,24 +232,34 @@ class ChangePasswordView(BasePerfil):
             )
         }
 
+    @method_decorator(never_cache)
     def get(self, *args, **kwargs):
         return render(self.request, self.template_name, self.context)
 
+    @method_decorator(never_cache)
     def post(self, *args, **kwargs):
         form = self.context['form']
-        if not form.is_valid():
+        if form.is_valid():
+            password = form.cleaned_data.get('password')
+            user = self.request.user
+            user.set_password(password)
+            user.save()
+            logout(self.request)
+            self.request.session.flush()  # Limpa a sessão
+
+            messages.success(
+                self.request,
+                'Senha alterada com sucesso!'
+            )
+            return redirect('perfil:criar')
+
+        else:
+            for error in form.errors.values():
+                messages.error(
+                    self.request,
+                    error.as_text()
+                )
             return render(self.request, self.template_name, self.context)
-
-        password = form.cleaned_data.get('password')
-        user = self.request.user
-        user.set_password(password)
-        user.save()
-
-        messages.success(
-            self.request,
-            'Senha alterada com sucesso!'
-        )
-        return redirect('perfil:conta')
 
 
 class Login(View):
@@ -284,7 +315,7 @@ class Logout(View):
         return redirect('restau:index')
 
 
-# @method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name='dispatch')
 class Conta(BasePerfil):
     template_name = 'perfil/conta.html'
 
@@ -297,6 +328,9 @@ class Conta(BasePerfil):
     def get(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return redirect('perfil:criar')
+
+        acesso_restrito = self.request.user.groups.filter(
+            name='acesso_restrito').exists()
 
         active_setup = ActiveSetup.objects \
             .order_by('-id') \
@@ -315,6 +349,7 @@ class Conta(BasePerfil):
         total_pontos = total_recompensas_decimal - total_ofertas_decimal
 
         self.context = {
+            'acesso_restrito': acesso_restrito,
             'active_setup': active_setup,
             'total_pontos': total_pontos,
             'total_recompensas': total_recompensas_decimal,
@@ -340,7 +375,7 @@ class Conta(BasePerfil):
 #         )
 #         return redirect('restau:index')
 
-
+@method_decorator(login_required, name='dispatch')
 class CartaoCliente(View):
     template_name = 'perfil/cartao_cliente.html'
 
@@ -365,6 +400,7 @@ class CartaoCliente(View):
         return render(self.request, self.template_name, self.context)
 
 
+@method_decorator(login_required, name='dispatch')
 class Vantagens(View):
     template_name = 'perfil/vantagens.html'
 
@@ -407,9 +443,12 @@ class ConfirmarEmail(View):
     def get(self, request, token):
         # Tenta encontrar o token na sessao
         temp_user = request.session.get('temp_user', None)
+        print('temp_user', temp_user)
+        print('token from session', temp_user.get('token'))
+        print('token from url', token)
 
         # verifica se o token já foi utilizado ou expirou
-        if not temp_user or temp_user.get('token') != token:
+        if not temp_user or str(temp_user.get('token')) != str(token):
             messages.error(
                 request,
                 'Este link já foi utilizado ou está expirado!'
@@ -474,6 +513,13 @@ class RequestResetPasswordView(View):
         user = User.objects.filter(email=email).first()
         form = RequestResetPasswordForm(request.POST)
 
+        if not user:
+            messages.error(
+                request,
+                'Email não encontrado!'
+            )
+            return redirect('perfil:request_reset_password')
+
         if form.is_valid():
             email = form.cleaned_data.get('email')
             reset_password_email(user)
@@ -510,6 +556,9 @@ class ResetPasswordView(View):
         token = get_object_or_404(
             PasswordResetToken, token=token
         )
+
+        user = token.user
+
         if request.user.is_authenticated:
             messages.error(
                 request,
@@ -534,7 +583,8 @@ class ResetPasswordView(View):
             {
                 'active_setup': self.context['active_setup'],
                 'form': form,
-                'token': token
+                'token': token,
+                'user': user
             }
         )
 
@@ -578,11 +628,12 @@ class ResetPasswordView(View):
                 {
                     'active_setup': self.context['active_setup'],
                     'form': form,
-                    'token': token
+                    'token': token,
                 }
             )
 
 
+@method_decorator(login_required, name='dispatch')
 class MovimentosCliente(BasePerfil):
     template_name = 'perfil/movimentos_cliente.html'
 

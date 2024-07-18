@@ -4,7 +4,7 @@ from restau.models import ActiveSetup, Fotos, Horario
 from typing import Dict
 
 
-@login_required
+@login_required(login_url='/perfil')
 @user_passes_test(lambda user: user.groups.filter(
     name='acesso_restrito').exists())
 def admin_home(request):
@@ -12,8 +12,6 @@ def admin_home(request):
     return render(
         request,
         'restau/pages/admin_home.html',
-
-
     )
 
 
