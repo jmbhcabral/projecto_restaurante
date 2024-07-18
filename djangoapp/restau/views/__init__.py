@@ -1,6 +1,5 @@
 # flake8: noqa
 # type: ignore
-from .admin_forms import *
 from .product_views import *
 from .product_forms import *
 from .category_views import *
