@@ -3,6 +3,7 @@ from restau.models import (
     Products, Category, SubCategory, ActiveSetup,)
 from django.db.models import Prefetch
 from collections import defaultdict
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
 def encomendas(request):
@@ -48,6 +49,9 @@ def encomendas(request):
     return render(request, 'restau/pages/encomendas.html', context)
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def produtos(request):
     categorias = Category.objects \
         .all() \
@@ -73,6 +77,9 @@ def produtos(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def produto(request, produto_id):
     produto = get_object_or_404(
         Products.objects

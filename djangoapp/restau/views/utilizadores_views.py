@@ -6,8 +6,12 @@ from fidelidade.models import ComprasFidelidade, OfertasFidelidade
 from django.db import models
 from operator import attrgetter
 from datetime import datetime
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def admin_utilizadores(request, *args, **kwargs):
     query = request.GET.get('query', None)
 
@@ -34,6 +38,9 @@ def admin_utilizadores(request, *args, **kwargs):
     return render(request, 'restau/pages/admin_utilizadores.html')
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def admin_utilizador(request, utilizador_pk):
     user = get_object_or_404(User, pk=utilizador_pk)
 
@@ -76,6 +83,9 @@ def admin_utilizador(request, utilizador_pk):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def movimentos(request, utilizador_id):
     user = get_object_or_404(User, pk=utilizador_id)
 

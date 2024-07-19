@@ -6,8 +6,12 @@ from restau.models import (
 )
 from typing import Dict
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def configuracao(request):
     campos = ActiveSetup.objects.all()
 
@@ -22,6 +26,9 @@ def configuracao(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def imagem_logo(request):
 
     logos = ImagemLogo.objects.all().order_by('id')
@@ -39,6 +46,9 @@ def imagem_logo(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def imagem_topo(request):
 
     imagens = ImagemTopo.objects.all().order_by('id')
@@ -56,6 +66,9 @@ def imagem_topo(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def intro(request):
 
     textos = Intro.objects.all().order_by('id')
@@ -73,6 +86,9 @@ def intro(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def intro_imagem(request):
 
     imagens = IntroImagem.objects.all().order_by('id')
@@ -90,6 +106,9 @@ def intro_imagem(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def frase_cima(request):
 
     textos = FraseCima.objects.all().order_by('id')
@@ -107,6 +126,9 @@ def frase_cima(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def imagem_frase_cima(request):
 
     imagens = ImagemFraseCima.objects.all().order_by('id')
@@ -124,6 +146,9 @@ def imagem_frase_cima(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def frase_central(request):
 
     textos = FraseInspiradora.objects.all().order_by('id')
@@ -141,6 +166,9 @@ def frase_central(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def frase_baixo(request):
 
     textos = FraseBaixo.objects.all().order_by('id')
@@ -158,6 +186,9 @@ def frase_baixo(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def imagem_frase_baixo(request):
 
     imagens = ImagemFraseBaixo.objects.all().order_by('id')
@@ -175,6 +206,9 @@ def imagem_frase_baixo(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def imagem_padrao(request):
 
     imagens = ImagemPadrao.objects.all().order_by('id')
@@ -192,6 +226,9 @@ def imagem_padrao(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def contatos_site(request):
 
     contacto = ContactosSite.objects.all().first()
@@ -228,6 +265,9 @@ def contatos_site(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def google_maps(request):
 
     local = GoogleMaps.objects.all().first()
@@ -264,6 +304,9 @@ def google_maps(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def horario(request):
 
     horarios = Horario.objects.all().order_by('id')

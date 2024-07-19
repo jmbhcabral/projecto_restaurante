@@ -1,7 +1,11 @@
 from django.shortcuts import render
 from restau.models import Fotos
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def galeria(request):
     numero_fotos = Fotos.objects.all().count()
     fotos = Fotos.objects.all()

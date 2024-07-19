@@ -3,8 +3,12 @@ from restau.models import Fotos
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def adicionar_foto(request):
     fotos = Fotos.objects.all().order_by('id')
 
@@ -40,6 +44,9 @@ def adicionar_foto(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def povoar_galeria(request):
     form_action = reverse('restau:povoar_galeria')
 

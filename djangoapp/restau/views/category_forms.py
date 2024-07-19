@@ -112,6 +112,9 @@ def apagar_categoria(request, categoria_id):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def ordenar_categorias(request):
     categorias = Category.objects.all().order_by('ordem')
 

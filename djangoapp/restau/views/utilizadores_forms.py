@@ -1,4 +1,5 @@
 import logging
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -11,6 +12,9 @@ from utils.scanner_input_interpreter import interpretar_dados
 logger = logging.getLogger(__name__)
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def compras_utilizador(request, utilizador_pk):
     user = get_object_or_404(User, id=utilizador_pk)
 
@@ -93,6 +97,9 @@ def compras_utilizador(request, utilizador_pk):
     return render(request, 'restau/pages/compras_utilizador.html', context)
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def ofertas_utilizador(request, utilizador_id):
     user = get_object_or_404(User, id=utilizador_id)
 

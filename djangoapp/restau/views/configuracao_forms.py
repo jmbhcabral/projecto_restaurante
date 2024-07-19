@@ -16,8 +16,12 @@ from restau.forms import (
     ImagemPadraoForm, ImagemPadraoFormSet, ContactosSiteForm, GoogleMapsForm,
     HorarioForm,
 )
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def configuracao(request):
     campos = ActiveSetup.objects.all()
 
@@ -32,6 +36,9 @@ def configuracao(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def criar_logo(request):
     form_action = reverse('restau:criar_logo')
     if request.method == 'POST':
@@ -58,6 +65,9 @@ def criar_logo(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def apagar_logo(request, ):
 
     form_action = reverse('restau:apagar_logo')
@@ -103,6 +113,9 @@ def apagar_logo(request, ):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def escolher_logo(request,):
 
     form_action = reverse('restau:escolher_logo')
@@ -143,6 +156,9 @@ def escolher_logo(request,):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def criar_imagem_topo(request):
     form_action = reverse('restau:criar_imagem_topo')
     if request.method == 'POST':
@@ -169,6 +185,9 @@ def criar_imagem_topo(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def apagar_imagem_topo(request, ):
 
     form_action = reverse('restau:apagar_imagem_topo')
@@ -214,6 +233,9 @@ def apagar_imagem_topo(request, ):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def escolher_imagem_topo(request,):
 
     form_action = reverse('restau:escolher_imagem_topo')
@@ -254,6 +276,9 @@ def escolher_imagem_topo(request,):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def criar_intro(request):
     form_action = reverse('restau:criar_intro')
     if request.method == 'POST':
@@ -280,6 +305,9 @@ def criar_intro(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def apagar_intro(request, ):
 
     form_action = reverse('restau:apagar_intro')
@@ -318,6 +346,9 @@ def apagar_intro(request, ):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def escolher_intro(request,):
 
     form_action = reverse('restau:escolher_intro')
@@ -361,6 +392,9 @@ def escolher_intro(request,):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def criar_intro_imagem(request):
     form_action = reverse('restau:criar_intro_imagem')
     if request.method == 'POST':
@@ -387,6 +421,9 @@ def criar_intro_imagem(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def apagar_intro_imagem(request, ):
 
     form_action = reverse('restau:apagar_intro_imagem')
@@ -432,6 +469,9 @@ def apagar_intro_imagem(request, ):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def escolher_intro_imagem(request,):
 
     form_action = reverse('restau:escolher_intro_imagem')
@@ -473,6 +513,9 @@ def escolher_intro_imagem(request,):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def criar_frase_cima(request):
     form_action = reverse('restau:criar_frase_cima')
     if request.method == 'POST':
@@ -499,6 +542,9 @@ def criar_frase_cima(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def apagar_frase_cima(request, ):
 
     form_action = reverse('restau:apagar_frase_cima')
@@ -537,6 +583,9 @@ def apagar_frase_cima(request, ):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def escolher_frase_cima(request,):
 
     form_action = reverse('restau:escolher_frase_cima')
@@ -580,6 +629,9 @@ def escolher_frase_cima(request,):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def criar_imagem_frase_cima(request):
     form_action = reverse('restau:criar_imagem_frase_cima')
     if request.method == 'POST':
@@ -606,6 +658,9 @@ def criar_imagem_frase_cima(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def apagar_imagem_frase_cima(request, ):
 
     form_action = reverse('restau:apagar_imagem_frase_cima')
@@ -652,6 +707,9 @@ def apagar_imagem_frase_cima(request, ):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def escolher_imagem_frase_cima(request,):
 
     form_action = reverse('restau:escolher_imagem_frase_cima')
@@ -695,6 +753,9 @@ def escolher_imagem_frase_cima(request,):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def criar_frase_central(request):
     form_action = reverse('restau:criar_frase_central')
     if request.method == 'POST':
@@ -721,6 +782,9 @@ def criar_frase_central(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def apagar_frase_central(request, ):
 
     form_action = reverse('restau:apagar_frase_central')
@@ -760,6 +824,9 @@ def apagar_frase_central(request, ):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def escolher_frase_central(request,):
 
     form_action = reverse('restau:escolher_frase_central')
@@ -803,6 +870,9 @@ def escolher_frase_central(request,):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def criar_frase_baixo(request):
     form_action = reverse('restau:criar_frase_baixo')
     if request.method == 'POST':
@@ -829,6 +899,9 @@ def criar_frase_baixo(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def apagar_frase_baixo(request, ):
 
     form_action = reverse('restau:apagar_frase_baixo')
@@ -868,6 +941,9 @@ def apagar_frase_baixo(request, ):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def escolher_frase_baixo(request,):
 
     form_action = reverse('restau:escolher_frase_baixo')
@@ -911,6 +987,9 @@ def escolher_frase_baixo(request,):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def criar_imagem_frase_baixo(request):
     form_action = reverse('restau:criar_imagem_frase_baixo')
     if request.method == 'POST':
@@ -937,6 +1016,9 @@ def criar_imagem_frase_baixo(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def apagar_imagem_frase_baixo(request, ):
 
     form_action = reverse('restau:apagar_imagem_frase_baixo')
@@ -983,6 +1065,9 @@ def apagar_imagem_frase_baixo(request, ):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def escolher_imagem_frase_baixo(request,):
 
     form_action = reverse('restau:escolher_imagem_frase_baixo')
@@ -1026,6 +1111,9 @@ def escolher_imagem_frase_baixo(request,):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def criar_imagem_padrao(request):
     form_action = reverse('restau:criar_imagem_padrao')
     if request.method == 'POST':
@@ -1052,6 +1140,9 @@ def criar_imagem_padrao(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def apagar_imagem_padrao(request, ):
 
     form_action = reverse('restau:apagar_imagem_padrao')
@@ -1098,6 +1189,9 @@ def apagar_imagem_padrao(request, ):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def escolher_imagem_padrao(request,):
 
     form_action = reverse('restau:escolher_imagem_padrao')
@@ -1141,6 +1235,9 @@ def escolher_imagem_padrao(request,):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def criar_contatos_site(request):
     contatos = ContactosSite.objects.all().first()
     form_action = reverse('restau:criar_contatos_site')
@@ -1169,6 +1266,9 @@ def criar_contatos_site(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def editar_contatos_site(request, contato_id):
     form_action = reverse('restau:editar_contatos_site',
                           kwargs={'contato_id': contato_id})
@@ -1198,6 +1298,9 @@ def editar_contatos_site(request, contato_id):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def criar_google_maps(request):
     local = GoogleMaps.objects.all().first()
     form_action = reverse('restau:criar_google_maps')
@@ -1226,6 +1329,9 @@ def criar_google_maps(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def editar_google_maps(request, map_id):
     form_action = reverse('restau:editar_google_maps',
                           kwargs={'map_id': map_id})
@@ -1255,6 +1361,9 @@ def editar_google_maps(request, map_id):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def criar_horario(request):
     horario = Horario.objects.all().first()
     form_action = reverse('restau:criar_horario')
@@ -1283,6 +1392,9 @@ def criar_horario(request):
     )
 
 
+@login_required
+@user_passes_test(lambda user: user.groups.filter(
+    name='acesso_restrito').exists())
 def editar_horario(request, horario_id):
     form_action = reverse('restau:editar_horario',
                           kwargs={'horario_id': horario_id})
