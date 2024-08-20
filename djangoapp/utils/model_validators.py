@@ -201,8 +201,14 @@ def processar_transacoes_existentes():
         )['ultima']
 
         # Determinar a última atividade válida apenas se houver transações
-        ultima_atividade = max(ultima_compra, ultima_oferta) if (
-            ultima_compra or ultima_oferta) else None
+        if ultima_compra and ultima_oferta:
+            ultima_atividade = max(ultima_compra, ultima_oferta)
+        elif ultima_compra:
+            ultima_atividade = ultima_compra
+        elif ultima_oferta:
+            ultima_atividade = ultima_oferta
+        else:
+            ultima_atividade = None
 
         print(f'Perfil: {perfil.usuario.username}')
         print(f'Última atividade calculada: {ultima_atividade}')
