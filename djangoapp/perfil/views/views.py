@@ -350,14 +350,13 @@ class Conta(BasePerfil):
 
         total_pontos_ganhos = fidelidade_models.ComprasFidelidade.objects.filter(
             utilizador=self.request.user).aggregate(
-            total_pontos_ganhos=models.Sum('pontos_adicionados'))
-        total_pontos_ganhos_decimal = Decimal(
-            total_pontos_ganhos['total_pontos_ganhos']) or 0
+            total_pontos_ganhos=models.Sum('pontos_adicionados'))['total_pontos_ganhos'] or 0
+        total_pontos_ganhos_decimal = Decimal(total_pontos_ganhos)
+
         total_ofertas = fidelidade_models.OfertasFidelidade.objects.filter(
             utilizador=self.request.user).aggregate(
-            total_pontos_gastos=models.Sum('pontos_gastos'))
-        total_ofertas_decimal = Decimal(
-            total_ofertas['total_pontos_gastos']) or 0
+            total_pontos_gastos=models.Sum('pontos_gastos'))['total_pontos_gastos'] or 0
+        total_ofertas_decimal = Decimal(total_ofertas)
 
         total_pontos = calcular_total_pontos(self.request.user)
         total_pontos_disponiveis = calcular_total_pontos_disponiveis(
@@ -368,12 +367,13 @@ class Conta(BasePerfil):
             usuario=self.request.user).values('ultima_actividade').first()
 
         if ultima_presenca:
-            # Converta a data/hora para a data só
             ultima_presenca = ultima_presenca['ultima_actividade'].date()
-
-        tempo_para_expiracao_pontos = ultima_presenca + timedelta(days=45)
-        dias_expiracao = (tempo_para_expiracao_pontos -
-                          timezone.now().date()).days
+            tempo_para_expiracao_pontos = ultima_presenca + timedelta(days=45)
+            dias_expiracao = (tempo_para_expiracao_pontos -
+                              timezone.now().date()).days
+        else:
+            tempo_para_expiracao_pontos = None
+            dias_expiracao = None
 
         self.context = {
             'acesso_restrito': acesso_restrito,
