@@ -201,25 +201,21 @@ def processar_transacoes_existentes():
         )['ultima']
 
         # Determinar a última atividade válida apenas se houver transações
-        ultima_atividade = None
-        if ultima_compra or ultima_oferta:
-            ultima_atividade = max(
-                ultima_compra or ultima_oferta,
-                ultima_oferta or ultima_compra,
-            )
+        ultima_atividade = max(ultima_compra, ultima_oferta) if (
+            ultima_compra or ultima_oferta) else None
 
-        print(f'ultima_atividade: {ultima_atividade}')
-
-        # Inicializar a data da última transação verificada
-        ultima_transacao = None
+        print(f'Perfil: {perfil.usuario.username}')
+        print(f'Última atividade calculada: {ultima_atividade}')
 
         # Combinar todas as transações (compras e ofertas) ordenadas por data
         transacoes = sorted(
-            list(ComprasFidelidade.objects.filter(utilizador=perfil.usuario).order_by('criado_em')) +
-            list(OfertasFidelidade.objects.filter(
-                utilizador=perfil.usuario).order_by('criado_em')),
+            list(ComprasFidelidade.objects.filter(utilizador=perfil.usuario)) +
+            list(OfertasFidelidade.objects.filter(utilizador=perfil.usuario)),
             key=lambda x: x.criado_em
         )
+
+        # Inicializar a data da última transação verificada
+        ultima_transacao = None
 
         # Iterar sobre todas as transações do utilizador
         for transacao in transacoes:
@@ -228,21 +224,36 @@ def processar_transacoes_existentes():
                 continue
 
             # Verificar se houve inatividade de mais de 45 dias
-            if transacao.criado_em - ultima_transacao > timedelta(days=45):
+            dias_inativos = (transacao.criado_em - ultima_transacao).days
+            print(
+                f'Comparando {transacao.criado_em} com {ultima_transacao} - Dias inativos: {dias_inativos}')
+
+            if dias_inativos > 45:
+                print(
+                    f'Inatividade de mais de 45 dias detectada: {dias_inativos} dias.')
                 # Expirar todas as transações anteriores à transação atual
                 for t in transacoes:
                     if t.criado_em < transacao.criado_em:
-                        t.processado = True
-                        t.expirado = True
-                        t.save()
+                        if isinstance(t, ComprasFidelidade):
+                            if not t.expirado:
+                                t.expirado = True
+                                t.save()
+                                print(
+                                    f'Transação de compra expirada: {t.criado_em}')
+                        elif isinstance(t, OfertasFidelidade):
+                            if not t.processado:
+                                t.processado = True
+                                t.save()
+                                print(
+                                    f'Transação de oferta processada: {t.criado_em}')
 
             # Atualizar a última transação verificada
             ultima_transacao = transacao.criado_em
 
         # Após processar todas as transações, atualizar o campo ultima_actividade no perfil
         perfil.ultima_actividade = ultima_atividade
-        print(f'ultima_atividade 2: {ultima_atividade}')
         perfil.save()
 
         print(
             f'Processamento concluído para o perfil: {perfil.usuario.username}')
+        print('---')
