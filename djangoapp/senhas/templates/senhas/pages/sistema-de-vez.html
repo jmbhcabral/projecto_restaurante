@@ -1,0 +1,6 @@
+{% extends 'restau/base.html' %}
+{% block content %}
+ <h1>Sistema de vez</h1>
+    <p><a href="{% url 'senhas:adicionar_senha' %}">Chamar Senha</a></p>
+    <p><a href="{% url 'senhas:listar_senhas' %}">Lista de Senhas</a></p>
+{% endblock content %}

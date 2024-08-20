@@ -1,0 +1,30 @@
+{% extends 'restau/base_front_perfil.html' %}
+{% block content %}
+<main class="section-content-wide section-gap front-content main-content">
+    <section class="section-gap-conta white-bg top-background">
+        <div class="separator"></div>
+            <h1 class="center">Hamburgueria artesanal</h1>
+        <div class="separator "></div>
+        {% include "restau/partials/_messages.html" %}
+    </section>
+    <section class="conta">
+        {% include "perfil/partials/_conta_menu.html" %}
+        <div class="conta-content">
+            <h4 class="center">Regras do Sistema de Pontos de Fidelidade</h4>
+            <div class="rules">
+                <p><strong>Representação em Euros:</strong> Cada ponto ganho representa o valor de 1 Euro. Quanto mais visitar a nossa hamburgueria, mais pontos acumula, podendo utilizá-los em futuras compras.</p>
+                
+                <p><strong>Apresentação do QR Code:</strong> Para que os pontos possam ser adicionados à sua conta, é necessário que mostre o QR code associado ao seu perfil no seu telemóvel no momento do pagamento. Este QR code permite-nos aceder à sua conta e garantir que os pontos são corretamente creditados.</p>
+                
+                <p><strong>Atribuição de Pontos:</strong> Os pontos são atribuídos automaticamente no momento do pagamento. Assim que finalizar o pagamento da sua refeição, os pontos correspondentes são creditados na sua conta de fidelidade.</p>
+                
+                <p><strong>Disponibilidade dos Pontos:</strong> Os pontos ganhos hoje só estarão disponíveis para uso a partir de amanhã. Este pequeno atraso permite-nos garantir que tudo está corretamente registado no seu perfil de cliente.</p>
+                
+                <p><strong>Expiração dos Pontos:</strong> Para manter os seus pontos válidos, deve visitar a nossa hamburgueria pelo menos uma vez a cada 45 dias. Caso não realize nenhuma visita durante este período, os pontos acumulados expiram e são removidos da sua conta.</p>
+                
+                <p><strong>Troca de Pontos:</strong> Assim que acumular pontos suficientes para cobrir o custo total de um produto, pode trocá-los diretamente por esse produto. O valor necessário para a troca será deduzido automaticamente do saldo de pontos na sua conta.</p>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock content %}

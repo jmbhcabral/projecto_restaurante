@@ -11,9 +11,13 @@
         {% include "perfil/partials/_conta_menu.html" %}
         <div class="conta-content">
             <h4 class="center">Movimentos</h4>
-            <span><strong>Total Pontos Disponíveis: {{ total_pontos_disponiveis|floatformat:2 }} Pts</strong></span>
-            <span><strong>Total Pontos: {{ total_pontos|floatformat:2 }} Pts</strong></span>
-            <span>Os pontos adicionados no dia só ficam disponíveis no dia seguinte.</span>
+            <div class="center">
+                <span><strong>Total Pontos Disponíveis: {{ total_pontos_disponiveis|floatformat:2 }} Pts</strong></span>
+                <br>
+                <span><strong>Total Pontos: {{ total_pontos|floatformat:2 }} Pts</strong></span>
+                <br>
+                <span>Os pontos adicionados no dia só ficam disponíveis no dia seguinte.</span>
+            </div>
             <div class="grid-table">
                 <div class="grid-row grid-header">
                   <div class="grid-cell">Data</div>
@@ -31,9 +35,13 @@
                         {% endif %}
                     </div>
                     {% if movimento.valor != '-----' %}
-                    <div class="grid-cell-right">{{ movimento.valor|floatformat:2 }}€</div>
+                        {% if movimento.expirado %}
+                            <div class="grid-cell-right" style="color: red;">{{ movimento.valor|floatformat:2 }}(expirado)€</div>
+                        {% else %}
+                            <div class="grid-cell-right">{{ movimento.valor|floatformat:2 }}€</div>
+                        {% endif %}
                     {% else %}
-                    <div class="grid-cell-right">{{ movimento.valor }}</div>
+                        <div class="grid-cell-right">{{ movimento.valor }}</div>
                     {% endif %}
                     <div class="grid-cell-right">{{ movimento.pontos|floatformat:2 }}</div>
                 </div>
@@ -42,5 +50,4 @@
         </div>   
     </section>
 </main>
-    
 {% endblock content %}

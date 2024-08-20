@@ -30,29 +30,42 @@ class ProdutoFidelidadeIndividualAdmin(admin.ModelAdmin):
 class ComprasFidelidadeAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'fidelidade', 'utilizador', 'compra', 'pontos_adicionados',
-        'criado_em', 'chave_g',
+        'criado_em', 'chave_g', 'expirado'
     )
     search_fields = ('id', 'fidelidade__nome', 'utilizador__username',
                      'compra', 'pontos_adicionados', 'criado_em', 'chave_g',
+                     'expirado'
                      )
     list_filter = ('id', 'fidelidade__nome', 'utilizador__username', 'compra',
                    'pontos_adicionados', 'criado_em', 'chave_g',
+                   'expirado'
                    )
     ordering = ('id', 'fidelidade__nome', 'utilizador__username', 'compra',
-                'pontos_adicionados', 'criado_em', 'chave_g',
+                'pontos_adicionados', 'criado_em', 'chave_g', 'expirado'
+
                 )
+    list_editable = ('expirado',)
 
 
 @admin.register(OfertasFidelidade)
 class OfertasFidelidadeAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'fidelidade', 'utilizador', 'pontos_gastos', 'criado_em')
+        'id', 'fidelidade', 'utilizador', 'pontos_gastos', 'criado_em',
+        'processado'
+    )
     search_fields = ('id', 'fidelidade__nome',
-                     'utilizador__username', 'pontos_gastos', 'criado_em')
+                     'utilizador__username', 'pontos_gastos', 'criado_em',
+                     'processado'
+                     )
     list_filter = ('id', 'fidelidade__nome',
-                   'utilizador__username', 'pontos_gastos', 'criado_em')
+                   'utilizador__username', 'pontos_gastos', 'criado_em',
+                   'processado'
+                   )
     ordering = ('id', 'fidelidade__nome',
-                'utilizador__username', 'pontos_gastos', 'criado_em')
+                'utilizador__username', 'pontos_gastos', 'criado_em',
+                'processado'
+                )
+    list_editable = ('processado',)
 
 
 @admin.register(Perguntas)

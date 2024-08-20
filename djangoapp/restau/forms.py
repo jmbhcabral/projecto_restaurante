@@ -1,12 +1,14 @@
+''' Modulo de formulários para o app restau. '''
+
 from django.core.exceptions import ValidationError
 from django import forms
+from django.forms import modelformset_factory
 from restau.models import (
     Category, SubCategory, Products, Ementa, ProdutosEmenta,
     Fotos, ImagemLogo, ImagemTopo, Intro, IntroImagem, FraseInspiradora,
     FraseCima, ImagemFraseCima, FraseBaixo, ImagemFraseBaixo, ImagemPadrao,
     ContactosSite, GoogleMaps, Horario
 )
-from django.forms import modelformset_factory
 
 
 class SubCategoryForm(forms.ModelForm):

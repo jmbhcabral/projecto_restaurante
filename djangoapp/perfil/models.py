@@ -1,13 +1,15 @@
+''' Este módulo contém os modelos de dados para o aplicativo de perfil. '''
+
+import uuid
+from io import BytesIO
+from django.core.files import File
 from django.db import models
 from django.contrib.auth.models import User
-from fidelidade.models import Fidelidade, RespostaFidelidade
+from fidelidade.models import Fidelidade, RespostaFidelidade, Respostas
 from django.utils import timezone
 from django.forms import ValidationError
 from utils.model_validators import validar_nif
 import qrcode
-from io import BytesIO
-from django.core.files import File
-import uuid
 
 
 class Perfil(models.Model):
@@ -42,12 +44,12 @@ class Perfil(models.Model):
         blank=True,
         verbose_name="Número Cliente",
     )
-    estudante = models.CharField(
-        max_length=255,
-        blank=True,
+    estudante = models.ForeignKey(
+        RespostaFidelidade,
+        on_delete=models.SET_NULL,
         null=True,
+        blank=True,
         verbose_name="Estudante",
-        help_text='Se estudante, indique a escola onde estuda.',
     )
     tipo_fidelidade = models.ForeignKey(
         Fidelidade,
@@ -59,6 +61,13 @@ class Perfil(models.Model):
 
     ultima_atualizacao_data_nascimento = models.DateTimeField(
         null=True, blank=True)
+
+    ultima_actividade = models.DateTimeField(
+        default=timezone.now,
+        verbose_name="Última Actividade",
+        blank=True,
+        null=True,
+    )
 
     def save(self, *args, **kwargs):
         # Atualiza a data da última atualização da data de nascimento
@@ -83,11 +92,8 @@ class Perfil(models.Model):
             self.numero_cliente = f'CEW-{novo_numero}'
 
         if self.estudante:
-            fidelidade_obj = RespostaFidelidade.objects.get(
-                resposta=self.estudante)
-            print('fidelidade_obj', fidelidade_obj)
-            self.tipo_fidelidade = fidelidade_obj.tipo_fidelidade
-
+            # Aqui obtemos a instância de Fidelidade associada ao RespostaFidelidade
+            self.tipo_fidelidade = self.estudante.tipo_fidelidade
         else:
             self.tipo_fidelidade = None
 

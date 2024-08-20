@@ -67,6 +67,13 @@ def compras_utilizador(request, utilizador_pk):
 
                             try:
                                 compra_fidelidade.save()
+
+                                # Atualizar a última atividade do
+                                # perfil(compra)
+                                perfil = user.perfil
+                                perfil.ultima_actividade = timezone.now()
+                                perfil.save()
+
                                 logger.info(
                                     'LOGGER: Compra registada com sucesso.')
                                 messages.success(
@@ -155,6 +162,12 @@ def ofertas_utilizador(request, utilizador_id):
                 ofertas.utilizador = user
                 ofertas.fidelidade = user.perfil.tipo_fidelidade
                 ofertas.save()
+
+                # Atualizar a última atividade do perfil(oferta)
+                perfil = user.perfil
+                perfil.ultima_actividade = timezone.now()
+                perfil.save()
+
                 messages.success(
                     request,
                     'Oferta registada com sucesso.'

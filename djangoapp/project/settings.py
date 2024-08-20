@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'restau',
     'site_setup',
     'fidelidade',
+    'senhas',
     'crispy_forms',
 ]
 

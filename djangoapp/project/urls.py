@@ -1,9 +1,12 @@
+''' Arquivo de configuração de rotas do projeto '''
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
+    path('', include('senhas.urls', namespace='senhas')),
     path('', include('restau.urls')),
     path('', include('perfil.urls')),
     path('', include('fidelidade.urls')),

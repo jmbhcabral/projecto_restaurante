@@ -1,4 +1,12 @@
+'''Este módulo contém as views para o aplicativo perfil.'''
+
+
+from decimal import Decimal
 import uuid
+from utils.model_validators import (
+    calcular_total_pontos, calcular_total_pontos_disponiveis,
+    calcular_pontos_expirados
+)
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.urls import reverse
@@ -85,11 +93,15 @@ class Criar(BasePerfil):
             password = self.userform.cleaned_data.get('password')
             first_name = self.userform.cleaned_data.get('first_name')
             last_name = self.userform.cleaned_data.get('last_name')
+            token = str(uuid.uuid4())
             perfil_data = self.convert_dates_to_str(
                 self.perfilform.cleaned_data)
-            token = str(uuid.uuid4())
 
-            # Armazenar os dados na sessão
+            # Armazenar os dados na sessão garantindo que
+            # perfil_data armazene apenas IDs e valores simples
+            if 'estudante' in perfil_data and perfil_data['estudante']:
+                perfil_data['estudante'] = perfil_data['estudante'].id
+
             self.request.session['temp_user'] = {
                 'username': username,
                 'email': email,
@@ -336,28 +348,47 @@ class Conta(BasePerfil):
             .order_by('-id') \
             .first()
 
-        total_recompensas = fidelidade_models.ComprasFidelidade.objects.filter(
+        total_pontos_ganhos = fidelidade_models.ComprasFidelidade.objects.filter(
             utilizador=self.request.user).aggregate(
             total_pontos_ganhos=models.Sum('pontos_adicionados'))
+        total_pontos_ganhos_decimal = Decimal(
+            total_pontos_ganhos['total_pontos_ganhos']) or 0
         total_ofertas = fidelidade_models.OfertasFidelidade.objects.filter(
             utilizador=self.request.user).aggregate(
             total_pontos_gastos=models.Sum('pontos_gastos'))
-        total_recompensas_decimal = (
-            total_recompensas['total_pontos_ganhos'] or 0)
-        total_ofertas_decimal = total_ofertas['total_pontos_gastos'] or 0
+        total_ofertas_decimal = Decimal(
+            total_ofertas['total_pontos_gastos']) or 0
 
-        total_pontos = total_recompensas_decimal - total_ofertas_decimal
+        total_pontos = calcular_total_pontos(self.request.user)
+        total_pontos_disponiveis = calcular_total_pontos_disponiveis(
+            self.request.user)
+        total_pontos_expirados = calcular_pontos_expirados(self.request.user)
+
+        ultima_presenca = perfil_models.Perfil.objects.filter(
+            usuario=self.request.user).values('ultima_actividade').first()
+
+        if ultima_presenca:
+            # Converta a data/hora para a data só
+            ultima_presenca = ultima_presenca['ultima_actividade'].date()
+
+        tempo_para_expiracao_pontos = ultima_presenca + timedelta(days=45)
+        dias_expiracao = (tempo_para_expiracao_pontos -
+                          timezone.now().date()).days
 
         self.context = {
             'acesso_restrito': acesso_restrito,
             'active_setup': active_setup,
             'total_pontos': total_pontos,
-            'total_recompensas': total_recompensas_decimal,
-            'total_ofertas': total_ofertas_decimal,
+            'total_pontos_disponiveis': total_pontos_disponiveis,
+            'total_pontos_ganhos_decimal': total_pontos_ganhos_decimal,
+            'total_ofertas_decimal': total_ofertas_decimal,
+            'total_pontos_expirados': total_pontos_expirados,
+            'ultima_presenca': ultima_presenca,
+            'data_expiracao': tempo_para_expiracao_pontos,
+            'dias_expiracao': dias_expiracao,
         }
 
         return render(self.request, self.template_name, self.context)
-
 
 # class Deletar(View):
 #     def get(self, *args, **kwargs):
@@ -374,6 +405,7 @@ class Conta(BasePerfil):
 #             'Conta deletada com sucesso!'
 #         )
 #         return redirect('restau:index')
+
 
 @method_decorator(login_required, name='dispatch')
 class CartaoCliente(View):
@@ -401,8 +433,8 @@ class CartaoCliente(View):
 
 
 @method_decorator(login_required, name='dispatch')
-class Vantagens(View):
-    template_name = 'perfil/vantagens.html'
+class Regras(View):
+    template_name = 'perfil/regras.html'
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
@@ -466,6 +498,12 @@ class ConfirmarEmail(View):
 
         # Cria um perfil para o usuário
         perfil_data = temp_user['perfil_data']
+
+        # Recuperar a instãncia de RespostaFidelidade usando o ID armazenado
+        if 'estudante' in perfil_data and perfil_data['estudante']:
+            perfil_data['estudante'] = fidelidade_models.RespostaFidelidade.objects.get(
+                id=perfil_data['estudante'])
+
         perfil = perfil_models.Perfil.objects.create(
             usuario=user,
             **perfil_data
@@ -635,15 +673,13 @@ class ResetPasswordView(View):
 
 @method_decorator(login_required, name='dispatch')
 class MovimentosCliente(BasePerfil):
+    '''View para mostrar os movimentos do cliente'''
     template_name = 'perfil/movimentos_cliente.html'
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
 
-        active_setup = ActiveSetup.objects \
-            .order_by('-id') \
-            .first()
-
+        active_setup = ActiveSetup.objects.order_by('-id').first()
         user = self.request.user
 
         if not user.is_authenticated:
@@ -652,61 +688,46 @@ class MovimentosCliente(BasePerfil):
         perfil = user.perfil
         tipo_fidelidade = perfil.tipo_fidelidade
 
+        # Calcular o total de pontos
+        total_pontos = calcular_total_pontos(user)
+
+        # Calcular pontos disponíveis
+        total_pontos_disponiveis = calcular_total_pontos_disponiveis(user)
+
         compras_fidelidade = fidelidade_models.ComprasFidelidade.objects.filter(
-            utilizador=self.request.user).order_by('-criado_em')
+            utilizador=user).order_by('-criado_em')
 
-        # Calcular a diferença entre as compras e as ofertas
         ofertas_fidelidade = fidelidade_models.OfertasFidelidade.objects.filter(
-            utilizador=self.request.user).order_by('-criado_em')
-        total_compras = fidelidade_models.ComprasFidelidade.objects.filter(
-            utilizador=self.request.user).aggregate(
-            total_compras=models.Sum('pontos_adicionados'))
-        total_ofertas = fidelidade_models.OfertasFidelidade.objects.filter(
-            utilizador=self.request.user).aggregate(
-            total_ofertas=models.Sum('pontos_gastos'))
-        total_compras_decimal = (
-            total_compras['total_compras'] or 0)
-        total_ofertas_decimal = total_ofertas['total_ofertas'] or 0
-        total_pontos = total_compras_decimal - total_ofertas_decimal
-
-        # Combinar as consultas
-        agora = timezone.localtime()
-        inicio_para_uso_de_pontos_hoje = agora.replace(
-            hour=11, minute=30, second=0, microsecond=0)
+            utilizador=user).order_by('-criado_em')
 
         movimentos = []
 
+        agora = timezone.now()
         for compra in compras_fidelidade:
             criado_em_local = timezone.localtime(compra.criado_em)
-            # Verifica se a compra foi feita antes do início do dia de hoje
-            if criado_em_local < inicio_para_uso_de_pontos_hoje:
-                # Se sim os pontos estaram disponíveis para uso
-                disponivel_amanha = agora.date() > criado_em_local.date()
-            else:
-                # Se a compra foi feita depois do início do dia de hoje
-                # os pontos estarão disponíveis para uso amanhã
-                disponivel_amanha = agora.date() > (criado_em_local.date() + timedelta(days=1))
+            disponivel_amanha = agora.date() <= criado_em_local.date()
+            expirado = compra.expirado
 
-            movimentos.append(
-                {
-                    'data': criado_em_local.strftime('%Y-%m-%d'),
-                    'tipo': 'Compra',
-                    'valor': compra.compra,
-                    'pontos': compra.pontos_adicionados,
-                    'cor': 'black' if disponivel_amanha else 'orange',
-                }
-            )
+            movimentos.append({
+                'data': criado_em_local.strftime('%Y-%m-%d'),
+                'tipo': 'Compra',
+                'valor': compra.compra,
+                'pontos': compra.pontos_adicionados,
+                'cor': 'orange' if disponivel_amanha else 'black',
+                'disponivel_amanha': disponivel_amanha,
+                'expirado': expirado,
+            })
 
         for oferta in ofertas_fidelidade:
-            movimentos.append(
-                {
-                    'data': oferta.criado_em.strftime('%Y-%m-%d'),
-                    'tipo': 'Oferta',
-                    'valor': '-----',
-                    'pontos': '-' + str(oferta.pontos_gastos),
-                    'cor': 'red',
-                }
-            )
+            processado = oferta.processado
+            movimentos.append({
+                'data': oferta.criado_em.strftime('%Y-%m-%d'),
+                'tipo': 'Oferta',
+                'valor': '-----',
+                'pontos': '-' + str(oferta.pontos_gastos),
+                'cor': 'red',
+                'processado': processado,
+            })
 
         # Ordenar os movimentos por data decrescente
         movimentos.sort(key=lambda x: x['data'], reverse=True)
@@ -717,41 +738,9 @@ class MovimentosCliente(BasePerfil):
             'ofertas_fidelidade': ofertas_fidelidade,
             'tipo_fidelidade': tipo_fidelidade,
             'total_pontos': total_pontos,
+            'total_pontos_disponiveis': total_pontos_disponiveis,
             'movimentos': movimentos,
         }
-
-        # Ajustar a data e hora para o fuso horário local
-        agora = timezone.localtime()
-
-        # Define o início do dia de hoje para uso de pontos
-        inicio_do_dia_de_hoje = agora.replace(
-            hour=0, minute=0, second=0, microsecond=0)
-
-        # Define o limite para considerar pontos disponíveis(11:30 de hoje)
-        limite_pontos_disponiveis = agora.replace(
-            hour=1, minute=30, second=0, microsecond=0)
-
-        # Determina a data de referência para filtrar compras
-        if agora < limite_pontos_disponiveis:
-            # Se ainda não são 11:30, ajusta a referência para o inicio de anteontem
-            data_referencia = inicio_do_dia_de_hoje - timedelta(days=2)
-        else:
-            # Se já passou das 11:30, ajusta a referência para o início de ontem
-            data_referencia = inicio_do_dia_de_hoje - timedelta(days=1)
-
-        # Filtrar as compras até a data de referência para calcular pontos disponíveis
-        total_compras_ate_referencia = fidelidade_models.ComprasFidelidade.objects.filter(
-            utilizador=self.request.user,
-            criado_em__lt=data_referencia
-        ).aggregate(
-            total_compras=models.Sum('pontos_adicionados'))['total_compras'] or 0
-
-        # Calcular total pontos disponiveis
-        total_pontos_disponiveis = total_compras_ate_referencia - total_ofertas_decimal
-        # Adicionar o total de pontos disponíveis ao contexto
-        self.context.update({
-            'total_pontos_disponiveis': total_pontos_disponiveis,
-        })
 
     def get(self, *args, **kwargs):
         if not self.request.user.is_authenticated:

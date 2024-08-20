@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from perfil.models import Perfil
-from fidelidade.models import Respostas
+from fidelidade.models import RespostaFidelidade
 from . import models
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -38,24 +38,16 @@ class PerfilForm(forms.ModelForm):
         help_text='Número de telemóvel para contacto.',
     )
 
-    estudante = forms.ChoiceField(
-        choices=(
-            ('escola_sec_ramada', 'Sim, na Esc. Sec. Ramada'),
-            ('agrup_vasco_santana', 'Sim, no Agrup. Vasco Santana'),
-            ('outra_escola', 'Sim, noutra escola'),
-            ('nao', 'Não'),
-        ),
+    estudante = forms.ModelChoiceField(
+        queryset=RespostaFidelidade.objects.all(),
         required=True,
-        label='É estudante?',
-        help_text='Se estudante, indique a escola onde estuda.',
+        label='Estudante',
+        help_text='Selecione uma resposta.',
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['estudante'].choices = [
-            (resposta.id, resposta.resposta)
-            for resposta in Respostas.objects.all()
-        ]
+
         for field_name, field in self.fields.items():
             if field.required:
                 field.label_suffix = mark_safe(
@@ -77,8 +69,7 @@ class PerfilForm(forms.ModelForm):
 
         if data_nascimento_data:
             if data_nascimento_data > timezone.now().date():
-                validation_error_msgs['data_nascimento'] = \
-                    error_msg_data_nascimento
+                validation_error_msgs['data_nascimento'] = error_msg_data_nascimento
 
         if telemovel_data:
             if len(telemovel_data) != 9:
@@ -93,8 +84,7 @@ class PerfilForm(forms.ModelForm):
                 telemovel_db = Perfil.objects.filter(
                     telemovel=telemovel_data).first()
             if telemovel_db:
-                validation_error_msgs['telemovel'] = \
-                    error_msg_telemovel_existe
+                validation_error_msgs['telemovel'] = error_msg_telemovel_existe
         if validation_error_msgs:
             raise (forms.ValidationError(validation_error_msgs))
 
@@ -199,14 +189,11 @@ class UserForm(forms.ModelForm):
 
             if password_data:
                 if password_data != password2_data:
-                    validation_error_msgs['password'] = \
-                        error_msg_passwords_not_match
-                    validation_error_msgs['password2'] = \
-                        error_msg_passwords_not_match
+                    validation_error_msgs['password'] = error_msg_passwords_not_match
+                    validation_error_msgs['password2'] = error_msg_passwords_not_match
 
                 if len(password_data) < 6:
-                    validation_error_msgs['password'] = \
-                        error_msg_password_short
+                    validation_error_msgs['password'] = error_msg_password_short
 
         # Usúarios não logados: Criação
         else:
@@ -223,14 +210,11 @@ class UserForm(forms.ModelForm):
                 validation_error_msgs['password2'] = error_msg_required
 
             if password_data != password2_data:
-                validation_error_msgs['password'] = \
-                    error_msg_passwords_not_match
-                validation_error_msgs['password2'] = \
-                    error_msg_passwords_not_match
+                validation_error_msgs['password'] = error_msg_passwords_not_match
+                validation_error_msgs['password2'] = error_msg_passwords_not_match
 
             if len(password_data) < 6:
-                validation_error_msgs['password'] = \
-                    error_msg_password_short
+                validation_error_msgs['password'] = error_msg_password_short
 
         if validation_error_msgs:
             raise (forms.ValidationError(validation_error_msgs))
@@ -268,14 +252,11 @@ class ChangePasswordForm(forms.Form):
         )
         if password_data:
             if len(password_data) < 6:
-                validation_error_msgs['password'] = \
-                    error_msg_password_short
+                validation_error_msgs['password'] = error_msg_password_short
 
             if password_data != password2_data:
-                validation_error_msgs['password'] = \
-                    error_msg_passwords_not_match
-                validation_error_msgs['password2'] = \
-                    error_msg_passwords_not_match
+                validation_error_msgs['password'] = error_msg_passwords_not_match
+                validation_error_msgs['password2'] = error_msg_passwords_not_match
 
         if validation_error_msgs:
             raise (forms.ValidationError(validation_error_msgs))
@@ -334,14 +315,11 @@ class ResetPasswordForm(forms.Form):
         )
         if password_data:
             if len(password_data) < 6:
-                validation_error_msgs['password'] = \
-                    error_msg_password_short
+                validation_error_msgs['password'] = error_msg_password_short
 
             if password_data != password2_data:
-                validation_error_msgs['password'] = \
-                    error_msg_passwords_not_match
-                validation_error_msgs['password2'] = \
-                    error_msg_passwords_not_match
+                validation_error_msgs['password'] = error_msg_passwords_not_match
+                validation_error_msgs['password2'] = error_msg_passwords_not_match
 
         if validation_error_msgs:
             message.error(request, 'Erro ao alterar a palavra-passe.')

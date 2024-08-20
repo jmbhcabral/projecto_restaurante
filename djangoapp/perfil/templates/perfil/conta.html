@@ -4,34 +4,43 @@
     <section class="section-gap-conta white-bg top-background">
         <div class="separator"></div>
             <h1 class="center">Hamburgueria artesanal</h1>
-        <div class="separator "></div>
+        <div class="separator"></div>
         {% include "restau/partials/_messages.html" %}
     </section>
     <section class="conta">
         {% include "perfil/partials/_conta_menu.html" %}
         <div class="conta-content">
-            <p>Olá {{ user.first_name }}, bem-vindo á sua area de utilizador.
-            Aqui pode alterar os seus dados, ver as suas vantagens e muito mais.
+            <p>Olá {{ user.first_name }}, bem-vindo à sua área de utilizador.
+            Aqui, pode atualizar os seus dados, explorar as suas vantagens exclusivas e muito mais.
             </p>
             {% if total_pontos > 0 %}
             <p>
-                Tem na sua conta fidelidade {{ total_pontos|floatformat:2 }} pontos.
-                Recebeu {{total_recompensas|floatformat:2}} pontos de recompensa.
-                Gastou {{total_ofertas|floatformat:2}} pontos.
+                <strong>Estado da sua conta de fidelidade:</strong><br>
+                <strong>Pontos disponíveis:</strong> {{ total_pontos_disponiveis|floatformat:2 }}<br>
+                <strong>Pontos acumulados:</strong> {{ total_pontos_ganhos_decimal|floatformat:2 }}<br>
+                <strong>Pontos utilizados:</strong> {{ total_ofertas_decimal|floatformat:2 }}<br>
+                <strong>Pontos expirados:</strong> {{ total_pontos_expirados|floatformat:2 }}<br>
             </p>
-            {% elif total_pontos < 0 %}
             <p>
-                Tem na sua conta fidelidade {{ total_pontos }} pontos.
-                Recebeu {{total_recompensas}} pontos de recompensa.
-                Gastou {{total_ofertas}} pontos.
+                Esteve a última vez em {{ ultima_presenca }}.
+            </p>
+            <p>
+                Os seus pontos expiram em {{ data_expiracao }}. Faltam {{ dias_expiracao }} dias.
+            </p>
+            {% elif total_pontos == 0 and total_pontos_ganhos > 0 %}
+            <p>
+                <strong>Estado da sua conta de fidelidade:</strong><br>
+                <strong>Pontos disponíveis:</strong> 0<br>
+                <strong>Pontos acumulados:</strong> {{ total_pontos_ganhos_decimal|floatformat:2 }}<br>
+                <strong>Pontos utilizados:</strong> {{ total_ofertas_decimal|floatformat:2 }}<br>
+                <strong>Pontos expirados:</strong> {{ total_pontos_expirados|floatformat:2 }}<br>
+            </p>
             {% else %}
             <p>
-                Ainda não tem pontos na sua conta fidelidade.
+                Ainda não tem pontos na sua conta de fidelidade.
             </p>
             {% endif %}
         </div>
-        
     </section>
 </main>
-    
 {% endblock content %}

@@ -1,6 +1,9 @@
+''' Este ficheiro contém os modelos de dados da aplicação fidelidade '''
+
 from django.db import models
-from restau.models import Products, Ementa
 from django.contrib.auth.models import User
+from django.utils import timezone
+from restau.models import Products, Ementa
 from utils.model_validators import calcular_pontos
 
 
@@ -85,7 +88,9 @@ class ComprasFidelidade(models.Model):
         verbose_name='Pontos Adicionados',
     )
 
-    criado_em = models.DateTimeField(auto_now_add=True)
+    criado_em = models.DateTimeField(
+        default=timezone.now,
+        verbose_name='Criado em',)
 
     chave_g = models.CharField(
         max_length=200,
@@ -93,6 +98,11 @@ class ComprasFidelidade(models.Model):
         null=True,
         blank=True,
         verbose_name='Chave G',
+    )
+
+    expirado = models.BooleanField(
+        verbose_name='Expirado',
+        default=False,
     )
 
     def __str__(self):
@@ -120,8 +130,15 @@ class OfertasFidelidade(models.Model):
         max_digits=10, decimal_places=2, null=True, blank=True,
         verbose_name='Pontos Gastos',
     )
+    processado = models.BooleanField(
+        verbose_name='Processado',
+        default=False,
+    )
 
-    criado_em = models.DateTimeField(auto_now_add=True)
+    criado_em = models.DateTimeField(
+        default=timezone.now,
+        verbose_name='Criado em',
+    )
 
     def __str__(self):
         return f" {self.fidelidade} - {self.utilizador} "
@@ -173,4 +190,4 @@ class RespostaFidelidade(models.Model):
     )
 
     def __str__(self):
-        return f"{self.resposta} - {self.tipo_fidelidade}"
+        return f"{self.tipo_fidelidade}"

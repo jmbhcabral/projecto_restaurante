@@ -7,6 +7,8 @@ from django.db import models
 from operator import attrgetter
 from datetime import datetime
 from django.contrib.auth.decorators import login_required, user_passes_test
+from utils.model_validators import (calcular_total_pontos,
+                                    calcular_total_pontos_disponiveis)
 
 
 @login_required
@@ -56,22 +58,28 @@ def admin_utilizador(request, utilizador_pk):
     else:
         dias_sem_comprar = 'Nunca comprou.'
 
-    pontos_ganhos = ComprasFidelidade.objects.filter(
-        utilizador=user).aggregate(
-        total_pontos_ganhos=models.Sum('pontos_adicionados'))
-    pontos_gastos = OfertasFidelidade.objects.filter(
-        utilizador=user).aggregate(
-        total_pontos_gastos=models.Sum('pontos_gastos'))
+    # pontos_ganhos = ComprasFidelidade.objects.filter(
+    #     utilizador=user).aggregate(
+    #     total_pontos_ganhos=models.Sum('pontos_adicionados'))
+    # pontos_gastos = OfertasFidelidade.objects.filter(
+    #     utilizador=user).aggregate(
+    #     total_pontos_gastos=models.Sum('pontos_gastos'))
 
-    pontos_ganhos_decimal = pontos_ganhos['total_pontos_ganhos'] or 0
-    pontos_gastos_decimal = pontos_gastos['total_pontos_gastos'] or 0
+    # pontos_ganhos_decimal = pontos_ganhos['total_pontos_ganhos'] or 0
+    # pontos_gastos_decimal = pontos_gastos['total_pontos_gastos'] or 0
 
-    total_pontos = pontos_ganhos_decimal - pontos_gastos_decimal
+    # total_pontos = pontos_ganhos_decimal - pontos_gastos_decimal
+    total_pontos = calcular_total_pontos(user)
+    print(f'total_pontos: {total_pontos}')
+
+    total_pontos_disponiveis = calcular_total_pontos_disponiveis(user)
+    print(f'total_pontos_disponiveis: {total_pontos_disponiveis}')
 
     context = {
         'utilizador': user,
         'perfil': user.perfil,
         'total_pontos': total_pontos,
+        'total_pontos_disponiveis': total_pontos_disponiveis,
         'ultima_compra': ultima_compra,
         'ultima_oferta': ultima_oferta,
         'dias_sem_comprar': dias_sem_comprar,
