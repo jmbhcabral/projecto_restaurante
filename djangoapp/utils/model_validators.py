@@ -222,6 +222,7 @@ def processar_transacoes_existentes():
 
         # Inicializar a data da última transação verificada
         ultima_transacao = None
+        hoje = timezone.now().date()
 
         # Iterar sobre todas as transações do utilizador
         for transacao in transacoes:
@@ -229,14 +230,15 @@ def processar_transacoes_existentes():
                 ultima_transacao = transacao.criado_em
                 continue
 
-            # Verificar se houve inatividade de mais de 45 dias
-            dias_inativos = (transacao.criado_em - ultima_transacao).days
+            # Verificar se houve inatividade de mais de 45 dias entre transações
+            dias_inativos = (transacao.criado_em.date() -
+                             ultima_transacao.date()).days
             print(
-                f'Comparando {transacao.criado_em} com {ultima_transacao} - Dias inativos: {dias_inativos}')
+                f'Comparando {transacao.criado_em.date()} com {ultima_transacao.date()} - Dias inativos: {dias_inativos}')
 
             if dias_inativos > 45:
                 print(
-                    f'Inatividade de mais de 45 dias detectada: {dias_inativos} dias.')
+                    f'Inatividade de mais de 45 dias detectada entre transações: {dias_inativos} dias.')
                 # Expirar todas as transações anteriores à transação atual
                 for t in transacoes:
                     if t.criado_em < transacao.criado_em:
@@ -255,6 +257,22 @@ def processar_transacoes_existentes():
 
             # Atualizar a última transação verificada
             ultima_transacao = transacao.criado_em
+
+        # Verificar se a última transação ocorreu há mais de 45 dias desde hoje
+        if ultima_atividade and (hoje - ultima_atividade.date()).days > 45:
+            print(
+                f'Última atividade há mais de 45 dias atrás (em {ultima_atividade.date()}). Expirando todas as transações.')
+            for t in transacoes:
+                if isinstance(t, ComprasFidelidade):
+                    if not t.expirado:
+                        t.expirado = True
+                        t.save()
+                        print(f'Transação de compra expirada: {t.criado_em}')
+                elif isinstance(t, OfertasFidelidade):
+                    if not t.processado:
+                        t.processado = True
+                        t.save()
+                        print(f'Transação de oferta processada: {t.criado_em}')
 
         # Após processar todas as transações, atualizar o campo ultima_actividade no perfil
         perfil.ultima_actividade = ultima_atividade
