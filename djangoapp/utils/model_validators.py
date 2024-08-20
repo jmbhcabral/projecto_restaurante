@@ -183,6 +183,10 @@ def processar_transacoes_existentes():
 
     from fidelidade.models import ComprasFidelidade, OfertasFidelidade
     from perfil.models import Perfil
+    from django.utils import timezone
+    from datetime import timedelta
+    from django.db.models import Max
+
     # Iterar sobre todos os perfis de utilizadores
     for perfil in Perfil.objects.all():
         # Obter a última compra ou oferta existente (a mais recente)
@@ -196,13 +200,14 @@ def processar_transacoes_existentes():
             ultima=Max('criado_em')
         )['ultima']
 
-        # Determinar a última atividade válida
-        ultima_atividade = max(
-            ultima_compra or timezone.datetime.min.replace(
-                tzinfo=timezone.utc),
-            ultima_oferta or timezone.datetime.min.replace(
-                tzinfo=timezone.utc),
-        )
+        # Determinar a última atividade válida apenas se houver transações
+        ultima_atividade = None
+        if ultima_compra or ultima_oferta:
+            ultima_atividade = max(
+                ultima_compra or ultima_oferta,
+                ultima_oferta or ultima_compra,
+            )
+
         print(f'ultima_atividade: {ultima_atividade}')
 
         # Inicializar a data da última transação verificada
@@ -222,7 +227,7 @@ def processar_transacoes_existentes():
                 ultima_transacao = transacao.criado_em
                 continue
 
-            # Verificar se houve inatividade de mais de 30 dias
+            # Verificar se houve inatividade de mais de 45 dias
             if transacao.criado_em - ultima_transacao > timedelta(days=45):
                 # Expirar todas as transações anteriores à transação atual
                 for t in transacoes:
@@ -234,7 +239,7 @@ def processar_transacoes_existentes():
             # Atualizar a última transação verificada
             ultima_transacao = transacao.criado_em
 
-        # Após processar todas as transações, atualizar o campo ultima_atividade no perfil
+        # Após processar todas as transações, atualizar o campo ultima_actividade no perfil
         perfil.ultima_actividade = ultima_atividade
         print(f'ultima_atividade 2: {ultima_atividade}')
         perfil.save()
