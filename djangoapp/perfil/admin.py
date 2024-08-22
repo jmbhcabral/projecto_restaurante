@@ -6,10 +6,12 @@ from perfil.models import (Perfil, Morada, EmailConfirmationToken,
 @admin.register(Perfil)
 class PerfilAdmin(admin.ModelAdmin):
     list_display = ('id', 'numero_cliente', 'usuario', 'tipo_fidelidade',
-                    'data_nascimento', 'telemovel', 'nif', 'estudante')
+                    'data_nascimento', 'telemovel', 'nif', 'estudante',
+                    'ultima_actividade')
     list_display_links = 'id', 'numero_cliente', 'usuario'
     search_fields = ('id', 'numero_cliente', 'usuario', 'tipo_fidelidade',
-                     'data_nascimento', 'telemovel', 'nif', 'estudante')
+                     'data_nascimento', 'telemovel', 'nif', 'estudante',
+                     'ultima_actividade')
 
 
 @admin.register(Morada)

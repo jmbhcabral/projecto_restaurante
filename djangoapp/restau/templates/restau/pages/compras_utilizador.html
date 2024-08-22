@@ -1,37 +1,38 @@
 {% extends "restau/base.html" %}
 {% block content %}
-    <div class="section-content-wide content">
-        {% include "restau/partials/_utilizador_menu.html" %}
-            <div class="conta-content">
-                <h2>**********</h2>
-                <span><strong>Utilizador: {{ utilizador }}</strong></span>
-                <span><strong>Fidelidade: {{ utilizador.perfil.tipo_fidelidade }}</strong></span>
-                <div class="content">
-                    <form action="{% url 'restau:compras_utilizador' utilizador_pk=utilizador.pk %}" method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <div>
-                            <label for="id_qr_data">Dados do QR Code:</label>
-                            <input type="text" id="id_qr_data" name="dados" autofocus placeholder="Scan or enter QR code here" value="{{ form.qr_data.value }}">
-                        </div>
-                        {{ form }}
-                        <input type="submit" value="Submeter">
-                    </form> 
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            var qrDataField = document.getElementById('id_qr_data');
-                            if (qrDataField) {
-                                qrDataField.focus();
-                            }
-    
-                            const form = document.querySelector("form");
-                            form.addEventListener("submit", function(event) {
-                                const submitButton = form.querySelector("input[type='submit']");
-                                submitButton.disabled = true;
-                            });
-                        });
-                    </script> 
+<div class="section-content-wide content">
+    {% include "restau/partials/_utilizador_menu.html" %}
+    <div class="conta-row">
+        <div class="conta-col">
+            <h2>**********</h2>
+            <span><strong>Utilizador: {{ utilizador }}</strong></span>
+            <span><strong>Fidelidade: {{ utilizador.perfil.tipo_fidelidade }}</strong></span>
+        </div>
+        <div class="content">
+            <form action="{% url 'restau:compras_utilizador' utilizador_pk=utilizador.pk %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div>
+                    <label for="id_qr_data">Dados do QR Code:</label>
+                    <input type="text" id="id_qr_data" name="dados" autofocus placeholder="Scan or enter QR code here" value="{{ form.qr_data.value }}">
                 </div>
-            </div>
+                {{ form }}
+                <input type="submit" value="Submeter">
+            </form> 
         </div>
     </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var qrDataField = document.getElementById('id_qr_data');
+        if (qrDataField) {
+            qrDataField.focus();
+        }
+
+        const form = document.querySelector("form");
+        form.addEventListener("submit", function(event) {
+            const submitButton = form.querySelector("input[type='submit']");
+            submitButton.disabled = true;
+        });
+    });
+</script> 
 {% endblock %}

@@ -7,6 +7,7 @@ from utils.model_validators import (
     calcular_total_pontos, calcular_total_pontos_disponiveis,
     calcular_pontos_expirados
 )
+from utils.listar_compras_ofertas import listar_compras_ofertas
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.urls import reverse
@@ -347,6 +348,12 @@ class Conta(BasePerfil):
         active_setup = ActiveSetup.objects \
             .order_by('-id') \
             .first()
+        hoje = timezone.now().date()
+        pontos_hoje = fidelidade_models.ComprasFidelidade.objects.filter(
+            utilizador=self.request.user,
+            criado_em__date=hoje).aggregate(
+                pontos_hoje=models.Sum('pontos_adicionados'))['pontos_hoje'] or 0
+        pontos_hoje_decimal = Decimal(pontos_hoje)
 
         total_pontos_ganhos = fidelidade_models.ComprasFidelidade.objects.filter(
             utilizador=self.request.user).aggregate(
@@ -366,18 +373,20 @@ class Conta(BasePerfil):
         ultima_presenca = perfil_models.Perfil.objects.filter(
             usuario=self.request.user).values('ultima_actividade').first()
 
-        if ultima_presenca:
+        if ultima_presenca and ultima_presenca['ultima_actividade']:
             ultima_presenca = ultima_presenca['ultima_actividade'].date()
             tempo_para_expiracao_pontos = ultima_presenca + timedelta(days=45)
             dias_expiracao = (tempo_para_expiracao_pontos -
                               timezone.now().date()).days
         else:
+            ultima_presenca = None
             tempo_para_expiracao_pontos = None
             dias_expiracao = None
 
         self.context = {
             'acesso_restrito': acesso_restrito,
             'active_setup': active_setup,
+            'pontos_hoje_decimal': pontos_hoje_decimal,
             'total_pontos': total_pontos,
             'total_pontos_disponiveis': total_pontos_disponiveis,
             'total_pontos_ganhos_decimal': total_pontos_ganhos_decimal,
@@ -472,12 +481,12 @@ class Regras(View):
 
 
 class ConfirmarEmail(View):
+    '''View para confirmar o email do usuário'''
+
     def get(self, request, token):
+        '''Método GET para confirmar o email do usuário'''
         # Tenta encontrar o token na sessao
         temp_user = request.session.get('temp_user', None)
-        print('temp_user', temp_user)
-        print('token from session', temp_user.get('token'))
-        print('token from url', token)
 
         # verifica se o token já foi utilizado ou expirou
         if not temp_user or str(temp_user.get('token')) != str(token):
@@ -499,7 +508,7 @@ class ConfirmarEmail(View):
         # Cria um perfil para o usuário
         perfil_data = temp_user['perfil_data']
 
-        # Recuperar a instãncia de RespostaFidelidade usando o ID armazenado
+        # Recuperar a instancia de RespostaFidelidade usando o ID armazenado
         if 'estudante' in perfil_data and perfil_data['estudante']:
             perfil_data['estudante'] = fidelidade_models.RespostaFidelidade.objects.get(
                 id=perfil_data['estudante'])
@@ -694,48 +703,13 @@ class MovimentosCliente(BasePerfil):
         # Calcular pontos disponíveis
         total_pontos_disponiveis = calcular_total_pontos_disponiveis(user)
 
-        compras_fidelidade = fidelidade_models.ComprasFidelidade.objects.filter(
-            utilizador=user).order_by('-criado_em')
-
-        ofertas_fidelidade = fidelidade_models.OfertasFidelidade.objects.filter(
-            utilizador=user).order_by('-criado_em')
-
-        movimentos = []
-
-        agora = timezone.now()
-        for compra in compras_fidelidade:
-            criado_em_local = timezone.localtime(compra.criado_em)
-            disponivel_amanha = agora.date() <= criado_em_local.date()
-            expirado = compra.expirado
-
-            movimentos.append({
-                'data': criado_em_local.strftime('%Y-%m-%d'),
-                'tipo': 'Compra',
-                'valor': compra.compra,
-                'pontos': compra.pontos_adicionados,
-                'cor': 'orange' if disponivel_amanha else 'black',
-                'disponivel_amanha': disponivel_amanha,
-                'expirado': expirado,
-            })
-
-        for oferta in ofertas_fidelidade:
-            processado = oferta.processado
-            movimentos.append({
-                'data': oferta.criado_em.strftime('%Y-%m-%d'),
-                'tipo': 'Oferta',
-                'valor': '-----',
-                'pontos': '-' + str(oferta.pontos_gastos),
-                'cor': 'red',
-                'processado': processado,
-            })
-
-        # Ordenar os movimentos por data decrescente
-        movimentos.sort(key=lambda x: x['data'], reverse=True)
+        # Listar compras e ofertas
+        movimentos = listar_compras_ofertas(user)
 
         self.context = {
             'active_setup': active_setup,
-            'compras_fidelidade': compras_fidelidade,
-            'ofertas_fidelidade': ofertas_fidelidade,
+            # 'compras_fidelidade': compras_fidelidade,
+            # 'ofertas_fidelidade': ofertas_fidelidade,
             'tipo_fidelidade': tipo_fidelidade,
             'total_pontos': total_pontos,
             'total_pontos_disponiveis': total_pontos_disponiveis,

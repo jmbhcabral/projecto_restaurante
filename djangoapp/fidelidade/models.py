@@ -190,4 +190,4 @@ class RespostaFidelidade(models.Model):
     )
 
     def __str__(self):
-        return f"{self.tipo_fidelidade}"
+        return f"{self.resposta}"

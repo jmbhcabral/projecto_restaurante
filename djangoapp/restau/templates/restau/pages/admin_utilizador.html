@@ -1,31 +1,34 @@
 {% extends "restau/base.html" %}
 {% block content %}
-    <div class="section-content-wide content">
-        {% include "restau/partials/_utilizador_menu.html" %}
-            <div class="conta-content">
-                <h2>**********</h2>
-                <div class="content">
-                    <p>Nome: {{utilizador.first_name}} {{utilizador.last_name}}</p>
-                    <p>id: {{perfil.id}}</p>
-                    <p>pontos: {{total_pontos}}</p>
-                    <p>pontos disponiveis: {{total_pontos_disponiveis}}</p>
-                    <p>telefone: {{perfil.telemovel}}</p>
-                    <p>Numero Cliente: {{ perfil.numero_cliente }}</p>
-                    <p>Fidelidade: {{ perfil.tipo_fidelidade.nome }}</p>
-                    <p>Aniversário: {{ perfil.data_nascimento }}</p>
-                    {% if ultima_compra %}
-                    <p>Ultima compra: {{ ultima_compra.criado_em }}</p>
-                    {% else %}
-                    <p>Ultima compra: Nenhuma compra recente.</p>
-                    {% endif %}
-                    {% if ultima_oferta %}
-                    <p>Ultima Oferta: {{ ultima_oferta.criado_em }}</p>
-                    {% else %}
-                    <p>Ultima Oferta: Nenhuma oferta recente.</p>
-                    {% endif %}
-                    <p>Dias sem comprar: {{ dias_sem_comprar }} dias.</p>
-                </div>
-            </div>
+<div class="section-content-wide content">
+    {% include "restau/partials/_utilizador_menu.html" %}
+    <div class="conta-row">
+        <div class="conta-col">
+            <h2>**********</h2>
+            <span>Nome: {{utilizador.first_name}} {{utilizador.last_name}}</span>
+            <span>id: {{perfil.id}}</span>
+            <span>pontos: {{total_pontos|floatformat:2}}</span>
+            <span>pontos disponiveis: {{total_pontos_disponiveis|floatformat:2}}</span>
+            <span>telefone: {{perfil.telemovel}}</span>
+            <span>Numero Cliente: {{ perfil.numero_cliente }}</span>
+            <span>Fidelidade: {{ perfil.tipo_fidelidade.nome }}</span>
+            <span>Aniversário: {{ perfil.data_nascimento }}</span>
         </div>
+        <div class="content">   
+            {% if ultima_compra %}
+            <p>Ultima compra: {{ ultima_compra.criado_em }}</p>
+            {% else %}
+            <p>Ultima compra: Nenhuma compra recente.</p>
+            {% endif %}
+            {% if ultima_oferta %}
+            <p>Ultima Oferta: {{ ultima_oferta.criado_em }}</p>
+            {% else %}
+            <p>Ultima Oferta: Nenhuma oferta recente.</p>
+            {% endif %}
+            <p>Dias sem comprar: {{ dias_sem_comprar }} dias.</p>
+            {% comment %} {% if  %}{% endif %} {% endcomment %}
+            <p>Dias sem ofertas: {{ dias_sem_oferta }} </p>
+        </div>  
     </div>
+</div>
 {% endblock %}

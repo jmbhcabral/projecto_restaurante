@@ -1179,8 +1179,29 @@ body.frontend {
   text-decoration: none;
 }
 
+.conta-col {
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+}
+
+.conta-row {
+  display: flex;
+  flex-direction: row;
+  /* justify-content: space-between;
+  align-items: center;
+  width: 100%; */
+}
+
 
 .conta-content {
+  padding: var(--spacing-smlst);
+  /* width: 100%;  */
+  display: flex;
+  flex-direction: row;
+}
+
+.conta-content-perfil {
   padding: var(--spacing-smlst);
   width: 100%; 
   display: flex;

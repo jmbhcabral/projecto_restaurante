@@ -1,3 +1,5 @@
+''' Este módulo contém as views para as operações de compra e oferta de pontos de fidelidade. '''
+
 import logging
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
@@ -8,6 +10,9 @@ from fidelidade.models import ComprasFidelidade, OfertasFidelidade
 from django.db import models, IntegrityError
 from django.utils import timezone
 from utils.scanner_input_interpreter import interpretar_dados
+from utils.model_validators import (
+    calcular_total_pontos, calcular_total_pontos_disponiveis
+)
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +45,9 @@ def compras_utilizador(request, utilizador_pk):
                             "LOGGER: Erro ao ler Qrcode, valor: %s, chave G: %s", valor_compra, chave_g_valor)
 
                     # Verificar se a chave G já foi usada
-                    elif ComprasFidelidade.objects.filter(chave_g=chave_g_valor).exists():
+                    elif ComprasFidelidade.objects\
+                        .filter(chave_g=chave_g_valor)\
+                            .exists():
                         messages.error(
                             request, 'Uma compra com este código já foi registada.')
                         logger.warning(
@@ -110,47 +117,50 @@ def compras_utilizador(request, utilizador_pk):
 def ofertas_utilizador(request, utilizador_id):
     user = get_object_or_404(User, id=utilizador_id)
 
-    agora = timezone.now()
-    inicio_do_dia_atual = agora.replace(
-        hour=0, minute=0, second=0, microsecond=0)
-    inicio_para_uso_de_pontos = agora.replace(
-        hour=11, minute=30, second=0, microsecond=0)
+    # agora = timezone.now()
+    # inicio_do_dia_atual = agora.replace(
+    #     hour=0, minute=0, second=0, microsecond=0)
+    # inicio_para_uso_de_pontos = agora.replace(
+    #     hour=11, minute=30, second=0, microsecond=0)
 
-    if agora < inicio_para_uso_de_pontos:
-        data_de_referencia = inicio_do_dia_atual - timezone.timedelta(days=1)
-    else:
-        data_de_referencia = inicio_do_dia_atual
+    # if agora < inicio_para_uso_de_pontos:
+    #     data_de_referencia = inicio_do_dia_atual - timezone.timedelta(days=1)
+    # else:
+    #     data_de_referencia = inicio_do_dia_atual
 
-    pontos_ganhos = ComprasFidelidade.objects.filter(
-        utilizador=user, criado_em__lt=data_de_referencia).aggregate(
-        total_pontos_ganhos=models.Sum('pontos_adicionados'))
+    # pontos_ganhos = ComprasFidelidade.objects.filter(
+    #     utilizador=user, criado_em__lt=data_de_referencia).aggregate(
+    #     total_pontos_ganhos=models.Sum('pontos_adicionados'))
 
-    pontos_gastos = OfertasFidelidade.objects.filter(
-        utilizador=user).aggregate(
-        total_pontos_gastos=models.Sum('pontos_gastos'))
+    # pontos_gastos = OfertasFidelidade.objects.filter(
+    #     utilizador=user).aggregate(
+    #     total_pontos_gastos=models.Sum('pontos_gastos'))
 
-    pontos_ganhos_decimal = pontos_ganhos['total_pontos_ganhos'] or 0
-    pontos_gastos_decimal = pontos_gastos['total_pontos_gastos'] or 0
+    # pontos_ganhos_decimal = pontos_ganhos['total_pontos_ganhos'] or 0
+    # pontos_gastos_decimal = pontos_gastos['total_pontos_gastos'] or 0
 
-    total_pontos_disponiveis = pontos_ganhos_decimal - pontos_gastos_decimal
+    # total_pontos_disponiveis = pontos_ganhos_decimal - pontos_gastos_decimal
+
+    total_pontos_disponiveis = calcular_total_pontos_disponiveis(user)
+    total_pontos = calcular_total_pontos(user)
 
     initial_data = {
         'utilizador': user,
         'fidelidade': user.perfil.tipo_fidelidade.id,
     }
 
-    pontos_ganhos_totais = ComprasFidelidade.objects.filter(
-        utilizador=user).aggregate(
-        total_pontos_ganhos=models.Sum('pontos_adicionados'))
+    # pontos_ganhos_totais = ComprasFidelidade.objects.filter(
+    #     utilizador=user).aggregate(
+    #     total_pontos_ganhos=models.Sum('pontos_adicionados'))
 
-    pontos_gastos_totais = OfertasFidelidade.objects.filter(
-        utilizador=user).aggregate(
-        total_pontos_gastos=models.Sum('pontos_gastos'))
+    # pontos_gastos_totais = OfertasFidelidade.objects.filter(
+    #     utilizador=user).aggregate(
+    #     total_pontos_gastos=models.Sum('pontos_gastos'))
 
-    total_pontos_ganhos_decimal = pontos_ganhos_totais['total_pontos_ganhos'] or 0
-    total_pontos_gastos_decimal = pontos_gastos_totais['total_pontos_gastos'] or 0
+    # total_pontos_ganhos_decimal = pontos_ganhos_totais['total_pontos_ganhos'] or 0
+    # total_pontos_gastos_decimal = pontos_gastos_totais['total_pontos_gastos'] or 0
 
-    total_pontos = total_pontos_ganhos_decimal - total_pontos_gastos_decimal
+    # total_pontos = total_pontos_ganhos_decimal - total_pontos_gastos_decimal
 
     if request.method == 'POST':
         form = OfertasFidelidadeForm(request.POST, initial=initial_data)
@@ -192,6 +202,7 @@ def ofertas_utilizador(request, utilizador_id):
         'perfil': user.perfil,
         'total_pontos': total_pontos,
         'total_pontos_disponiveis': total_pontos_disponiveis,
+        'fidelidade': user.perfil.tipo_fidelidade,
     }
 
     return render(request, 'restau/pages/ofertas_utilizador.html', context)

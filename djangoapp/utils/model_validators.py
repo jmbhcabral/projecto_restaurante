@@ -64,6 +64,7 @@ def verificar_expiracao_pontos(utilizador):
 
     # Importação dos modelos necessários
     from fidelidade.models import ComprasFidelidade, OfertasFidelidade
+    from perfil.models import Perfil
 
     # Obter a data da última compra feita pelo utilizador
     ultima_compra = ComprasFidelidade.objects.filter(utilizador=utilizador).aggregate(
@@ -86,27 +87,36 @@ def verificar_expiracao_pontos(utilizador):
                 return timezone.make_aware(datetime_obj)
             return datetime_obj  # Se já for timezone-aware, retorna como está
         # Se a data for nula, retorna uma data mínima com fuso horário UTC
-        return timezone.datetime.min.replace(tzinfo=timezone.utc)
+        return None
 
-    # Determina a última atividade do utilizador, considerando compras e ofertas
-    ultima_atividade = max(
-        # Converte a última compra para timezone-aware, se necessário
-        ensure_aware(ultima_compra),
-        # Converte a última oferta para timezone-aware, se necessário
-        ensure_aware(ultima_oferta),
-    )
+    # Converte as datas para timezone-aware, se necessário
+    ultima_compra_aware = ensure_aware(ultima_compra)
+    ultima_oferta_aware = ensure_aware(ultima_oferta)
 
-    # Verifica se passaram mais de 30 dias desde a última atividade
-    if timezone.now() - ultima_atividade > timedelta(days=45):
-        print(f'Pontos expirados para {utilizador.username}')
+    # Cria uma lista de atividades que não contenham None
+    atividades = [dt for dt in [ultima_compra_aware,
+                                ultima_oferta_aware] if dt is not None]
 
-        # Marca todas as compras anteriores à última atividade como expiradas
-        ComprasFidelidade.objects.filter(
-            utilizador=utilizador).update(expirado=True)
+    if atividades:
+        # Determina a última atividade do utilizador
+        ultima_atividade = max(atividades)
 
-        # Marca todas as ofertas anteriores à última atividade como processadas
-        OfertasFidelidade.objects.filter(
-            utilizador=utilizador).update(processado=True)
+        # Atualiza a última atividade do utilizador no perfil
+        perfil = Perfil.objects.get(usuario=utilizador)
+        perfil.ultima_actividade = ultima_atividade
+        perfil.save()
+
+        # Verifica se passaram mais de 30 dias desde a última atividade
+        if timezone.now() - ultima_atividade > timedelta(days=45):
+            print(f'Pontos expirados para {utilizador.username}')
+
+            # Marca todas as compras anteriores à última atividade como expiradas
+            ComprasFidelidade.objects.filter(
+                utilizador=utilizador).update(expirado=True)
+
+            # Marca todas as ofertas anteriores à última atividade como processadas
+            OfertasFidelidade.objects.filter(
+                utilizador=utilizador).update(processado=True)
 
 
 def calcular_total_pontos(utilizador):

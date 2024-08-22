@@ -9,17 +9,18 @@
     </section>
     <section class="conta">
         {% include "perfil/partials/_conta_menu.html" %}
-        <div class="conta-content">
+        <div class="conta-content-perfil">
             <p>Olá {{ user.first_name }}, bem-vindo à sua área de utilizador.
             Aqui, pode atualizar os seus dados, explorar as suas vantagens exclusivas e muito mais.
             </p>
             {% if total_pontos > 0 %}
             <p>
                 <strong>Estado da sua conta de fidelidade:</strong><br>
-                <strong>Pontos disponíveis:</strong> {{ total_pontos_disponiveis|floatformat:2 }}<br>
-                <strong>Pontos acumulados:</strong> {{ total_pontos_ganhos_decimal|floatformat:2 }}<br>
-                <strong>Pontos utilizados:</strong> {{ total_ofertas_decimal|floatformat:2 }}<br>
-                <strong>Pontos expirados:</strong> {{ total_pontos_expirados|floatformat:2 }}<br>
+                <strong>Total pontos disponíveis:</strong> {{ total_pontos_disponiveis|floatformat:2 }}<br>
+                <strong>Pontos hoje:</strong> {{ pontos_hoje_decimal|floatformat:2 }}<br>
+                <strong>Total pontos acumulados:</strong> {{ total_pontos_ganhos_decimal|floatformat:2 }}<br>
+                <strong>Total pontos utilizados:</strong> {{ total_ofertas_decimal|floatformat:2 }}<br>
+                <strong>Total pontos expirados:</strong> {{ total_pontos_expirados|floatformat:2 }}<br>
             </p>
             <p>
                 Esteve a última vez em {{ ultima_presenca }}.
@@ -27,17 +28,28 @@
             <p>
                 Os seus pontos expiram em {{ data_expiracao }}. Faltam {{ dias_expiracao }} dias.
             </p>
-            {% elif total_pontos == 0 and total_pontos_ganhos > 0 %}
+            {% elif total_pontos == 0 and total_pontos_ganhos_decimal > 0 %}
             <p>
                 <strong>Estado da sua conta de fidelidade:</strong><br>
-                <strong>Pontos disponíveis:</strong> 0<br>
-                <strong>Pontos acumulados:</strong> {{ total_pontos_ganhos_decimal|floatformat:2 }}<br>
-                <strong>Pontos utilizados:</strong> {{ total_ofertas_decimal|floatformat:2 }}<br>
-                <strong>Pontos expirados:</strong> {{ total_pontos_expirados|floatformat:2 }}<br>
+                <strong>Total pontos disponíveis:</strong> {{ total_pontos_disponiveis|floatformat:2 }}<br>
+                <strong>Pontos hoje:</strong> {{ pontos_hoje_decimal|floatformat:2 }}<br>
+                <strong>Total pontos acumulados:</strong> {{ total_pontos_ganhos_decimal|floatformat:2 }}<br>
+                <strong>Total pontos utilizados:</strong> {{ total_ofertas_decimal|floatformat:2 }}<br>
+                <strong>Total pontos expirados:</strong> {{ total_pontos_expirados|floatformat:2 }}<br>
+            </p>
+            <p>
+                Visite-nos para acumular mais pontos e desfrutar de ofertas exclusivas.
             </p>
             {% else %}
             <p>
-                Ainda não tem pontos na sua conta de fidelidade.
+                <strong>Estado da sua conta de fidelidade:</strong><br>
+                <strong>Pontos disponíveis:</strong> 0<br>
+                <strong>Pontos acumulados:</strong> 0<br>
+                <strong>Pontos utilizados:</strong> 0<br>
+                <strong>Pontos expirados:</strong> 0<br>
+            </p>
+            <p>
+                Visite-nos para acumular pontos e desfrutar de ofertas exclusivas.
             </p>
             {% endif %}
         </div>

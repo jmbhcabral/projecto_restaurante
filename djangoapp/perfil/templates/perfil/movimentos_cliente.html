@@ -9,7 +9,7 @@
     </section>
     <section class="conta">
         {% include "perfil/partials/_conta_menu.html" %}
-        <div class="conta-content">
+        <div class="conta-col">
             <h4 class="center">Movimentos</h4>
             <div class="center">
                 <span><strong>Total Pontos Disponíveis: {{ total_pontos_disponiveis|floatformat:2 }} Pts</strong></span>
@@ -32,11 +32,13 @@
                         {{ movimento.tipo }}
                         {% if movimento.disponivel_amanha %}
                         <span style="color: orange;">(Só disponível amanhã)</span>
+                        {% elif movimento.expirado %}
+                            <span style="color: red;">(Expirado)</span>
                         {% endif %}
                     </div>
                     {% if movimento.valor != '-----' %}
                         {% if movimento.expirado %}
-                            <div class="grid-cell-right" style="color: red;">{{ movimento.valor|floatformat:2 }}(expirado)€</div>
+                            <div class="grid-cell-right" style="color: red;">{{ movimento.valor|floatformat:2 }}€</div>
                         {% else %}
                             <div class="grid-cell-right">{{ movimento.valor|floatformat:2 }}€</div>
                         {% endif %}

@@ -9,7 +9,7 @@
     </section>
     <section class="conta">
         {% include "perfil/partials/_conta_menu.html" %}
-        <div class="conta-content">
+        <div class="conta-content-perfil">
             <h4 class="center">Cartão Cliente</h4>
             <p class="center">Nº Cliente: {{ perfil.numero_cliente }}</p>
             <p><img src="{{ perfil.qr_code.url }}" alt="Qrcode"></p>
