@@ -1,19 +1,28 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.utils.safestring import mark_safe
+from django.utils import timezone
 from perfil.models import Perfil
 from fidelidade.models import RespostaFidelidade
 from . import models
-from django.utils import timezone
-from django.utils.safestring import mark_safe
 
 
 class PerfilForm(forms.ModelForm):
+    '''
+    Profile Form
+    '''
     class Meta:
+        '''
+        Meta Class
+        '''
         model = models.Perfil
         fields = '__all__'
-        exclude = ('usuario', 'numero_cliente', 'created_at',
-                   'updated_at', 'nif', 'qr_code', 'tipo_fidelidade',
-                   'ultima_atualizacao_data_nascimento')
+        exclude = (
+            'usuario', 'numero_cliente', 'created_at',
+            'updated_at', 'nif', 'qr_code', 'tipo_fidelidade',
+            'ultima_atualizacao_data_nascimento', 'ultima_actividade',
+            'reset_password_code', 'reset_password_code_expires'
+        )
 
         widgets = {
             'data_nascimento': forms.DateInput(
@@ -139,12 +148,13 @@ class UserForm(forms.ModelForm):
 
         self.usuario = usuario
 
-        if updating:
+        self.updating = updating
+
+        if self.updating:
+
             # se estiver a atualizar remover os campos de password
-            if 'password' in self.fields:
-                del self.fields['password']
-            if 'password2' in self.fields:
-                del self.fields['password2']
+            self.fields.pop('password')
+            self.fields.pop('password2')
 
         if usuario:
             self.fields['username'].widget.attrs['readonly'] = True
@@ -192,7 +202,7 @@ class UserForm(forms.ModelForm):
                     validation_error_msgs['password'] = error_msg_passwords_not_match
                     validation_error_msgs['password2'] = error_msg_passwords_not_match
 
-                if len(password_data) < 6:
+                if password_data is not None and len(password_data) < 6:
                     validation_error_msgs['password'] = error_msg_password_short
 
         # Usúarios não logados: Criação
@@ -210,10 +220,14 @@ class UserForm(forms.ModelForm):
                 validation_error_msgs['password2'] = error_msg_required
 
             if password_data != password2_data:
-                validation_error_msgs['password'] = error_msg_passwords_not_match
-                validation_error_msgs['password2'] = error_msg_passwords_not_match
+                validation_error_msgs['password'] = (
+                    error_msg_passwords_not_match
+                )
+                validation_error_msgs['password2'] = (
+                    error_msg_passwords_not_match
+                )
 
-            if len(password_data) < 6:
+            if password_data is not None and len(password_data) < 6:
                 validation_error_msgs['password'] = error_msg_password_short
 
         if validation_error_msgs:

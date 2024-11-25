@@ -1,0 +1,80 @@
+{% extends 'restau/base_front_perfil.html' %}
+{% block content %}
+<main class="section-content-wide section-gap front-content">
+    <section class="section-gap-conta white-bg top-background">
+        <div class="separator"></div>
+            <h1 class="center">Hamburgueria artesanal</h1>
+        <div class="separator"></div>
+        {% include "restau/partials/_messages.html" %}
+    </section>
+    <section class="section-gap">
+        <div class="center-form">
+            <div class="form-container">
+                <div class="section-gap">
+                    <div class="col section-gap">
+                        <h2 class="center">Verificação</h2>        
+                        <h5 class="center">Insira o código de verificação que lhe foi enviado por email.</h5>
+                    </div>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="code_1" class="center">Código de Verificação</label>
+                        <div class="code-inputs">
+                            <input type="text" class="form-control code-input" id="code_1" name="code_1" maxlength="3" inputmode="numeric" pattern="\d*" required aria-label="Primeiro dígito do código de verificação">
+                            <input type="text" class="form-control code-input" id="code_2" name="code_2" maxlength="3" inputmode="numeric" pattern="\d*" required aria-label="Segundo dígito do código de verificação">
+                            <input type="text" class="form-control code-input" id="code_3" name="code_3" maxlength="3" inputmode="numeric" pattern="\d*" required aria-label="Terceiro dígito do código de verificação">
+                        </div>
+                    </div>
+                    <div class="section-gap">
+                        <button type="submit" class="btn btn-primary">Verificar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="section-gap">
+                {% if allow_resend %}
+                    <div class="form-group text-center">
+                        <p class="center">
+                            <form method="POST" action="{% url 'perfil:user_resend_reset_code' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">Reenviar CÓDIGO</button>
+                            </form>
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</main>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Places the focus on the first input when the page loads
+        setTimeout(function() {
+            document.getElementById('code_1').focus();
+        }, 100);
+    
+        const inputs = document.querySelectorAll('.code-input');
+
+        inputs.forEach((input, index) => {
+            // allows only numbers
+            input.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, ''); // Removes all non-numeric characters
+            });
+
+            input.addEventListener('input', () => {
+                // If the input has a length of 3 and there is another input after it, move the focus to the next input
+                if (input.value.length === 3 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+
+            // Mves the focus to the previous input when the backspace key is pressed and the input is empty
+            input.addEventListener('keydown', (e) => {
+                if (e.key === "Backspace" && input.value.length === 0 && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+    });
+</script>
+{% endblock content %}

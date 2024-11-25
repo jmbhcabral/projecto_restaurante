@@ -14,7 +14,12 @@
             <p>Atualize os campos abaixo.</p>
             <form action="" method="POST">
                 {% csrf_token %}
-                {{ userform|crispy }}
+                {# Remover os campos password e password2 do userform antes de renderizar #}
+                {% for field in userform %}
+                    {% if field.name != 'password' and field.name != 'password2' %}
+                        {{ field|as_crispy_field }}
+                    {% endif %}
+                {% endfor %}
                 {{ perfilform|crispy }}
                 <div class="row">
                     <div class="col">
@@ -22,7 +27,6 @@
                     </div>
                 </div>
             </form>
-
         </div>
     </section>
 </main>

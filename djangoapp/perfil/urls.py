@@ -13,10 +13,8 @@ users_api_v1.register(
 
 urlpatterns = [
     path('perfil/', views.Criar.as_view(), name='criar'),
-    path('confirmar_email/<uuid:token>/', views.ConfirmarEmail.as_view(),
-         name='confirmar_email'),
-    path('perfil/reenvio_confirmacao_email/<str:username>/', views.ResendConfirmationEmail.as_view(),
-         name='resend_confirmation_email'),
+    path('perfil/user_verification_code/', views.VerificationCodeView.as_view(),
+         name='user_verification_code'),
     path('perfil/atualizar/', views.Atualizar.as_view(), name='atualizar'),
     path('perfil/login/', views.Login.as_view(), name='login'),
     path('perfil/logout/', views.Logout.as_view(), name='logout'),
@@ -31,7 +29,13 @@ urlpatterns = [
     path('perfil/request_reset_password/',
          views.RequestResetPasswordView.as_view(),
          name='request_reset_password'),
-    path('perfil/reset_password/<str:token>/', views.ResetPasswordView.as_view(),
+    path('perfil/user_reset_code/',
+         views.ResetCodeView.as_view(),
+         name='user_reset_code'),
+    path('perfil/user_resend_reset_code/',
+         views.ResendResetCodeView.as_view(),
+         name='user_resend_reset_code'),
+    path('perfil/reset_password/', views.ResetPasswordView.as_view(),
          name='reset_password'),
     # Change password
     path('perfil/change_password/', views.ChangePasswordView.as_view(),

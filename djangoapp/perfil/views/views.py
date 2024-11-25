@@ -2,7 +2,11 @@
 
 
 from decimal import Decimal
-import uuid
+from utils.email_confirmation import (
+    send_confirmation_email, send_reset_password_email
+)
+from utils.generate_reset_password_code import generate_reset_password_code
+
 from utils.model_validators import (
     calcular_total_pontos, calcular_total_pontos_disponiveis,
     calcular_pontos_expirados
@@ -26,16 +30,16 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from restau.models import ActiveSetup
-from perfil.models import PasswordResetToken
-from utils.reset_password_email import reset_password_email
 from django.conf import settings
-from perfil.forms import (ResetPasswordForm, RequestResetPasswordForm,
-                          ChangePasswordForm)
-from django.utils.decorators import method_decorator
+from perfil.forms import (
+    ResetPasswordForm, RequestResetPasswordForm,
+    ChangePasswordForm)
 from django.views.decorators.cache import never_cache
 
 
 class BasePerfil(View):
+    '''Base class for the perfil views.'''
+
     template_name = 'perfil/criar.html'
 
     def setup(self, *args, **kwargs):
@@ -78,15 +82,25 @@ class BasePerfil(View):
         self.userform = self.context['userform']
         self.perfilform = self.context['perfilform']
 
-        self.renderizar = render(self.request, self.template_name,
-                                 self.context)
+        self.renderizar = render(
+            self.request,
+            self.template_name,
+            self.context
+        )
 
     def get(self, *args, **kwargs):
+        '''Get the base perfil.'''
         return self.renderizar
 
 
 class Criar(BasePerfil):
+    '''Create a new user.'''
+
     def post(self, *args, **kwargs):
+        '''Create a new user.'''
+
+        # Clean session data
+        self.request.session.clear()
 
         if self.userform.is_valid() and self.perfilform.is_valid():
             username = self.userform.cleaned_data.get('username')
@@ -94,7 +108,7 @@ class Criar(BasePerfil):
             password = self.userform.cleaned_data.get('password')
             first_name = self.userform.cleaned_data.get('first_name')
             last_name = self.userform.cleaned_data.get('last_name')
-            token = str(uuid.uuid4())
+            code = generate_reset_password_code()
             perfil_data = self.convert_dates_to_str(
                 self.perfilform.cleaned_data)
 
@@ -110,17 +124,17 @@ class Criar(BasePerfil):
                 'first_name': first_name,
                 'last_name': last_name,
                 'perfil_data': perfil_data,
-                'token': token,
+                'code': code,
             }
 
             # Enviar email de confirmação
-            self.send_confirmation_email(email, username, token)
+            send_confirmation_email(self.request, email, username, code)
 
             messages.success(
                 self.request,
-                'Conta criada com sucesso!\nVerifique o seu email para ativar a conta!')
+                'Verifique o seu email para criar a conta!')
 
-            return redirect('perfil:criar')
+            return redirect('perfil:user_verification_code')
 
         # Se o formulário não for válido, exibir os erros
         for form in [self.userform, self.perfilform]:
@@ -140,21 +154,6 @@ class Criar(BasePerfil):
         self.setup(*args, **kwargs)
         return self.renderizar
 
-    def send_confirmation_email(self, email, username, token):
-        confirm_url = reverse('perfil:confirmar_email', args=[token])
-        full_url = f"{self.request.scheme}://{self.request.get_host()}{confirm_url}"
-
-        send_mail(
-            'Confirmação de email',
-            f'Olá {username},\n\n'
-            'Para confirmar o seu email, por favor clique no link abaixo:\n\n'
-            f'{full_url}\n\n'
-            'Obrigado!',
-            settings.EMAIL_HOST_USER,
-            [email],
-            fail_silently=False,
-        )
-
     def convert_dates_to_str(self, data):
         """Convert date objects to strings in the data dictionary."""
         for key, value in data.items():
@@ -163,12 +162,89 @@ class Criar(BasePerfil):
         return data
 
 
+class VerificationCodeView(BasePerfil):
+    '''View for inserting the verification code.'''
+
+    template_name = 'perfil/user_verification_code.html'
+
+    def get(self, *args, **kwargs):
+        '''GET method.'''
+        if self.request.user.is_authenticated:
+            return redirect('perfil:conta')
+
+        return render(
+            self.request,
+            self.template_name,
+            self.context
+        )
+
+    def post(self, *args, **kwargs):
+        '''POST method.'''
+
+        # Get the code from the post request
+        code_1 = self.request.POST.get('code_1')
+        code_2 = self.request.POST.get('code_2')
+        code_3 = self.request.POST.get('code_3')
+
+        final_code = int(f'{code_1}{code_2}{code_3}')
+
+        # Get the user from the session
+        temp_user = self.request.session.get('temp_user', None)
+
+        # Check if the user exists
+        if not temp_user:
+            messages.error(
+                self.request,
+                'Utilizador não encontrado! Por favor, registe-se novamente.'
+            )
+            return redirect('perfil:criar')
+
+        # Check if the code is valid
+        if not final_code or str(temp_user.get('code')) != str(final_code):
+            messages.error(
+                self.request,
+                'Código inválido! Por favor, insira o código correto.'
+            )
+            return render(self.request, self.template_name, self.context)
+
+        # Create the user
+        user = User.objects.create_user(
+            username=temp_user['username'],
+            email=temp_user['email'],
+            password=temp_user['password'],
+            first_name=temp_user['first_name'],
+            last_name=temp_user['last_name'],
+        )
+
+        # Cria um perfil para o usuário
+        perfil_data = temp_user['perfil_data']
+
+        # Recuperar a instancia de RespostaFidelidade usando o ID armazenado
+        if 'estudante' in perfil_data and perfil_data['estudante']:
+            perfil_data['estudante'] = fidelidade_models.RespostaFidelidade.objects.get(
+                id=perfil_data['estudante'])
+
+        perfil = perfil_models.Perfil.objects.create(
+            usuario=user,
+            **perfil_data
+        )
+
+        messages.success(
+            self.request,
+            'Código verificado com sucesso! Já pode aceder á sua conta.'
+        )
+
+        return redirect('perfil:criar')
+
+
 @method_decorator(login_required, name='dispatch')
 class Atualizar(BasePerfil):
+    '''View for updating the user.'''
     template_name = 'perfil/atualizar.html'
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
+
         # Aqui ajustamos o userform para o contexto de atualização
         if self.request.user.is_authenticated:
             self.context['userform'] = perfil_forms.UserForm(
@@ -179,31 +255,43 @@ class Atualizar(BasePerfil):
             )
 
     def get(self, *args, **kwargs):
+        '''GET method.'''
         if not self.request.user.is_authenticated:
             return redirect('perfil:criar')
+
         return render(self.request, self.template_name, self.context)
 
     def post(self, *args, **kwargs):
+        '''POST method.'''
 
-        if not self.userform.is_valid() or not self.perfilform.is_valid():
-            return self.renderizar
+        self.setup(*args, **kwargs)
 
-        username = self.userform.cleaned_data.get('username')
-        # password = self.userform.cleaned_data.get('password')
-        email = self.userform.cleaned_data.get('email')
-        first_name = self.userform.cleaned_data.get('first_name')
-        last_name = self.userform.cleaned_data.get('last_name')
+        # Inicializa o userform novamente no método post
+        self.context['userform'] = perfil_forms.UserForm(
+            data=self.request.POST,
+            instance=self.request.user,
+            usuario=self.request.user,
+            updating=True,  # Passa que é uma atualização
+        )
 
-        # Usuários logados
-        if self.request.user.is_authenticated:
-            usuario = get_object_or_404(
-                User, username=self.request.user.username)
+        if self.context['userform'].is_valid() and self.context['perfilform'].is_valid():
 
-            usuario.username = username
-            usuario.email = email
-            usuario.first_name = first_name
-            usuario.last_name = last_name
-            usuario.save()
+            username = self.context['userform'].cleaned_data.get('username')
+            email = self.context['userform'].cleaned_data.get('email')
+            first_name = self.context['userform'].cleaned_data.get(
+                'first_name')
+            last_name = self.context['userform'].cleaned_data.get('last_name')
+
+            # Usuários logados
+            if self.request.user.is_authenticated:
+                usuario = get_object_or_404(
+                    User, username=self.request.user.username)
+
+                usuario.username = username
+                usuario.email = email
+                usuario.first_name = first_name
+                usuario.last_name = last_name
+                usuario.save()
 
             if not self.perfil:
                 self.perfilform.cleaned_data['usuario'] = usuario
@@ -215,18 +303,20 @@ class Atualizar(BasePerfil):
                 perfil.usuario = usuario
                 perfil.save()
 
-        else:
-            messages.error(
+            messages.success(
                 self.request,
-                'Não foi possivel atualizar o perfil!'
+                'Conta atualizada com sucesso!'
             )
-            return redirect('perfil:criar')
 
-        messages.success(
+            return redirect('perfil:conta')
+
+        messages.error(
             self.request,
-            'Conta atualizada com sucesso!')
+            'Não foi possivel atualizar o perfil! Verifique os erros nos campos!'
+        )
 
-        return redirect('perfil:conta')
+        self.setup(*args, **kwargs)
+        return self.renderizar
 
 
 @method_decorator(login_required, name='dispatch')
@@ -480,51 +570,6 @@ class Regras(View):
         return render(self.request, self.template_name, self.context)
 
 
-class ConfirmarEmail(View):
-    '''View para confirmar o email do usuário'''
-
-    def get(self, request, token):
-        '''Método GET para confirmar o email do usuário'''
-        # Tenta encontrar o token na sessao
-        temp_user = request.session.get('temp_user', None)
-
-        # verifica se o token já foi utilizado ou expirou
-        if not temp_user or str(temp_user.get('token')) != str(token):
-            messages.error(
-                request,
-                'Este link já foi utilizado ou está expirado!'
-            )
-            return redirect('perfil:criar')
-
-        # Cria um novo usuário
-        user = User.objects.create_user(
-            username=temp_user['username'],
-            email=temp_user['email'],
-            password=temp_user['password'],
-            first_name=temp_user['first_name'],
-            last_name=temp_user['last_name'],
-        )
-
-        # Cria um perfil para o usuário
-        perfil_data = temp_user['perfil_data']
-
-        # Recuperar a instancia de RespostaFidelidade usando o ID armazenado
-        if 'estudante' in perfil_data and perfil_data['estudante']:
-            perfil_data['estudante'] = fidelidade_models.RespostaFidelidade.objects.get(
-                id=perfil_data['estudante'])
-
-        perfil = perfil_models.Perfil.objects.create(
-            usuario=user,
-            **perfil_data
-        )
-
-        messages.success(
-            request,
-            'Email confirmado com sucesso!'
-        )
-        return redirect('perfil:criar')
-
-
 class ResendConfirmationEmail(View):
     def get(self, request, username):
         user = get_object_or_404(User, username=username)
@@ -537,7 +582,12 @@ class ResendConfirmationEmail(View):
 
 
 class RequestResetPasswordView(View):
-    template_name = 'perfil/request_reset_password.html'
+    '''View for the request reset password.'''
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.template_name = 'perfil/request_reset_password.html'
+        self.context = {}
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
@@ -552,13 +602,19 @@ class RequestResetPasswordView(View):
         }
 
     def get(self, request):
+        '''GET method.'''
+        if request.user.is_authenticated:
+            return redirect('perfil:conta')
         # renderizar o template com o formulário para digitar o email
         return render(self.request, self.template_name, self.context)
 
     def post(self, request):
+        '''POST method.'''
+
+        # Clear the session
+        self.request.session.clear()
         email = request.POST.get('email')
         user = User.objects.filter(email=email).first()
-        form = RequestResetPasswordForm(request.POST)
 
         if not user:
             messages.error(
@@ -567,23 +623,135 @@ class RequestResetPasswordView(View):
             )
             return redirect('perfil:request_reset_password')
 
-        if form.is_valid():
-            email = form.cleaned_data.get('email')
-            reset_password_email(user)
-            messages.success(
-                request,
-                'Email enviado com sucesso!'
+        # Store the email in the session
+        request.session['reset_password_email'] = email
+
+        reset_code = generate_reset_password_code()
+
+        user.perfil.reset_password_code = reset_code
+        user.perfil.reset_password_code_expires = timezone.now()
+        user.perfil.save()
+
+        send_reset_password_email(request, email, reset_code)
+
+        messages.success(
+            request,
+            'Email enviado com sucesso! Por favor, verifique seu email.'
+        )
+        return redirect('perfil:user_reset_code')
+
+
+class ResetCodeView(View):
+    '''View for the reset code.'''
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.template_name = 'perfil/user_reset_verification_code.html'
+        self.context = {}
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+
+        active_setup = ActiveSetup.objects\
+            .order_by('-id')\
+            .first()
+
+        self.context = {
+            'active_setup': active_setup,
+            'allow_resend': False,
+        }
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect('perfil:conta')
+        return render(request, self.template_name, self.context)
+
+    def post(self, request):
+        code_1 = request.POST.get('code_1')
+        code_2 = request.POST.get('code_2')
+        code_3 = request.POST.get('code_3')
+        final_code = int(f'{code_1}{code_2}{code_3}')
+
+        # Find the user with the reset code
+        user = perfil_models.Perfil.objects.filter(
+            reset_password_code=final_code).first()
+
+        # Check if the code is valid
+        if not final_code:
+            messages.error(request, 'Código inválido!')
+            return render(request, self.template_name, self.context)
+
+        if user and user.reset_password_code_expires:
+            # Check if the code has expired
+            expiration_time = user.reset_password_code_expires + \
+                timezone.timedelta(minutes=15)
+            if timezone.now() > expiration_time:
+                messages.error(
+                    request,
+                    'Código expirado! Por favor, solicite um novo.'
+                )
+                self.context['allow_resend'] = True
+                return render(request, self.template_name, self.context)
+
+            # Store the code in the session
+            request.session['reset_code'] = final_code
+            return redirect(
+                'perfil:reset_password'
             )
-            return redirect('perfil:request_reset_password')
         else:
+            messages.error(request, 'Código inválido!')
+            return render(request, self.template_name, self.context)
+
+
+class ResendResetCodeView(View):
+    '''View for resending the reset code.'''
+
+    def post(self, request):
+        '''POST method.'''
+
+        # Get the email from the session
+        email = request.session.get('reset_password_email', None)
+
+        if not email:
             messages.error(
                 request,
-                'Erro ao enviar o email!'
+                'Não foi possível encontrar o email. '
+                'Por favor, insira novamente.'
             )
-            return redirect('perfil:request_reset_password')
+            return redirect(
+                'perfil:request_reset_password'
+            )
+
+        # Check if the email exists
+        user = User.objects.filter(email=email).first()
+
+        if not user:
+            messages.error(request, 'Utilizador não encontrado!')
+            return redirect(
+                'perfil:request_reset_password'
+            )
+
+        reset_code = generate_reset_password_code()
+        user.perfil.reset_password_code = reset_code
+        user.perfil.reset_password_code_expires = timezone.now()
+        user.perfil.save()
+
+        send_reset_password_email(request, email, reset_code)
+
+        messages.success(
+            request,
+            'Um novo código foi enviado.'
+        )
+        return redirect('perfil:user_reset_code')
 
 
 class ResetPasswordView(View):
+    '''View for the reset password.'''
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.template_name = 'perfil/reset_password.html'
+        self.context = {}
 
     def setup(self, *args, **kwargs):
 
@@ -597,14 +765,20 @@ class ResetPasswordView(View):
             'active_setup': active_setup,
         }
 
-    def get(self, request, token):
+    def get(self, request):
+        '''GET method.'''
 
-        # Tenta encontrar o token no banco de dados
-        token = get_object_or_404(
-            PasswordResetToken, token=token
-        )
+        # Get the user from the session
+        email = request.session.get('reset_password_email', None)
 
-        user = token.user
+        user = User.objects.filter(email=email).first()
+
+        if not email:
+            messages.error(
+                request,
+                'Não foi possível encontrar o usuário. Por favor, tente novamente.'
+            )
+            return redirect('perfil:request_reset_password')
 
         if request.user.is_authenticated:
             messages.error(
@@ -613,39 +787,31 @@ class ResetPasswordView(View):
             )
             return redirect('perfil:conta')
 
-        # verifica se o token já foi utilizado ou expirou
-        if token.is_expired() or token.used:
-            messages.error(
-                request,
-                'Este link já foi utilizado ou expirou!'
-            )
-            return redirect('perfil:request_reset_password')
-
         form = ResetPasswordForm()
 
         # renderizar o template com o formulário para digitar a nova senha
         return render(
             request,
-            'perfil/reset_password.html',
+            self.template_name,
             {
                 'active_setup': self.context['active_setup'],
                 'form': form,
-                'token': token,
                 'user': user
             }
         )
 
-    def post(self, request, token):
-        # Tenta encontrar o token no banco de dados
-        reset_token = get_object_or_404(
-            PasswordResetToken, token=token, used=False
-        )
+    def post(self, request):
+        '''POST method.'''
 
-        # verifica se o token já foi utilizado ou expirou
-        if reset_token.is_expired():
+        # Get the user from the session
+        email = request.session.get('reset_password_email', None)
+
+        user = User.objects.filter(email=email).first()
+
+        if not user:
             messages.error(
                 request,
-                'Este link já foi utilizado ou expirou!'
+                'Não foi possível encontrar o usuário. Por favor, tente novamente.'
             )
             return redirect('perfil:request_reset_password')
 
@@ -653,31 +819,32 @@ class ResetPasswordView(View):
         form = ResetPasswordForm(request.POST)
         if form.is_valid():
             new_password = request.POST.get('password')
-            user = reset_token.user
             user.set_password(new_password)
             user.save()
-            reset_token.used = True
-            reset_token.save()
+
+            # Clear the session
+            del request.session['reset_password_email']
+
             # Redireciona para a página de login
             messages.success(
                 request,
                 'Senha alterada com sucesso!'
             )
             return redirect('perfil:criar')
-        else:
-            messages.error(
-                request,
-                'Erro ao alterar a senha!'
-            )
-            return render(
-                request,
-                'perfil/reset_password.html',
-                {
-                    'active_setup': self.context['active_setup'],
-                    'form': form,
-                    'token': token,
-                }
-            )
+
+        messages.error(
+            request,
+            'Erro ao alterar a senha!'
+        )
+        return render(
+            request,
+            self.template_name,
+            {
+                'active_setup': self.context['active_setup'],
+                'form': form,
+                'user': user,
+            }
+        )
 
 
 @method_decorator(login_required, name='dispatch')

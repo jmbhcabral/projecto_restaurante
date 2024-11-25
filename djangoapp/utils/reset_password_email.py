@@ -1,7 +1,8 @@
+''' Reset Password Email '''
 import uuid
 from django.conf import settings
-from perfil.models import PasswordResetToken
 from django.core.mail import send_mail
+from perfil.models import PasswordResetToken
 
 
 def reset_password_email(user):

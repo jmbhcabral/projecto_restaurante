@@ -1466,3 +1466,16 @@ body.frontend {
 .input-group .form-control {
   padding-right: 2.5rem;
 }
+
+/* Código de verificação */
+.code-inputs {
+  display: flex;
+  justify-content: center;
+}
+
+.code-input {
+  width: 80px; /* Largura dos inputs */
+  text-align: center; /* Centraliza o texto */
+  font-size: 28px !important; /* Aumenta o tamanho da fonte */
+  margin-right: 10px; /* Espaço entre as caixas */
+}

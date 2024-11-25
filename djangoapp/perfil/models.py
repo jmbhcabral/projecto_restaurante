@@ -4,16 +4,18 @@ import uuid
 from io import BytesIO
 from django.core.files import File
 from django.db import models
-from django.contrib.auth.models import User
-from fidelidade.models import Fidelidade, RespostaFidelidade, Respostas
 from django.utils import timezone
 from django.forms import ValidationError
+from django.contrib.auth.models import User
+from fidelidade.models import Fidelidade, RespostaFidelidade, Respostas
 from utils.model_validators import validar_nif
 import qrcode
 
 
 class Perfil(models.Model):
+    ''' Model for the user profile. '''
     class Meta:
+        ''' Meta class for the Perfil model. '''
         verbose_name = "Perfil"
         verbose_name_plural = "Perfis"
 
@@ -24,6 +26,7 @@ class Perfil(models.Model):
         blank=False,
         default=None,
         verbose_name="Utilizador",
+        related_name='perfil',
     )
     data_nascimento = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
@@ -67,6 +70,18 @@ class Perfil(models.Model):
         verbose_name="Última Actividade",
         blank=True,
         null=True,
+    )
+    reset_password_code = models.IntegerField(
+        verbose_name="Código de Reset de Password",
+        blank=True,
+        null=True,
+        default=000000000
+    )
+    reset_password_code_expires = models.DateTimeField(
+        verbose_name="Expiração do Código de Reset de Password",
+        blank=True,
+        null=True,
+        default=timezone.now
     )
 
     def save(self, *args, **kwargs):
