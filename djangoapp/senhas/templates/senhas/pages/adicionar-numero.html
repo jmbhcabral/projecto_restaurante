@@ -24,15 +24,17 @@
 				text-align: center;
 			}
 			.senha-display {
-				font-size: 30rem;
+				font-size: 20rem; /* Ajustado para caber melhor em ecrãs pequenos */
 				font-weight: bold;
 				flex: 1;
 				display: flex;
 				align-items: center;
 				justify-content: center;
+				margin-bottom: 10px; /* Reduz o espaço abaixo do display */
 			}
 			form {
 				width: 100%;
+				margin-top: 10px; /* Reduz a margem acima do formulário */
 			}
 			input[type='number'] {
 				width: 100%;
@@ -44,15 +46,23 @@
 				padding: 10px;
 				font-size: 1.5rem;
 			}
+
+			/* Media query para ajustar layout em ecrãs pequenos */
 			@media (max-width: 768px) {
 				.senha-display {
-					font-size: 15rem; /* Reduz o tamanho do texto para ecrãs pequenos */
+					font-size: 10rem; /* Ajusta o tamanho do texto */
+				}
+				form {
+					margin-top: 5px; /* Reduz ainda mais a margem para ecrãs pequenos */
 				}
 			}
 
 			@media (max-width: 480px) {
 				.senha-display {
-					font-size: 7rem; /* Ajuste adicional para ecrãs muito pequenos */
+					font-size: 7rem; /* Ajusta para ecrãs muito pequenos */
+				}
+				form {
+					margin-top: 5px;
 				}
 			}
 		</style>
