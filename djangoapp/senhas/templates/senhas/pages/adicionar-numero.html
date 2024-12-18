@@ -17,24 +17,25 @@
 				flex-direction: column;
 			}
 			.container {
-				flex: 1;
 				display: flex;
 				flex-direction: column;
-				justify-content: space-between;
-				text-align: center;
+				justify-content: flex-start; /* Alinha o conteúdo no topo */
+				align-items: center; /* Centraliza horizontalmente */
+				padding: 10px; /* Espaçamento interno */
 			}
 			.senha-display {
-				font-size: 20rem; /* Ajustado para caber melhor em ecrãs pequenos */
+				font-size: 30rem; /* Ajuste para ecrãs pequenos */
 				font-weight: bold;
-				flex: 1;
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				margin-bottom: 10px; /* Reduz o espaço abaixo do display */
+				margin-bottom: 5px; /* Muito pouca margem abaixo */
 			}
 			form {
 				width: 100%;
-				margin-top: 10px; /* Reduz a margem acima do formulário */
+				display: flex;
+				flex-direction: column; /* Coloca os elementos em coluna */
+				gap: 5px; /* Pequeno espaço entre input e botão */
 			}
 			input[type='number'] {
 				width: 100%;
@@ -46,23 +47,14 @@
 				padding: 10px;
 				font-size: 1.5rem;
 			}
-
-			/* Media query para ajustar layout em ecrãs pequenos */
 			@media (max-width: 768px) {
 				.senha-display {
-					font-size: 10rem; /* Ajusta o tamanho do texto */
-				}
-				form {
-					margin-top: 5px; /* Reduz ainda mais a margem para ecrãs pequenos */
+					font-size: 15rem; /* Reduz o tamanho do texto para ecrãs pequenos */
 				}
 			}
-
 			@media (max-width: 480px) {
 				.senha-display {
-					font-size: 7rem; /* Ajusta para ecrãs muito pequenos */
-				}
-				form {
-					margin-top: 5px;
+					font-size: 7rem; /* Reduz tamanho para dispositivos menores */
 				}
 			}
 		</style>
