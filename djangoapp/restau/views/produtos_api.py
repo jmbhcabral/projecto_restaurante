@@ -102,6 +102,7 @@ class UserEmentaAPIView(APIView):
             produtos_ementa = Ementa.objects.filter(
                 id=ementa.id,
             )
+
             serializer = ProdutosEmentaSerializer(
                 produtos_ementa,
                 many=True,
