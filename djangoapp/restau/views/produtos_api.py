@@ -50,6 +50,33 @@ class ProdutosAPIv1ViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
+    
+
+# @api_view()
+# def produtos_api_detalhe(request, pk):
+#     produto = get_object_or_404(
+#         Products.objects.all(),
+#         pk=pk,
+#     )
+#     serializer = ProdutoSerializer(
+#         instance=produto,
+#         many=False,
+#         context={'request': request},
+#     )
+#     return Response(serializer.data)
+
+class ProdutosAPIv1DetailView(APIView):
+    def get(self, request, pk):
+        produto = get_object_or_404(
+            Products.objects.all(),
+            pk=pk,
+        )
+        serializer = ProdutoSerializer(
+            instance=produto,
+            many=False,
+            context={'request': request},
+        )
+        return Response(serializer.data)
 
 
 @api_view()

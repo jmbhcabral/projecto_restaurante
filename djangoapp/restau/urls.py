@@ -491,6 +491,11 @@ urlpatterns = [
         name='ementa_api_v1'
     ),
     path(
+        'produtos/api/v1/detalhe/<int:pk>/',
+        views.ProdutosAPIv1DetailView.as_view(),
+        name='produto_detalhe_api_v1'
+    ),
+    path(
         'produtos/api/v1/categoria/<int:pk>/',
         views.categoria_api_detalhe,  # type: ignore
         name='produto_categoria_api_v1'
