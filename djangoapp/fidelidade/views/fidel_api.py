@@ -5,7 +5,8 @@ from ..models import (ProdutoFidelidadeIndividual, ComprasFidelidade,
                       )
 from ..serializers import ProdutoFidelidadeIndividualSerializer
 from collections import defaultdict
-
+from django.db.models import Sum
+from utils.model_validators import calcular_total_pontos, calcular_dias_para_expirar
 
 class ProdutoFidelidadeAPI(APIView):
     """
@@ -121,10 +122,16 @@ class TotalPontosAPIV1(APIView):
             total_compras = compras_fidelidade.count()
             total_ofertas = ofertas_fidelidade.count()
 
+            total_visitas = total_compras + total_ofertas
+
+            total_expirados = compras_fidelidade.filter(
+                expirado=True).aggregate(total=Sum('pontos_adicionados'))['total'] or 0
+
             detalhes_compras = [
                 {
                     "compra": compra.compra,
                     "pontos_adicionados": compra.pontos_adicionados,
+                    "expirado": compra.expirado,
                     "criado_em": compra.criado_em,
                 }
                 for compra in compras_fidelidade
@@ -144,14 +151,24 @@ class TotalPontosAPIV1(APIView):
             total_pontos_gastos = sum(
                 [oferta.pontos_gastos for oferta in ofertas_fidelidade
                  if oferta.pontos_gastos])
-            saldo_pontos = total_pontos_adicionados - total_pontos_gastos
+
+            saldo_pontos = calcular_total_pontos(user)
+
+            dias_para_expirar = calcular_dias_para_expirar(user)
+
+
 
             resposta = {
-                "utilizador": user.username,
+                "utilizador": user.id,
                 "tipo_fidelidade": tipo_fidelidade.nome if tipo_fidelidade else None,
+                "total_pontos_adicionados": total_pontos_adicionados,
+                "total_pontos_gastos": total_pontos_gastos,
                 "total_compras": total_compras,
                 "total_ofertas": total_ofertas,
+                "total_visitas": total_visitas,
+                "total_expirados": total_expirados,
                 "saldo_pontos": saldo_pontos,
+                "dias_para_expirar": dias_para_expirar,
                 "detalhes_compras": detalhes_compras,
                 "detalhes_ofertas": detalhes_ofertas,
             }

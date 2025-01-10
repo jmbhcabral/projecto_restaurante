@@ -40,7 +40,6 @@ urlpatterns = [
         name='produtos_fidelidade_api_v1'),
     path(
         'fidelidade/api/v1/pontos/<int:pk>/',
-
         TotalPontosAPIV1.as_view(),
         name='pontos_fidelidade_api_v1'),
 

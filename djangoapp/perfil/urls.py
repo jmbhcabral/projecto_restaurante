@@ -7,7 +7,6 @@ app_name = 'perfil'
 users_api_v1 = SimpleRouter()
 users_api_v1.register(
     'users/api/v1', views.RegisterUserView, basename='users-api',
-
 )
 
 

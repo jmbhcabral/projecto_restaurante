@@ -188,6 +188,25 @@ def calcular_pontos_expirados(user):
     return total_pontos_expirados
 
 
+def calcular_dias_para_expirar(user):
+    '''Calcular o número de dias restantes para expirar os pontos de fidelidade de um utilizador'''
+
+    from perfil.models import Perfil
+
+    ultima_presenca = Perfil.objects.filter(
+            usuario=user).values('ultima_actividade').first()
+
+    if ultima_presenca and ultima_presenca['ultima_actividade']:
+        ultima_presenca = ultima_presenca['ultima_actividade'].date()
+        tempo_para_expiracao_pontos = ultima_presenca + timedelta(days=45)
+        dias_expiracao = (tempo_para_expiracao_pontos -
+                            timezone.now().date()).days
+    else:
+        ultima_presenca = None
+        tempo_para_expiracao_pontos = None
+        dias_expiracao = None
+
+    return dias_expiracao
 def processar_transacoes_existentes():
     '''Processar todas as transações existentes para todos os perfis de utilizadores'''
 
