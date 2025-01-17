@@ -9,8 +9,8 @@ class PerfilAdmin(admin.ModelAdmin):
                     'data_nascimento', 'telemovel', 'nif', 'estudante',
                     'ultima_actividade')
     list_display_links = 'id', 'numero_cliente', 'usuario'
-    search_fields = ('id', 'numero_cliente', 'usuario', 'tipo_fidelidade',
-                     'data_nascimento', 'telemovel', 'nif', 'estudante',
+    search_fields = ('id', 'numero_cliente', 'usuario__username',
+                     'usuario__email', 'data_nascimento', 'telemovel', 'nif',
                      'ultima_actividade')
 
 
