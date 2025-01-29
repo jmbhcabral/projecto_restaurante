@@ -822,6 +822,11 @@ class ResetPasswordView(View):
             user.set_password(new_password)
             user.save()
 
+            # Limpar o código de redefinição para evitar reutilização
+            user.perfil.reset_password_code = None
+            user.perfil.reset_password_code_expires = None
+            user.perfil.save()
+
             # Clear the session
             del request.session['reset_password_email']
 

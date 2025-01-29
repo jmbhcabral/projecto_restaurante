@@ -72,16 +72,29 @@ class SubCategoriaSerializer(serializers.ModelSerializer):
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
-        data = super().validate(attrs)
-
-        # Assegurando que o atributo 'id' existe
-        user_id = getattr(self.user, 'id', None)
-        if user_id is not None:
-            data['user_id'] = user_id
-        else:
-            raise serializers.ValidationError("ID de usuário não encontrado.")
-
-        return data
+        try:
+            data = super().validate(attrs)
+            
+            # Adiciona o ID do usuário aos dados retornados
+            data['user_id'] = self.user.id
+            
+            
+            return data
+            
+        except Exception as e:
+            error_message = str(e)
+            if "No active account found" in error_message:
+                raise serializers.ValidationError({
+                    "error": "Utilizador e/ou password inválidos"
+                })
+            elif "This field may not be blank" in error_message:
+                raise serializers.ValidationError({
+                    "error": "Os campos de Utilizador e Password são obrigatórios."
+                })
+            else:
+                raise serializers.ValidationError({
+                    "error": "Erro ao fazer login. Por favor, tente novamente."
+                })
 
 
 class MyTokenRefreshSerializer(TokenRefreshSerializer):

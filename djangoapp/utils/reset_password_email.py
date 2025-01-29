@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from perfil.models import PasswordResetToken
 
-
+ # TODO: Não esta a ser utilizado
 def reset_password_email(user):
     """
     Send reset password email to user.

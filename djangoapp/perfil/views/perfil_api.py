@@ -2,13 +2,20 @@ from django.contrib.auth.models import User
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from ..serializers import (
-    UserRegistrationSerializer, )
+    UserRegistrationSerializer, RequestResetPasswordSerializer,
+    ValidateResetCodeSerializer
+    )
 from rest_framework.pagination import PageNumberPagination
 from ..permissions import IsAcessoRestrito, IsOwner
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny
 from perfil.models import Perfil
+from django.http import JsonResponse
+from rest_framework.views import APIView
+from fidelidade.models import RespostaFidelidade
+from rest_framework.decorators import action
+from django.utils import timezone
 
 
 class UsersAPIv1Pagination(PageNumberPagination):
@@ -69,7 +76,9 @@ class RegisterUserView(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def create(self, request, *args, **kwargs):
-        serializer = UserRegistrationSerializer(data=request.data)
+        serializer = UserRegistrationSerializer(
+            data=request.data, context={'request': request}
+            )
         if serializer.is_valid():
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
@@ -111,3 +120,143 @@ class RegisterUserView(viewsets.ModelViewSet):
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def reset_code_email(self, request):
+        serializer = RequestResetPasswordSerializer(
+            data=request.data, context={'request': request}
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {'message': 'Código de redefinição de senha enviado com sucesso.'},
+                status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def validate_reset_code(self, request):
+        serializer = ValidateResetCodeSerializer(data=request.data, context={'request': request})
+        email = request.data.get('email', '').strip().lower()
+        code = request.data.get('code', '')
+
+        if not email or not code:
+            return Response(
+                {'error': 'O email e o código são obrigatórios.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user = User.objects.filter(email=email).first()
+        if not user:
+            return Response({'error': 'Este email não está registado.'}, status=404)
+
+        perfil = user.perfil
+        print('perfil.reset_password_code: ', perfil.reset_password_code)
+        print('code: ', code)
+
+        if perfil.reset_password_code != code:
+            return Response({'error': 'Código de verificação inválido.'}, status=400)
+        
+        expiration_time = user.perfil.reset_password_code_expires + \
+            timezone.timedelta(minutes=15)
+        
+        if timezone.now() > expiration_time:
+            return Response({'error': 'O código de verificação expirou.'}, status=400)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Código validado com sucesso.'}, status=200)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def reset_password_mobile(self, request):
+        email = request.data.get('email', '').strip().lower()
+        new_password = request.data.get('new_password', '').strip()
+
+        if not email or not new_password:
+            return Response(
+                {'error': 'O email e a nova senha são obrigatórios.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user = User.objects.filter(email=email).first()
+        if not user:
+            return Response('Este email não está registado.', status=404)
+
+        perfil = user.perfil
+
+        # Redefinir a senha do utilizador
+        user.set_password(new_password)
+        user.save()
+
+        # Limpar o código de redefinição para evitar reutilização
+        perfil.reset_password_code = None
+        perfil.reset_password_code_expires = None
+        perfil.save()
+
+        return Response({'message': 'Senha redefinida com sucesso.'}, status=200)
+
+
+class UserConfirmationView(APIView):
+    def post(self, request, *args, **kwargs):
+        # Recuperar o temp_user da sessão
+        temp_user = request.session.get('temp_user')
+        if not temp_user:
+            return JsonResponse({'error': 'Usuário temporário não encontrado.'}, status=400)
+
+        # Verificar o código de confirmação
+        code = request.data.get('code')
+        if not code:
+            return JsonResponse({'error': 'Código de confirmação não fornecido.'}, status=400)
+
+        if str(temp_user['code']) != str(code):
+            return JsonResponse({'error': 'Código de confirmação inválido.'}, status=400)
+
+        # Criar o usuário
+        user = User.objects.create_user(
+            username=temp_user['username'],
+            email=temp_user['email'],
+            password=temp_user['password'],
+            first_name=temp_user['first_name'],
+            last_name=temp_user['last_name'],
+        )
+
+        # Criar o perfil associado
+        perfil_data = temp_user['perfil']
+        estudante_id = perfil_data.pop('estudante', None)
+        estudante = get_object_or_404(RespostaFidelidade, id=estudante_id) if estudante_id else None
+
+        Perfil.objects.create(
+            usuario=user,
+            estudante=estudante,
+            **perfil_data
+        )
+
+        # Limpar a sessão
+        del request.session['temp_user']
+
+        return JsonResponse({'message': 'Usuário e perfil criados com sucesso.'}, status=201)
+    
+class ValidateResetCodeView(APIView):
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email', '').strip().lower()
+        if not email:
+            return Response({'error': 'O email é obrigatório.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.filter(email=email).first()
+        print('user: ', user)
+        print('user.id: ', user.id)
+        if not user:
+            return Response({'error': 'Este email não está registado.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ValidateResetCodeSerializer(data=request.data)
+        if serializer.is_valid():
+            return Response({'message': 'Código validado com sucesso.',
+                             'id': user.id,
+                             'email': user.email
+                             }, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

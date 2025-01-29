@@ -98,7 +98,45 @@ def compras_utilizador(request, utilizador_pk):
             else:
                 messages.error(request, 'Erro ao ler o código QR.')
                 logger.warning("LOGGER: Código QR inválido: %s", qr_data)
-        return redirect('restau:compras_utilizador', utilizador_pk=utilizador_pk)
+                
+            return redirect('restau:compras_utilizador', utilizador_pk=utilizador_pk)
+        else:
+            form = ComprasFidelidadeForm(
+                request.POST, initial=initial_data)
+            if form.is_valid():
+                compra_fidelidade = form.save(commit=False)
+                compra_fidelidade.utilizador = user
+                compra_fidelidade.fidelidade = user.perfil.tipo_fidelidade
+                compra_fidelidade.chave_g = '0'
+                try:
+                    compra_fidelidade.pontos_adicionados = round(
+                        float(compra_fidelidade.compra) * compra_fidelidade.fidelidade.desconto / 100, 2)
+                except (TypeError, ValueError) as e:
+                    compra_fidelidade.pontos_adicionados = 0
+                    logger.error(
+                        "LOGGER: Erro ao calcular pontos adicionados: %s", e)
+                    messages.error(
+                        request, 'Erro ao calcular os pontos adicionados.')
+                    
+                compra_fidelidade.save()
+
+                # Atualizar a última atividade do
+                # perfil(compra)
+                perfil = user.perfil
+                perfil.ultima_actividade = timezone.now()
+                perfil.save()
+
+                logger.info(
+                    'LOGGER: Compra registada com sucesso.')
+                messages.success(
+                    request, 'Compra registada com sucesso.')
+                
+                return redirect('restau:compras_utilizador', utilizador_pk=utilizador_pk)
+            else:
+                messages.error(request, 'Erro ao processar a compra.')
+                logger.warning("LOGGER: Erro ao processar a compra: %s", form.errors)
+                return redirect('restau:compras_utilizador', utilizador_pk=utilizador_pk)
+
     else:
         form = ComprasFidelidadeForm(initial=initial_data)
 

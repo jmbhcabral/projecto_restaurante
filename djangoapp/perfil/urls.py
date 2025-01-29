@@ -1,6 +1,7 @@
 from django.urls import path
 from perfil import views
 from rest_framework.routers import SimpleRouter
+from .views.perfil_api import UserConfirmationView, ValidateResetCodeView
 
 app_name = 'perfil'
 
@@ -39,6 +40,11 @@ urlpatterns = [
     # Change password
     path('perfil/change_password/', views.ChangePasswordView.as_view(),
          name='change_password'),
+
+    # API
+    # User confirmation
+    path('perfil/confirmation/', UserConfirmationView.as_view(), name='user-confirmation'),
+    path('perfil/validate_reset_code/', ValidateResetCodeView.as_view(), name='validate-reset-code'),
 ]
 
 urlpatterns += users_api_v1.urls

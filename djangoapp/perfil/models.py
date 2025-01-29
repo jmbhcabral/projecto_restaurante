@@ -86,10 +86,23 @@ class Perfil(models.Model):
 
     def save(self, *args, **kwargs):
         # Atualiza a data da última atualização da data de nascimento
+        print('self.pk: ', self.pk)
         if self.pk:
             original = Perfil.objects.get(pk=self.pk)
+        
+            # Verifica se a data de nascimento foi alterada
             if original.data_nascimento != self.data_nascimento:
                 agora = timezone.now()
+                ultima_atualizacao = self.ultima_atualizacao_data_nascimento
+
+                # Se há uma última atualização, verifica o período mínimo
+                if ultima_atualizacao:
+                    periodo_minimo = ultima_atualizacao + timezone.timedelta(days=182.5)  # 6 meses
+                    if agora < periodo_minimo:
+                        return
+                
+                # Atualiza a data da última alteração se a regra for cumprida
+                self.ultima_atualizacao_data_nascimento = agora
 
         # Gera o número de cliente
         if not self.numero_cliente:
