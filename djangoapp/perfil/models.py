@@ -1,16 +1,19 @@
 ''' Este módulo contém os modelos de dados para o aplicativo de perfil. '''
 
 import uuid
+from datetime import timedelta
+from django.utils import timezone
+from django.utils.timezone import now
 from io import BytesIO
 from django.core.files import File
 from django.db import models
-from django.utils import timezone
 from django.forms import ValidationError
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from fidelidade.models import Fidelidade, RespostaFidelidade, Respostas
 from utils.model_validators import validar_nif
 import qrcode
 
+User = get_user_model()
 
 class Perfil(models.Model):
     ''' Model for the user profile. '''
@@ -82,6 +85,11 @@ class Perfil(models.Model):
         blank=True,
         null=True,
         default=timezone.now
+    )
+    data_cancelamento = models.DateTimeField(
+        verbose_name="Data de Cancelamento",
+        blank=True,
+        null=True,
     )
 
     def save(self, *args, **kwargs):
@@ -234,50 +242,13 @@ class Morada(models.Model):
         return self.finalidade_morada
 
 
-def generate_uuid():
-    return str(uuid.uuid4())
-
-
-class EmailConfirmationToken(models.Model):
-    class Meta:
-        verbose_name = "EmailConfirmation"
-        verbose_name_plural = "EmailConfirmations"
-
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name="User",
-    )
-    token = models.CharField(max_length=100, default=generate_uuid)
-    created_at = models.DateTimeField(default=timezone.now)
-
-    def is_expired(self):
-        # Expira em 48 horas
-        tempo_expiracao = self.created_at + timezone.timedelta(seconds=60)
-        return tempo_expiracao < timezone.now()
-
-    def __str__(self):
-        return self.token
-
-
 class PasswordResetToken(models.Model):
-    class Meta:
-        verbose_name = "PasswordResetToken"
-        verbose_name_plural = "PasswordResetTokens"
-
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name="User",
-    )
-    token = models.CharField(max_length=100, default=generate_uuid)
-    created_at = models.DateTimeField(default=timezone.now)
-    used = models.BooleanField(default=False)
-
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.UUIDField(default=uuid.uuid4, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
     def is_expired(self):
-        # Expira em 24 horas
-        tempo_expiracao = self.created_at + timezone.timedelta(hours=24)
-        return tempo_expiracao < timezone.now()
+        return now() > self.created_at + timedelta(minutes=15)  # Expira em 15 minutos
 
     def __str__(self):
-        return self.token
+        return f"Reset Token for {self.user.email}"

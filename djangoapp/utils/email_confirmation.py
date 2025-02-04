@@ -64,7 +64,7 @@ def send_confirmation_email(request, email, username, code):
     email_message.send()
 
 
-def send_reset_password_email(request, email, reset_code):
+def send_reset_password_email( email, reset_code):
     ''' Sends the reset password email. '''
     reset_code = str(reset_code)
 

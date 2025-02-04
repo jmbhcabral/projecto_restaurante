@@ -21,8 +21,10 @@ class PerfilForm(forms.ModelForm):
             'usuario', 'numero_cliente', 'created_at',
             'updated_at', 'nif', 'qr_code', 'tipo_fidelidade',
             'ultima_atualizacao_data_nascimento', 'ultima_actividade',
-            'reset_password_code', 'reset_password_code_expires'
+            'reset_password_code', 'reset_password_code_expires',
+            'data_cancelamento'
         )
+
 
         widgets = {
             'data_nascimento': forms.DateInput(
@@ -106,22 +108,29 @@ class UserForm(forms.ModelForm):
                   'password', 'password2', 'email')
 
     username = forms.CharField(
+        min_length=3,
+        max_length=30,
         required=True,
         label='Utilizador',
         help_text='Importante! O utilizador não pode ser alterado.'
     )
 
+
     first_name = forms.CharField(
+        max_length=30,
         required=True,
         label='Nome',
         help_text='Seu nome.'
     )
 
+
     last_name = forms.CharField(
+        max_length=30,
         required=True,
         label='Apelido',
         help_text='Seu apelido.'
     )
+
 
     email = forms.EmailField(
         required=True,

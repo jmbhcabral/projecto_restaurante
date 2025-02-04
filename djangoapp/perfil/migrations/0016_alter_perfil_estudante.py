@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('perfil', '0015_passwordresettoken'),
+        ('perfil', '0013_perfil_ultima_atualizacao_data_nascimento'),
     ]
 
     operations = [

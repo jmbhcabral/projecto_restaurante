@@ -1,13 +1,16 @@
 from django.urls import path
 from perfil import views
 from rest_framework.routers import SimpleRouter
-from .views.perfil_api import UserConfirmationView, ValidateResetCodeView
+from .views.perfil_api import (
+    UserConfirmationApiView, ValidateResetCodeApiView, ResetPasswordApiView, 
+    GetCSRFToken, RegisterUserApiView, CancelRegistrationApiView
+    )
 
 app_name = 'perfil'
 
 users_api_v1 = SimpleRouter()
 users_api_v1.register(
-    'users/api/v1', views.RegisterUserView, basename='users-api',
+    'users/api/v1', views.RegisterUserApiView, basename='users-api',
 )
 
 
@@ -43,8 +46,11 @@ urlpatterns = [
 
     # API
     # User confirmation
-    path('perfil/confirmation/', UserConfirmationView.as_view(), name='user-confirmation'),
-    path('perfil/validate_reset_code/', ValidateResetCodeView.as_view(), name='validate-reset-code'),
+    path('perfil/confirmation_api/', UserConfirmationApiView.as_view(), name='user-confirmation-api'),
+    path('perfil/validate_reset_code_api/', ValidateResetCodeApiView.as_view(), name='validate-reset-code-api'),
+    path('perfil/reset_password_api/', ResetPasswordApiView.as_view(), name='reset-password-api'),
+    path('perfil/get_csrf_token/', GetCSRFToken.as_view(), name='get-csrf-token'),
+    path('perfil/cancel_registration_api/', CancelRegistrationApiView.as_view(), name='cancel-registration-api'),
 ]
 
 urlpatterns += users_api_v1.urls
