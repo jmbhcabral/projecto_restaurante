@@ -34,7 +34,12 @@ class PerfilSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Perfil
-        fields = ('data_nascimento', 'telemovel', 'estudante', 'qrcode_url', 'ultima_atualizacao_data_nascimento', 'tipo_fidelidade')
+        fields = (
+            'data_nascimento', 'telemovel', 'estudante', 'qrcode_url', 
+                  'ultima_atualizacao_data_nascimento', 'tipo_fidelidade',
+                  'notificacoes_email', 'notificacoes_telemovel'
+                  )
+
 
     def validate_data_nascimento(self, value):
         """Valida a alteração da data de nascimento respeitando a regra dos 6 meses."""
@@ -68,9 +73,13 @@ class PerfilSerializer(serializers.ModelSerializer):
         return value
     
     def validate(self, data):
-        """ Impõe a obrigatoriedade de estudante apenas na criação. """
-        if self.instance is None and 'estudante' not in data:
-            raise serializers.ValidationError({"estudante": "Este campo é obrigatório."})
+        """ Impõe a obrigatoriedade de estudante apenas na criação de um novo perfil. """
+        request = self.context.get("request")  # Obtém o request, se existir
+
+        # Se o perfil ainda não existe (criação) e for uma requisição POST, exige estudante
+        if not self.instance and request and request.method == "POST":
+            if "estudante" not in data:
+                raise serializers.ValidationError({"estudante": "Este campo é obrigatório!"})
 
         return data
     
@@ -233,19 +242,40 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         perfil_data = validated_data.pop('perfil', {})
+
+        print('🔎 validated_data:', validated_data)
         print('🔎 Perfil data:', perfil_data)
 
+        # Atualizar os campos do User
         if 'password' in validated_data:
             instance.set_password(validated_data.pop('password'))
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+
         instance.save()
 
+        # Atualizar os campos do Perfil
         perfil_instance = getattr(instance, 'perfil', None)
-        if perfil_instance and perfil_data:
+
+        if perfil_instance:
+            # Extraímos os valores corretamente
+            notificacoes_email = self.initial_data.get("perfil", {}).get("notificacoes_email", perfil_instance.notificacoes_email)
+            notificacoes_telemovel = self.initial_data.get("perfil", {}).get("notificacoes_telemovel", perfil_instance.notificacoes_telemovel)
+
+            # Atualizamos apenas se o valor for diferente do atual
+            if notificacoes_email is not None:
+                perfil_instance.notificacoes_email = notificacoes_email
+            if notificacoes_telemovel is not None:
+                perfil_instance.notificacoes_telemovel = notificacoes_telemovel
+
+            print('🔎 Atualizado -> perfil_instance.notificacoes_email:', perfil_instance.notificacoes_email)
+            print('🔎 Atualizado -> perfil_instance.notificacoes_telemovel:', perfil_instance.notificacoes_telemovel)
+
+            # Atualizar outros campos do perfil
             for attr, value in perfil_data.items():
                 setattr(perfil_instance, attr, value)
+
             perfil_instance.save()
 
         return instance
