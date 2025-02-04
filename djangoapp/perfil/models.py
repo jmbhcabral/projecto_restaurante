@@ -91,6 +91,14 @@ class Perfil(models.Model):
         blank=True,
         null=True,
     )
+    notificacoes_email = models.BooleanField(
+        verbose_name="Notificações por Email",
+        default=True,
+    )
+    notificacoes_telemovel = models.BooleanField(
+        verbose_name="Notificações por Telemóvel",
+        default=True,
+    )
 
     def save(self, *args, **kwargs):
         # Atualiza a data da última atualização da data de nascimento

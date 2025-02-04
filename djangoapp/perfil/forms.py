@@ -22,8 +22,10 @@ class PerfilForm(forms.ModelForm):
             'updated_at', 'nif', 'qr_code', 'tipo_fidelidade',
             'ultima_atualizacao_data_nascimento', 'ultima_actividade',
             'reset_password_code', 'reset_password_code_expires',
-            'data_cancelamento'
+            'data_cancelamento','notificacoes_email',
+            'notificacoes_telemovel'
         )
+
 
 
         widgets = {
