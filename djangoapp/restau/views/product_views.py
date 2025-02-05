@@ -5,10 +5,7 @@ from restau.models import (
 from django.db.models import Prefetch
 from collections import defaultdict
 from django.contrib.auth.decorators import login_required, user_passes_test
-from collections import defaultdict
 
-
-from collections import defaultdict
 
 def encomendas(request):
     active_setup = ActiveSetup.objects.first()

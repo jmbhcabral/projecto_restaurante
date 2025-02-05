@@ -3,7 +3,8 @@ from .models import Category, SubCategory, Products
 from rest_framework_simplejwt.serializers import (
     TokenObtainPairSerializer, TokenRefreshSerializer
 )
-from .models import Ementa, VersaoApp
+from .models import Ementa, VersaoApp, ProdutosEmenta
+from collections import defaultdict
 
 
 class ProdutoSerializer(serializers.ModelSerializer):
@@ -123,41 +124,106 @@ class MyTokenRefreshSerializer(TokenRefreshSerializer):
         print(message)
 
 
-class ProdutosPorSubcategoriaSerializer(serializers.ModelSerializer):
-    produtos = serializers.SerializerMethodField()
+# class ProdutosPorSubcategoriaSerializer(serializers.ModelSerializer):
+#     produtos = serializers.SerializerMethodField()
 
+#     class Meta:
+#         model = SubCategory
+#         fields = [
+#             'id', 'nome', 'produtos'
+#         ]
+
+#     def get_produtos(self, subcategoria):
+#         produtos = Products.objects.filter(
+#             subcategoria=subcategoria,
+#             ementas__id=self.context['ementa_id']
+#         ).order_by('ordem')
+#         return ProdutoSerializer(
+#             produtos,
+#             many=True,
+#             context=self.context
+#         ).data
+
+
+# class CategoriaComSubcategoriaSerializer(serializers.ModelSerializer):
+#     subcategorias = serializers.SerializerMethodField()
+
+#     class Meta:
+#         model = Category
+#         fields = [
+#             'id', 'nome', 'subcategorias'
+#         ]
+
+#     def get_subcategorias(self, categoria):
+#         subcategorias = SubCategory.objects.filter(
+#             categoria=categoria
+#         ).order_by('ordem')
+#         return ProdutosPorSubcategoriaSerializer(
+#             subcategorias,
+#             many=True,
+#             context=self.context
+#         ).data
+
+
+class ProdutoEmentaSerializer(serializers.ModelSerializer):
+    preco_dinamico = serializers.SerializerMethodField()
+    descricao_final = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Products
+        fields = [
+            'id', 'nome', 'descricao_final', 'descricao_longa', 
+            'imagem', 'ordem', 'visibilidade', 'preco_dinamico'
+        ]
+    
+    def get_preco_dinamico(self, produto):
+        ementa = self.context.get('ementa')
+        if ementa:
+            campo_preco = ementa.nome_campo_preco_selecionado
+            return getattr(produto, campo_preco, 0.00)
+        return 0.00
+    
+    def get_descricao_final(self, produto):
+        produto_ementa = self.context.get('produto_ementa', {}).get(produto.id)
+        if produto_ementa and produto_ementa.descricao:
+            return produto_ementa.descricao
+        return produto.descricao_curta
+
+
+class SubCategoriaEmentaSerializer(serializers.ModelSerializer):
+    produtos = serializers.SerializerMethodField()
+    
     class Meta:
         model = SubCategory
-        fields = [
-            'id', 'nome', 'produtos'
-        ]
-
+        fields = ['id', 'nome', 'ordem', 'produtos']
+        
     def get_produtos(self, subcategoria):
+        ementa = self.context.get('ementa')
         produtos = Products.objects.filter(
             subcategoria=subcategoria,
-            ementas__id=self.context['ementa_id']
+            visibilidade=True
         ).order_by('ordem')
-        return ProdutoSerializer(
-            produtos,
+        
+        return ProdutoEmentaSerializer(
+            produtos, 
             many=True,
-            context=self.context
+            context={'ementa': ementa}
         ).data
 
 
-class CategoriaComSubcategoriaSerializer(serializers.ModelSerializer):
+class CategoriaEmentaSerializer(serializers.ModelSerializer):
     subcategorias = serializers.SerializerMethodField()
-
+    
     class Meta:
         model = Category
-        fields = [
-            'id', 'nome', 'subcategorias'
-        ]
-
+        fields = ['id', 'nome', 'ordem', 'subcategorias']
+        
     def get_subcategorias(self, categoria):
         subcategorias = SubCategory.objects.filter(
             categoria=categoria
         ).order_by('ordem')
-        return ProdutosPorSubcategoriaSerializer(
+        
+        return SubCategoriaEmentaSerializer(
             subcategorias,
             many=True,
             context=self.context
@@ -166,25 +232,79 @@ class CategoriaComSubcategoriaSerializer(serializers.ModelSerializer):
 
 class ProdutosEmentaSerializer(serializers.ModelSerializer):
     categorias = serializers.SerializerMethodField()
-
+    
     class Meta:
         model = Ementa
         fields = [
-            'nome', 'descricao', 'nome_campo_preco_selecionado', 'categorias',
+            'id', 'nome', 'descricao', 
+            'nome_campo_preco_selecionado', 'categorias'
         ]
+        
+    def get_categorias(self, ementa):
+        # Buscar produtos da ementa com suas descrições personalizadas
+        produtos_ementa = ProdutosEmenta.objects.filter(
+            ementa=ementa,
+            produto__visibilidade=True
+        ).select_related(
+            'produto', 
+            'produto__categoria', 
+            'produto__subcategoria'
+        ).order_by('produto__ordem')
 
-    def get_categorias(self, obj):
-        subcategorias_ids = obj.produtos.all().values_list(
-            'subcategoria', flat=True
-        )
-        categorias = Category.objects.filter(
-            subcategory__id__in=subcategorias_ids
-        ).distinct().order_by('ordem')
-        return CategoriaComSubcategoriaSerializer(
-            categorias,
-            many=True,
-            context={'ementa_id': obj.id, 'request': self.context['request']})\
-            .data
+        # Criar dicionário para mapear produtos e suas descrições personalizadas
+        produtos_ementa_dict = {pe.produto.id: pe for pe in produtos_ementa}
+        
+        # Dicionário para armazenar categorias e subcategorias ordenadas
+        categorias_dict = defaultdict(lambda: {'subcategorias': defaultdict(list)})
+        
+        for pe in produtos_ementa:
+            if pe.produto:
+                produto = pe.produto
+                cat = produto.categoria
+                subcat = produto.subcategoria
+                
+                if cat:  # Se o produto tem categoria
+                    categorias_dict[cat]['subcategorias'][subcat].append(produto)
+        
+        # Ordenar e formatar os dados para serialização
+        categorias_formatadas = []
+        for cat, cat_data in sorted(categorias_dict.items(), key=lambda x: x[0].ordem if x[0] else 0):
+            if cat:  # Verificar se a categoria não é None
+                subcategorias_formatadas = []
+                # Ordenar subcategorias
+                sorted_subcats = sorted(
+                    cat_data['subcategorias'].items(), 
+                    key=lambda x: x[0].ordem if x[0] else 0
+                )
+                
+                for subcat, produtos in sorted_subcats:
+                    # Ordenar produtos dentro da subcategoria
+                    produtos_ordenados = sorted(produtos, key=lambda p: p.ordem)
+                    
+                    subcategoria_data = {
+                        'id': subcat.id if subcat else None,
+                        'nome': subcat.nome if subcat else "Sem Subcategoria",
+                        'ordem': subcat.ordem if subcat else 0,
+                        'produtos': ProdutoEmentaSerializer(
+                            produtos_ordenados,
+                            many=True,
+                            context={
+                                'ementa': ementa,
+                                'produto_ementa': produtos_ementa_dict
+                            }
+                        ).data
+                    }
+                    subcategorias_formatadas.append(subcategoria_data)
+                
+                categoria_data = {
+                    'id': cat.id,
+                    'nome': cat.nome,
+                    'ordem': cat.ordem,
+                    'subcategorias': subcategorias_formatadas
+                }
+                categorias_formatadas.append(categoria_data)
+        
+        return categorias_formatadas
 
 
 class VersaoAppSerializer(serializers.ModelSerializer):
