@@ -5,59 +5,59 @@ from restau.models import (
 from django.db.models import Prefetch
 from collections import defaultdict
 from django.contrib.auth.decorators import login_required, user_passes_test
+from collections import defaultdict
 
+
+from collections import defaultdict
 
 def encomendas(request):
     active_setup = ActiveSetup.objects.first()
 
-    if active_setup:
-        if active_setup.active_imagem_padrao:
-            image = active_setup.active_imagem_padrao.imagem.url
-            print('imagem url: ', image)
-        else:
-            image = 'Não tem imagem padrao'
-            print('imagem url: ', image)
-
     if not active_setup or not active_setup.active_ementa:
-        return render(request, 'restau/pages/encomendas.html', {'active_setup': active_setup, 'categorias': []})
+        return render(request, 'restau/pages/encomendas.html', {'active_setup': active_setup, 'categorias': {}})
 
+    # Definir o campo de preço escolhido na ementa
     campo_preco = active_setup.active_ementa.nome_campo_preco_selecionado
 
-    # Alteração para buscar os produtos corretamente
+    # Buscar produtos da ementa com suas descrições personalizadas e categorias associadas
     produtos_ementa = ProdutosEmenta.objects.filter(
-        ementa=active_setup.active_ementa)\
-            .select_related('produto')\
-            .filter(produto__visibilidade=True)\
-            .order_by('produto__ordem')
+        ementa=active_setup.active_ementa,
+        produto__visibilidade=True
+    ).select_related('produto', 'produto__categoria', 'produto__subcategoria').order_by('produto__ordem')
 
-    categorias_dict = {}
+    # Dicionário para armazenar categorias e subcategorias ordenadas
+    categorias_dict = defaultdict(lambda: {'subcategorias': defaultdict(list)})
+
+    # Criar categorias e subcategorias ordenadas
+    categorias = Category.objects.all().order_by('ordem')
+    subcategorias = SubCategory.objects.all().order_by('ordem')
+
     for pe in produtos_ementa:
-
         if pe.produto:
             produto = pe.produto
-            print('produto: ', produto)
-            preco_dinamico = getattr(produto, campo_preco, 'Preço não definido')
-            descricao = pe.descricao if pe.descricao else produto.descricao_curta
+            produto.preco_dinamico = getattr(produto, campo_preco, 'Preço não definido')
+            produto.descricao_final = pe.descricao if pe.descricao else produto.descricao_curta  # Definir descrição final
 
+            cat = produto.categoria
+            subcat = produto.subcategoria
 
-            produto.preco_dinamico = preco_dinamico
-            produto.descricao_final = descricao  # Passar a descrição correta
+            categorias_dict[cat]['subcategorias'][subcat].append(produto)
 
-        cat = produto.categoria
-        subcat = produto.subcategoria
-
-        if cat not in categorias_dict:
-            categorias_dict[cat] = {'subcategorias': defaultdict(list)}
-
-        categorias_dict[cat]['subcategorias'][subcat].append(produto)
-
-    # Convertendo defaultdict para dict normal para evitar problemas no template
-    for cat in categorias_dict.keys():
-        categorias_dict[cat]['subcategorias'] = dict(categorias_dict[cat]['subcategorias'])
+    # Ordenar os produtos dentro das categorias e subcategorias
+    for cat, cat_data in categorias_dict.items():
+        # Criar um novo defaultdict para as subcategorias ordenadas
+        subcategorias_ordenadas = defaultdict(list)
+        # Primeiro, ordenar as subcategorias pela ordem
+        sorted_subcats = sorted(cat_data['subcategorias'].items(), key=lambda x: x[0].ordem if x[0] else 0)
+        for subcat, produtos in sorted_subcats:
+            subcategorias_ordenadas[subcat] = sorted(produtos, key=lambda p: p.ordem)
+        cat_data['subcategorias'] = dict(subcategorias_ordenadas)  # Converter para dict regular
 
     context = {
         'active_setup': active_setup,
-        'categorias': categorias_dict,
+        'categorias': dict(sorted(categorias_dict.items(), key=lambda c: c[0].ordem)),  # Ordenar categorias
+        'todas_categorias': categorias,  # Adicionando ao contexto
+        'todas_subcategorias': subcategorias,  # Adicionando ao contexto
     }
 
     return render(request, 'restau/pages/encomendas.html', context)
