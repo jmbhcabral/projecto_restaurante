@@ -3,7 +3,7 @@ from django.urls import reverse
 from restau.forms import EmentaForm, ProdutosEmentaForm
 from restau.models import (
     Ementa, Products, Category,
-    SubCategory
+    SubCategory, ProdutosEmenta
 )
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
@@ -107,67 +107,61 @@ def apagar_ementa(request, ementa_id):
 
 
 @login_required
-@user_passes_test(lambda user: user.groups.filter(
-    name='acesso_restrito').exists())
+@user_passes_test(lambda user: user.groups.filter(name='acesso_restrito').exists())
 def povoar_ementa(request, ementa_id):
-
     ementa = get_object_or_404(Ementa, pk=ementa_id)
 
+    # Buscar categorias, subcategorias e produtos ordenados
     categorias = Category.objects.all().order_by('ordem')
     subcategorias = SubCategory.objects.all().order_by('ordem')
     produtos = Products.objects.all().order_by('ordem')
 
     form_action = reverse('restau:povoar_ementa', args=[ementa_id])
 
+    # Buscar produtos já associados a esta ementa e suas descrições personalizadas
+    produtos_ementa = ProdutosEmenta.objects.filter(ementa=ementa)
+    
+    produtos_na_ementa = {pe.produto.id for pe in produtos_ementa if pe.produto}  # Set de IDs
+    produtos_descricao = {pe.produto.id: pe.descricao for pe in produtos_ementa if pe.produto}  # Dicionário de descrições
+
     if request.method == 'POST':
+        print(f'request.POST: {request.POST}')
         form = ProdutosEmentaForm(request.POST, ementa_id=ementa_id)
 
         if form.is_valid():
-            # Crie um novo objeto ProdutosEmenta, mas não o salve ainda.
-            instance = form.save(commit=False)
-            instance.ementa = ementa
-            instance.save()  # Agora, salve-o.
+            selected_products = form.cleaned_data['produto']  # Produtos selecionados no formulário
 
-            # Obtém os produtos selecionados no formulário.
-            selected_products = form.cleaned_data['produto']
-
-            # Obtém os produtos que já estão associados a esta ementa.
-            existing_products = [prod.id for prod in ementa.produtos.all()]
-
-            # Adicione novos produtos e remova os desmarcados.
+            # Adicionar novos produtos ou atualizar descrições
             for product in selected_products:
-                if product.id not in existing_products:
-                    ementa.produtos.add(product)
-                else:
-                    messages.error(
-                        request,
-                        f"O produto {product} já existe na ementa {ementa}"
-                    )
+                descricao_personalizada = request.POST.get(f'descricao_{product.id}', '')  # Obter descrição
 
-            for product_id in existing_products:
-                if product_id not in [prod.id for prod in selected_products]:
-                    ementa.produtos.remove(Products.objects.get(id=product_id))
+                # Atualizar se já existir na ementa, senão criar um novo
+                produtos_ementa_obj, created = ProdutosEmenta.objects.get_or_create(
+                    ementa=ementa, produto=product,
+                    defaults={'descricao': descricao_personalizada}
+                )
 
-            messages.success(
-                request,
-                f"Produtos adicionados à ementa {ementa}"
-            )
+                # Se já existir e a descrição foi alterada, atualizar
+                if not created and produtos_ementa_obj.descricao != descricao_personalizada:
+                    produtos_ementa_obj.descricao = descricao_personalizada
+                    produtos_ementa_obj.save()
 
+            # Remover produtos que foram desmarcados
+            ProdutosEmenta.objects.filter(ementa=ementa).exclude(produto__in=selected_products).delete()
+
+            messages.success(request, f"Produtos atualizados na ementa {ementa}")
             return redirect('restau:povoar_ementa', ementa_id=ementa_id)
-
         else:
-            print("O formulário não é válido.")
+            messages.error(request, "O formulário não é válido.")
 
     else:
-        initial_products = ementa.produtos.all()  # Assume que este é o campo
-        # ManyToMany
-        form = ProdutosEmentaForm(ementa_id=ementa_id, initial={
-                                  'produto': initial_products})
-
-    produtos_na_ementa = [prod.id for prod in ementa.produtos.all()]
+        # Definir os produtos já presentes na ementa como os valores iniciais do formulário
+        initial_products = Products.objects.filter(id__in=produtos_na_ementa)
+        form = ProdutosEmentaForm(ementa_id=ementa_id, initial={'produto': initial_products})
 
     context = {
         'produtos_na_ementa': produtos_na_ementa,
+        'produtos_descricao': produtos_descricao,  # Enviar as descrições para o template
         'ementa': ementa,
         'produtos': produtos,
         'categorias': categorias,
@@ -176,8 +170,4 @@ def povoar_ementa(request, ementa_id):
         'form_action': form_action,
     }
 
-    return render(
-        request,
-        'restau/pages/povoar_ementa.html',
-        context,
-    )
+    return render(request, 'restau/pages/povoar_ementa.html', context)

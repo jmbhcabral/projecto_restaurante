@@ -2,6 +2,7 @@ from django.db import models
 from utils.model_validators import positive_price
 from utils.images import resize_image
 from decimal import Decimal
+from typing import Any, Optional
 
 
 class Category(models.Model):
@@ -795,6 +796,9 @@ class Products(models.Model):
         verbose_name='Imagem',
         # validators=[validate_png]
     )
+    
+    preco_dinamico: Any = None
+    descricao_final: Optional[str] = None
 
     def save(self, *args, **kwargs):
         if not self.imagem:
@@ -848,7 +852,6 @@ class Ementa(models.Model):
         verbose_name='Preço',
     )
 
-    produtos = models.ManyToManyField(Products, related_name='ementas')
 
     def __str__(self):
         return self.nome
@@ -863,17 +866,34 @@ class ProdutosEmenta(models.Model):
         Ementa,
         on_delete=models.CASCADE,
         verbose_name='Ementa',
-        related_name='ementas',
+        related_name='produtos_ementa',
     )
 
-    produto = models.ManyToManyField(
+    produto = models.ForeignKey(
         Products,
         verbose_name='Produto',
-        related_name='produtos',
+        related_name='ementa_produto',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
 
+    descricao = models.TextField(
+        verbose_name='Descrição Personalizada',
+        blank=True,
+        null=True,
+        default='',
+    )
+
+    def get_preco(self):
+        """ Obtém dinamicamente o preço correto com base no campo escolhido pela ementa. """
+        return getattr(self.produto, self.ementa.nome_campo_preco_selecionado, 0.00)
+
     def __str__(self):
-        return self.ementa.nome
+        if self.produto:
+            return f"{self.produto.nome} - {self.ementa.nome}"
+        else:
+            return f"Produto não selecionado - {self.ementa.nome}"
 
 
 class VersaoApp(models.Model):
@@ -886,7 +906,6 @@ class VersaoApp(models.Model):
         verbose_name='Versão',
         blank=True,
         null=True,
-        default='',
     )
 
     url_download = models.URLField(verbose_name='URL Download')

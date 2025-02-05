@@ -216,13 +216,7 @@ class EmentaForm(forms.ModelForm):
         )
 
 
-class ProdutosEmentaForm(forms.ModelForm):
-    ementa = forms.ModelChoiceField(
-        queryset=Ementa.objects.none(),  # Empty by default
-        widget=forms.HiddenInput(),
-        # label='Ementa',
-        # help_text='Ementa.'
-    )
+class ProdutosEmentaForm(forms.Form): 
     produto = forms.ModelMultipleChoiceField(
         queryset=Products.objects.all(),
         widget=forms.CheckboxSelectMultiple,
@@ -230,23 +224,28 @@ class ProdutosEmentaForm(forms.ModelForm):
         help_text='Produto.'
     )
 
+    descricao = forms.CharField(
+        widget=forms.Textarea(
+            attrs={'placeholder': 'Descrição do produto na ementa'}
+        ),
+        label='Descrição',
+        help_text='Descrição do produto na ementa.',
+        required=False
+    )
+
     def __init__(self, *args, **kwargs):
         ementa_id = kwargs.pop('ementa_id', None)
-        super(ProdutosEmentaForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
+
         if ementa_id:
-            ementa_instance = Ementa.objects.get(pk=ementa_id)
-            self.fields['ementa'].queryset = Ementa \
-                .objects \
-                .filter(
-                pk=ementa_id
-            )
-            # Setting the initial value
-            self.fields['ementa'].initial = ementa_instance
+            self.ementa_instance = Ementa.objects.get(pk=ementa_id)
+        else:
+            self.ementa_instance = None
 
     class Meta:
         model = ProdutosEmenta
         fields = (
-            'ementa', 'produto',
+            'ementa', 'produto', 'descricao',
         )
 
 

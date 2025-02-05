@@ -1,39 +1,43 @@
-{% extends 'restau/base_front.html' %}
-{% block content %}
+{% extends 'restau/base_front.html' %} {% block content %}
 <section class="section-gap white-bg top-background">
-    <h1 class="left">Ementa</h1>
-    {% for categoria, dados in categorias.items %}
-        <div class="categoria">
-            <h2>{{ categoria.nome }}</h2>
-            {% for subcategoria, produtos in dados.subcategorias.items %}
+	<h1 class="left">Ementa</h1>
+	{% for categoria, dados in categorias.items %}
+	    <div class="categoria">
+		    <h2>{{ categoria.nome }}</h2>
+		    {% for subcategoria, produtos in dados.subcategorias.items %} 
                 {% if subcategoria %}
-                    <div class="subcategoria">
-                        <h3>{{ subcategoria.nome }}</h3>
-                    </div>
-                {% endif %}
+		            <div class="subcategoria">
+			            <h3>{{ subcategoria.nome }}</h3>
+		            </div>
+		        {% endif %} 
                 {% for produto in produtos %}
-                <div class="product-frame">
-                    {% if produto.imagem %}
-                    <div class="product-image">
-                        <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
-                    </div>
-                    {% else %}
-                    <div class="product-image">
-                        <img src="{{ active_setup.active_imagem_padrao.imagem.url }}" alt="Imagem padrão">
-                    </div>
-                    {% endif %}
-                    <div class="product-details">
-                        <h3 class="product-name">{{ produto.nome }}</h3>
-                        <h5 class="product-description">Descrição:</h5>
-                        <span class="product-description">{{ produto.descricao_curta }}</span>
-                        <div class="product-price-section">
-                            <p class="product-price">Preço: <span class="price">{{ produto.preco_dinamico }}</span></p>
-                        </div>
-                    </div>
-                </div>
-                    {% endfor %}
-            {% endfor %}
-        </div>
-    {% endfor %}
+		            <div class="product-frame">
+			        {% if produto.imagem %}
+			            <div class="product-image">
+				            <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}" />
+			            </div>
+			        {% else %}
+			            <div class="product-image">
+				            <img
+					        src="{{ active_setup.active_imagem_padrao.imagem.url }}"
+					        alt="Imagem padrão"
+				            />
+			            </div>
+			        {% endif %}
+			            <div class="product-details">
+				            <h3 class="product-name">{{ produto.nome }}</h3>
+				            <h5 class="product-description">Descrição:</h5>
+				            <span class="product-description">{{ produto.descricao_final }}</span>
+				            <div class="product-price-section">
+					            <p 
+                                    class="product-price">Preço: <span class="price">{{ produto.preco_dinamico }}</span>
+					            </p>
+				            </div>
+			            </div>
+		            </div>
+                {% endfor %}
+		    {% endfor %}
+	    </div>
+	{% endfor %}
 </section>
 {% endblock content %}

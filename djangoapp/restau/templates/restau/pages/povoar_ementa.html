@@ -1,66 +1,74 @@
 {% extends 'restau/base.html' %}
+{% load meus_filtros %}
 {% block content %}
 <div class="section-content-wide content">
   {% include "restau/partials/_conf_menu.html" %}
-    <div class="conta-content">
-      <div>
-        <h2 class="center">Povoar Ementa</h2>
-        <p class="center">
-          Assinale os produtos que quer que estejam presentes na ementa.
-        </p>
-      </div>
-      <div class="single-product">
-        <p><b>Nome: </b>{{ ementa.nome}}</p>
-        <p><b>Descrição: </b>{{ ementa.descricao }}</p>
-        <p><b>Preço: </b>{{ ementa.nome_campo_preco_selecionado }}</p>
-      </div>
-      <div class="content content-povoar-ementa">
-        <form action="{{ form_action }}" method="POST">
-          {% csrf_token %}
-          {{ form.ementa }}
+  <div class="conta-content">
+    <div>
+      <h2 class="center">Povoar Ementa</h2>
+      <p class="center">
+        Assinale os produtos que quer que estejam presentes na ementa.
+      </p>
+    </div>
+    <div class="single-product">
+      <p><b>Nome: </b>{{ ementa.nome }}</p>
+      <p><b>Descrição: </b>{{ ementa.descricao }}</p>
+      <p><b>Preço: </b>{{ ementa.nome_campo_preco_selecionado }}</p>
+    </div>
+    <div class="content content-povoar-ementa">
+      <form action="{{ form_action }}" method="POST">
+        {% csrf_token %}
+        {{ form.ementa }}
+
+        {% for categoria in categorias %}
+          <h3>{{ categoria.nome }}</h3>
           
-          {% for categoria in categorias %}
-              <h3>{{ categoria.nome }}</h3>
-            
-              {% for produto in produtos %}
-              {% if produto.categoria == categoria and not produto.subcategoria %}
-              <!-- Renderizar produtos sem subcategoria --> 
-              <div class="povoar-ementa">
-                <div>
-                  <label for="produto_{{ produto.id }}">{{ produto.nome }}</label>
-                </div>
-                <div>
-                  <input type="checkbox" id="produto_{{ produto.id }}" name="{{ form.produto.name }}" value="{{ produto.id }}" {% if produto.id in produtos_na_ementa %}checked{% endif %}>
-                </div>
-              </div>
-              {% endif %}
-              {% endfor %}
+          {% for produto in produtos %}
+          {% if produto.categoria == categoria and not produto.subcategoria %}
+          <!-- Renderizar produtos sem subcategoria -->
+          <div class="povoar-ementa">
+            <div>
+              <label for="produto_{{ produto.id }}">{{ produto.nome }}</label>
+            </div>
+            <div>
+              <input type="checkbox" id="produto_{{ produto.id }}" name="{{ form.produto.name }}" value="{{ produto.id }}"
+              {% if produto.id in produtos_na_ementa %}checked{% endif %}>
+            </div>
+            <div class="descricao-produto">
+              <label for="descricao_{{ produto.id }}">Descrição Personalizada:</label>
+              <textarea id="descricao_{{ produto.id }}" name="descricao_{{ produto.id }}">{{ produtos_descricao|get_item:produto.id }}</textarea>
+            </div>
+          </div>
+          {% endif %}
+          {% endfor %}
 
-              {% for subcategoria in subcategorias %}
-              {% if subcategoria.categoria == categoria %}
-              <h5>{{ subcategoria.nome }}</h5>
+          {% for subcategoria in subcategorias %}
+          {% if subcategoria.categoria == categoria %}
+          <h5>{{ subcategoria.nome }}</h5>
 
-              <!-- AQUI: Customizando a renderização do campo 'produto' do seu formulário -->
-              {% for produto in produtos %}
-              {% if produto.categoria == categoria and produto.subcategoria == subcategoria %}
-              <div class="povoar-ementa">
-                <div>
-                  <label for="produto_{{ produto.id }}">{{ produto.nome }}</label>
-                </div>
-                <div>
-                  <input type="checkbox" id="produto_{{ produto.id }}" name="{{ form.produto.name }}" value="{{ produto.id }}" {% if produto.id in produtos_na_ementa %}checked{% endif %}>
-                </div>
-              </div>
-
-
-              {% endif %}
-              {% endfor %}
-              
-              {% endif %}
-              {% endfor %}
+          {% for produto in produtos %}
+          {% if produto.categoria == categoria and produto.subcategoria == subcategoria %}
+          <div class="povoar-ementa">
+            <div>
+              <label for="produto_{{ produto.id }}">{{ produto.nome }}</label>
+            </div>
+            <div>
+              <input type="checkbox" id="produto_{{ produto.id }}" name="{{ form.produto.name }}" value="{{ produto.id }}"
+              {% if produto.id in produtos_na_ementa %}checked{% endif %}>
+            </div>
+            <div class="descricao-produto">
+              <label for="descricao_{{ produto.id }}">Descrição Personalizada:</label>
+              <textarea id="descricao_{{ produto.id }}" name="descricao_{{ produto.id }}">{{ produtos_descricao|get_item:produto.id }}</textarea>
+            </div>
+          </div>
+          {% endif %}
           {% endfor %}
           
-          <button type="submit" class="btn">Adicionar à Ementa</button>
+          {% endif %}
+          {% endfor %}
+        {% endfor %}
+        
+        <button type="submit" class="btn">Adicionar à Ementa</button>
       </form>
     </div>
   </div>

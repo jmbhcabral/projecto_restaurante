@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from restau.models import (
-    Products, Category, SubCategory, ActiveSetup,)
+    Products, Category, SubCategory, ActiveSetup, ProdutosEmenta
+    )
 from django.db.models import Prefetch
 from collections import defaultdict
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -8,6 +9,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 
 def encomendas(request):
     active_setup = ActiveSetup.objects.first()
+
     if active_setup:
         if active_setup.active_imagem_padrao:
             image = active_setup.active_imagem_padrao.imagem.url
@@ -20,13 +22,26 @@ def encomendas(request):
         return render(request, 'restau/pages/encomendas.html', {'active_setup': active_setup, 'categorias': []})
 
     campo_preco = active_setup.active_ementa.nome_campo_preco_selecionado
-    produtos_ementa = active_setup.active_ementa.produtos.filter(visibilidade=True).select_related(
-        'categoria', 'subcategoria').order_by('categoria', 'subcategoria', 'ordem')
+
+    # Alteração para buscar os produtos corretamente
+    produtos_ementa = ProdutosEmenta.objects.filter(
+        ementa=active_setup.active_ementa)\
+            .select_related('produto')\
+            .filter(produto__visibilidade=True)\
+            .order_by('produto__ordem')
 
     categorias_dict = {}
-    for produto in produtos_ementa:
-        preco_dinamico = getattr(produto, campo_preco, 'Preço não definido')
-        produto.preco_dinamico = preco_dinamico
+    for pe in produtos_ementa:
+
+        if pe.produto:
+            produto = pe.produto
+            print('produto: ', produto)
+            preco_dinamico = getattr(produto, campo_preco, 'Preço não definido')
+            descricao = pe.descricao if pe.descricao else produto.descricao_curta
+
+
+            produto.preco_dinamico = preco_dinamico
+            produto.descricao_final = descricao  # Passar a descrição correta
 
         cat = produto.categoria
         subcat = produto.subcategoria
@@ -38,8 +53,7 @@ def encomendas(request):
 
     # Convertendo defaultdict para dict normal para evitar problemas no template
     for cat in categorias_dict.keys():
-        categorias_dict[cat]['subcategorias'] = dict(
-            categorias_dict[cat]['subcategorias'])
+        categorias_dict[cat]['subcategorias'] = dict(categorias_dict[cat]['subcategorias'])
 
     context = {
         'active_setup': active_setup,

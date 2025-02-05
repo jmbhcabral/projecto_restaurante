@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from restau.models import Ementa, Category, SubCategory
+from restau.models import Ementa, Category, SubCategory, ProdutosEmenta
 from django.contrib.auth.decorators import login_required, user_passes_test
 from itertools import zip_longest
 
@@ -35,9 +35,7 @@ def ementa(request, ementa_id):
     ementa = get_object_or_404(
         Ementa.objects.filter(pk=ementa_id,)
     )
-    ementa_produtos = ementa.produtos \
-        .all() \
-        .order_by('ordem')
+    produtos_ementa = ProdutosEmenta.objects.filter(ementa=ementa)
 
     categorias = Category.objects.all().order_by('ordem')
     subcategorias = SubCategory.objects.all().order_by('ordem')
@@ -46,8 +44,9 @@ def ementa(request, ementa_id):
         'categorias': categorias,
         'subcategorias': subcategorias,
         'ementa': ementa,
-        'ementa_produtos': ementa_produtos,
+        'produtos_ementa': produtos_ementa,
     }
+
 
     return render(
         request,
