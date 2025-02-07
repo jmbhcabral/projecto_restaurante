@@ -120,8 +120,7 @@ def verificar_expiracao_pontos(utilizador):
 
 
 def calcular_total_pontos(utilizador):
-    '''Calcular o total de pontos de fidelidade disponíveis para um utilizador
-    excepto os pontos adicionados hoje'''
+    '''Calcular o total de pontos de fidelidade disponíveis para um utilizador'''
 
     from fidelidade.models import ComprasFidelidade, OfertasFidelidade
     # Atualizar o estado dos pontos expirados
@@ -310,3 +309,15 @@ def processar_transacoes_existentes():
         print(
             f'Processamento concluído para o perfil: {perfil.usuario.username}')
         print('---')
+def calcular_pontos_indisponiveis(user):
+    '''Calcular o total de pontos indisponíveis para um utilizador. Pontos que foram ganhos hoje.'''
+
+    from fidelidade.models import ComprasFidelidade
+
+    total_pontos_adicionados_hoje = ComprasFidelidade\
+        .objects\
+        .filter(utilizador=user, criado_em__date=timezone.now().date())\
+        .aggregate(total=Sum('pontos_adicionados'))['total'] or 0
+
+    return total_pontos_adicionados_hoje
+

@@ -6,7 +6,11 @@ from ..models import (ProdutoFidelidadeIndividual, ComprasFidelidade,
 from ..serializers import ProdutoFidelidadeIndividualSerializer
 from collections import defaultdict
 from django.db.models import Sum, Min
-from utils.model_validators import calcular_total_pontos, calcular_dias_para_expirar
+from utils.model_validators import (
+    calcular_total_pontos, calcular_dias_para_expirar, 
+    calcular_pontos_indisponiveis, calcular_total_pontos_disponiveis
+    )
+
 
 
 class ProdutoFidelidadeAPI(APIView):
@@ -186,21 +190,28 @@ class TotalPontosAPIV1(APIView):
 
             saldo_pontos = calcular_total_pontos(user)
 
+            pontos_disponiveis = calcular_total_pontos_disponiveis(user)
+
+            pontos_indisponiveis = calcular_pontos_indisponiveis(user)
+
             dias_para_expirar = calcular_dias_para_expirar(user) if total_compras > 0 and saldo_pontos > 0 else 0
 
             resposta = {
                 "utilizador": user.id,
                 "tipo_fidelidade": tipo_fidelidade.nome if tipo_fidelidade else None,
-                "total_pontos_adicionados": total_pontos_adicionados,
+                "total_pontos_ganhos": total_pontos_adicionados,
                 "total_pontos_gastos": total_pontos_gastos,
                 "total_compras": total_compras,
                 "total_ofertas": total_ofertas,
                 "total_visitas": total_visitas,
-                "total_expirados": total_expirados,
-                "saldo_pontos": saldo_pontos,
+                "total_pontos_expirados": total_expirados,
+                "pontos": saldo_pontos,
+                "pontos_disponiveis": pontos_disponiveis,
+                "pontos_indisponiveis": pontos_indisponiveis,
                 "dias_para_expirar": dias_para_expirar,
                 "detalhes_compras": detalhes_compras,
                 "detalhes_ofertas": detalhes_ofertas,
+
             }
 
             return Response(resposta)
