@@ -176,13 +176,20 @@ def calcular_pontos_expirados(user):
         .objects\
         .filter(utilizador=user, expirado=True)\
         .aggregate(total=Sum('pontos_adicionados'))['total'] or 0
+    
+    print('todos_pontos_expirados', todos_pontos_expirados)
 
     total_ofertas_processadas = OfertasFidelidade\
         .objects\
         .filter(utilizador=user, processado=True)\
         .aggregate(total=Sum('pontos_gastos'))['total'] or 0
 
+    print('total_ofertas_processadas', total_ofertas_processadas)
+
+
     total_pontos_expirados = todos_pontos_expirados - total_ofertas_processadas
+
+    print('total_pontos_expirados', total_pontos_expirados)
 
     return total_pontos_expirados
 

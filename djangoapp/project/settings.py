@@ -162,11 +162,17 @@ MESSAGE_TAGS = {
     constants.SUCCESS: 'alert-success',
     constants.WARNING: 'alert-warning',
 }
-# Sessão em dias: 60s * 60m * 24h * 1d
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 7
+# Sessão em dias: 60s * 60m * 24h * 1d * 6 meses
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30 * 6
 
 # Salvar a cada requisição
 SESSION_SAVE_EVERY_REQUEST = False
+
+# Sessão expira quando o navegador é fechado
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# Salvar a sessão em base de dados
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # Serializer - Padrão JSON
 # SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
@@ -190,7 +196,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
