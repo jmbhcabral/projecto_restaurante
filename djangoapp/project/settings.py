@@ -162,11 +162,11 @@ MESSAGE_TAGS = {
     constants.SUCCESS: 'alert-success',
     constants.WARNING: 'alert-warning',
 }
-# Sessão em dias: 60s * 60m * 24h * 1d * 6 meses
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 30 * 6
+# Sessão em dias: 60s * 60m * 24h * 1d * 3 meses
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30 * 3  
 
 # Salvar a cada requisição
-SESSION_SAVE_EVERY_REQUEST = False
+SESSION_SAVE_EVERY_REQUEST = True
 
 # Sessão expira quando o navegador é fechado
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
@@ -196,8 +196,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=90),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
     "SIGNING_KEY": os.getenv('SECRET_KEY_JWT', 'change-me'),
