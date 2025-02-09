@@ -99,6 +99,10 @@ class Perfil(models.Model):
         verbose_name="Notificações por Telemóvel",
         default=True,
     )
+    first_login = models.BooleanField(
+        verbose_name="Primeiro Login",
+        default=True,
+    )
 
     def save(self, *args, **kwargs):
         # Atualiza a data da última atualização da data de nascimento

@@ -37,7 +37,7 @@ class PerfilSerializer(serializers.ModelSerializer):
         fields = (
             'data_nascimento', 'telemovel', 'estudante', 'qrcode_url', 
                   'ultima_atualizacao_data_nascimento', 'tipo_fidelidade',
-                  'notificacoes_email', 'notificacoes_telemovel'
+                  'notificacoes_email', 'notificacoes_telemovel', 'first_login'
                   )
 
 

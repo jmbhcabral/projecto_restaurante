@@ -9,6 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404
+
 from django.http import JsonResponse
 from django.utils import timezone
 
@@ -115,7 +116,7 @@ class RegisterUserApiView(viewsets.ModelViewSet):
 
         return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-
+   
 class UserConfirmationApiView(APIView):
     """Confirmação do usuário através do código de verificação"""
     def post(self, request):
