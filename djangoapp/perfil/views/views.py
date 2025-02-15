@@ -1,40 +1,35 @@
 '''Este módulo contém as views para o aplicativo perfil.'''
 
 
+from datetime import date, timedelta
 from decimal import Decimal
-from utils.email_confirmation import (
-    send_confirmation_email, send_reset_password_email
-)
-from utils.generate_reset_password_code import generate_reset_password_code
 
-from utils.model_validators import (
-    calcular_total_pontos, calcular_total_pontos_disponiveis,
-    calcular_pontos_expirados
-)
-from utils.listar_compras_ofertas import listar_compras_ofertas
-from django.core.mail import send_mail
 from django.contrib import messages
-from django.urls import reverse
-from django.utils.safestring import mark_safe
-from datetime import datetime, timedelta, date
-from django.utils import timezone
-from django.db import models
-from django.shortcuts import render, get_object_or_404, redirect
-from django.views import View
-from perfil import models as perfil_models
-from perfil import forms as perfil_forms
-from fidelidade import models as fidelidade_models
-from fidelidade import forms as fidelidade_forms
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from restau.models import ActiveSetup
-from django.conf import settings
-from perfil.forms import (
-    ResetPasswordForm, RequestResetPasswordForm,
-    ChangePasswordForm)
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.db import models
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.utils.safestring import mark_safe
+from django.views import View
 from django.views.decorators.cache import never_cache
+from fidelidade import models as fidelidade_models
+from restau.models import ActiveSetup
+from utils.email_confirmation import send_confirmation_email, send_reset_password_email
+from utils.generate_reset_password_code import generate_reset_password_code
+from utils.listar_compras_ofertas import listar_compras_ofertas
+from utils.model_validators import (
+    calcular_pontos_expirados,
+    calcular_total_pontos,
+    calcular_total_pontos_disponiveis,
+)
+
+from perfil import forms as perfil_forms
+from perfil import models as perfil_models
+from perfil.forms import RequestResetPasswordForm, ResetPasswordForm
 
 
 class BasePerfil(View):
@@ -109,11 +104,9 @@ class Criar(BasePerfil):
             first_name = self.userform.cleaned_data.get('first_name')
             last_name = self.userform.cleaned_data.get('last_name')
             code = generate_reset_password_code()
-            perfil_data = self.convert_dates_to_str(
-                self.perfilform.cleaned_data)
-
-            # Armazenar os dados na sessão garantindo que
-            # perfil_data armazene apenas IDs e valores simples
+            perfil_data = self.convert_dates_to_str(self.perfilform.cleaned_data)
+            
+            # Garantir que apenas o ID do estudante seja armazenado
             if 'estudante' in perfil_data and perfil_data['estudante']:
                 perfil_data['estudante'] = perfil_data['estudante'].id
 
@@ -180,61 +173,78 @@ class VerificationCodeView(BasePerfil):
 
     def post(self, *args, **kwargs):
         '''POST method.'''
+        try:
+            # Get the code from the post request
+            code_1 = self.request.POST.get('code_1')
+            code_2 = self.request.POST.get('code_2')
+            code_3 = self.request.POST.get('code_3')
 
-        # Get the code from the post request
-        code_1 = self.request.POST.get('code_1')
-        code_2 = self.request.POST.get('code_2')
-        code_3 = self.request.POST.get('code_3')
+            # Verificar se os códigos são válidos antes de concatenar
+            if not all([code_1, code_2, code_3]):
+                messages.error(self.request, 'Código incompleto! Preencha todos os campos.')
+                return render(self.request, self.template_name, self.context)
 
-        final_code = int(f'{code_1}{code_2}{code_3}')
+            # Criar o código final
+            try:
+                final_code = int(f'{code_1}{code_2}{code_3}')
+            except ValueError:
+                messages.error(self.request, 'Código inválido! Insira apenas números.')
+                return render(self.request, self.template_name, self.context)
 
-        # Get the user from the session
-        temp_user = self.request.session.get('temp_user', None)
+            # Get the user from the session
+            temp_user = self.request.session.get('temp_user')
 
-        # Check if the user exists
-        if not temp_user:
-            messages.error(
-                self.request,
-                'Utilizador não encontrado! Por favor, registe-se novamente.'
+            # Check if the user exists in session
+            if not temp_user or 'code' not in temp_user:
+                messages.error(self.request, 'Utilizador não encontrado! Registe-se novamente.')
+                return redirect('perfil:criar')
+
+            # Check if the code is valid
+            if str(temp_user['code']) != str(final_code):
+                messages.error(self.request, 'Código inválido! Por favor, insira o código correto.')
+                return render(self.request, self.template_name, self.context)
+
+            # Criar o usuário
+            user = User.objects.create_user(
+                username=temp_user['username'],
+                email=temp_user['email'],
+                password=temp_user['password'],
+                first_name=temp_user['first_name'],
+                last_name=temp_user['last_name'],
             )
+
+            # Criar o perfil do usuário
+            perfil_data = temp_user.get('perfil_data', {})
+            
+            # Recuperar o objeto RespostaFidelidade apenas quando for criar o perfil
+            estudante_id = perfil_data.pop('estudante', None)  # Remove e guarda o ID
+            if estudante_id:
+                try:
+                    estudante = fidelidade_models.RespostaFidelidade.objects.get(id=estudante_id)
+                    perfil = perfil_models.Perfil.objects.create(
+                        usuario=user,
+                        estudante=estudante,  # Passa o objeto diretamente
+                        **perfil_data
+                    )
+                except fidelidade_models.RespostaFidelidade.DoesNotExist:
+                    messages.error(self.request, 'Erro ao recuperar dados de fidelidade.')
+                    return render(self.request, self.template_name, self.context)
+            else:
+                perfil = perfil_models.Perfil.objects.create(
+                    usuario=user,
+                    **perfil_data
+                )
+
+            messages.success(self.request, 'Código verificado com sucesso! Já pode aceder à sua conta.')
+            
+            # Apagar o temp_user da sessão
+            self.request.session.pop('temp_user', None)
+            
             return redirect('perfil:criar')
 
-        # Check if the code is valid
-        if not final_code or str(temp_user.get('code')) != str(final_code):
-            messages.error(
-                self.request,
-                'Código inválido! Por favor, insira o código correto.'
-            )
-            return render(self.request, self.template_name, self.context)
-
-        # Create the user
-        user = User.objects.create_user(
-            username=temp_user['username'],
-            email=temp_user['email'],
-            password=temp_user['password'],
-            first_name=temp_user['first_name'],
-            last_name=temp_user['last_name'],
-        )
-
-        # Cria um perfil para o usuário
-        perfil_data = temp_user['perfil_data']
-
-        # Recuperar a instancia de RespostaFidelidade usando o ID armazenado
-        if 'estudante' in perfil_data and perfil_data['estudante']:
-            perfil_data['estudante'] = fidelidade_models.RespostaFidelidade.objects.get(
-                id=perfil_data['estudante'])
-
-        perfil = perfil_models.Perfil.objects.create(
-            usuario=user,
-            **perfil_data
-        )
-
-        messages.success(
-            self.request,
-            'Código verificado com sucesso! Já pode aceder á sua conta.'
-        )
-
-        return redirect('perfil:criar')
+        except Exception as e:
+            messages.error(self.request, f"Ocorreu um erro inesperado: {str(e)}")
+            return redirect('perfil:criar')
 
 
 @method_decorator(login_required, name='dispatch')

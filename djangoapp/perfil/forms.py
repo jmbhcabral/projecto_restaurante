@@ -1,9 +1,11 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.utils.safestring import mark_safe
 from django.utils import timezone
-from perfil.models import Perfil
+from django.utils.safestring import mark_safe
 from fidelidade.models import RespostaFidelidade
+
+from perfil.models import Perfil
+
 from . import models
 
 
@@ -23,7 +25,7 @@ class PerfilForm(forms.ModelForm):
             'ultima_atualizacao_data_nascimento', 'ultima_actividade',
             'reset_password_code', 'reset_password_code_expires',
             'data_cancelamento','notificacoes_email',
-            'notificacoes_telemovel'
+            'notificacoes_telemovel', 'first_login'
         )
 
 
