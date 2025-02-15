@@ -2,16 +2,20 @@
 
 import uuid
 from datetime import timedelta
-from django.utils import timezone
-from django.utils.timezone import now
 from io import BytesIO
+
+import qrcode
+from django.contrib.auth import get_user_model
 from django.core.files import File
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.forms import ValidationError
-from django.contrib.auth import get_user_model
-from fidelidade.models import Fidelidade, RespostaFidelidade, Respostas
+from django.utils import timezone
+from django.utils.timezone import now
+from fidelidade.models import Fidelidade, RespostaFidelidade
 from utils.model_validators import validar_nif
-import qrcode
+from utils.notifications import send_push_notification, send_push_notifications_to_all
 
 User = get_user_model()
 
@@ -264,3 +268,117 @@ class PasswordResetToken(models.Model):
 
     def __str__(self):
         return f"Reset Token for {self.user.email}"
+    
+    
+class PushNotificationToken(models.Model):
+    '''Model for the push notification token.'''
+    class Meta:
+        verbose_name = "Token de Notificação Push"
+        verbose_name_plural = "Tokens de Notificação Push"
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    expo_token = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.expo_token}"
+    
+
+class NotificationUser(models.Model):
+    """Tabela onde as notificações individuais são criadas"""
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    data = models.JSONField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.title} - {self.message}'
+    
+class NotificationUserSent(models.Model):
+    """Tabela onde registamos os envios das notificações individuais"""
+    notification = models.ForeignKey(NotificationUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    sent_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=20,
+        choices=[('pending', 'Pending'), ('sent', 'Sent'), ('failed', 'Failed')],
+        default='pending'
+    )
+
+    def __str__(self):
+        return f"{self.user.username} - {self.notification.title} - {self.status}"
+    
+
+class NotificationAll(models.Model):
+    """Tabela onde as notificações para todos são criadas"""
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    data = models.JSONField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+    
+
+class NotificationAllSent(models.Model):
+    """Tabela onde registamos os envios das notificações para todos"""
+    notification = models.ForeignKey(NotificationAll, on_delete=models.CASCADE)
+    sent_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=20,
+        choices=[('pending', 'Pending'), ('sent', 'Sent'), ('failed', 'Failed')],
+        default='pending'
+    )
+
+    def __str__(self):
+        return f"{self.notification.title} - {self.status}"
+    
+
+@receiver(post_save, sender=NotificationAllSent)
+def send_notification_all(sender, instance, created, **kwargs):
+    """Envia notificações para todos os utilizadores automaticamente ao criar um registo de envio"""
+    if created:
+        response = send_push_notifications_to_all(
+            instance.notification.title,
+            instance.notification.message,
+            instance.notification.data
+        )
+
+        if "error" in response:
+            instance.status = 'failed'
+        else:
+            instance.status = 'sent'
+
+        instance.save()
+
+
+@receiver(post_save, sender=NotificationUser)
+def create_notification_user_sent(sender, instance, created, **kwargs):
+    """Cria um registo de envio apenas se o user estiver definido"""
+    if created:
+        NotificationUserSent.objects.create(
+            notification=instance,
+            status="pending"
+        )
+
+@receiver(post_save, sender=NotificationUserSent)
+def send_notification_user(sender, instance, created, **kwargs):
+    """Envia notificações individuais automaticamente quando um envio é criado"""
+    
+    print('instance', instance)
+    print('created', created)
+    print('user', instance.user)
+
+    if created and instance.user:  # Só envia se um utilizador estiver definido
+        response = send_push_notification(
+            instance.user,
+            instance.notification.title,
+            instance.notification.message,
+            instance.notification.data
+        )
+
+        # Atualiza o status no envio já criado
+        instance.status = "sent" if response and getattr(response, "status", None) == "ok" else "failed"
+        instance.save()
+    else:
+        print("⚠️ Aviso: O `user` não estava definido. Nenhuma notificação foi enviada.")

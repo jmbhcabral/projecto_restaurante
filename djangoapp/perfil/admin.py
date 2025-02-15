@@ -1,5 +1,16 @@
 from django.contrib import admin
-from perfil.models import (Perfil, Morada, PasswordResetToken)
+from django.utils.html import format_html
+
+from perfil.models import (
+    Morada,
+    NotificationAll,
+    NotificationAllSent,
+    NotificationUser,
+    NotificationUserSent,
+    PasswordResetToken,
+    Perfil,
+    PushNotificationToken,
+)
 
 
 @admin.register(Perfil)
@@ -26,3 +37,38 @@ class PasswordResetTokenAdmin(admin.ModelAdmin):
     list_display = 'id', 'user', 'token', 'created_at'
     list_display_links = 'id', 'user'
     search_fields = 'id', 'user', 'token', 'created_at'
+
+
+@admin.register(PushNotificationToken)
+class PushNotificationTokenAdmin(admin.ModelAdmin):
+    list_display = 'id', 'user', 'expo_token', 'created_at'
+    list_display_links = 'id', 'user'
+    search_fields = 'id', 'user', 'expo_token', 'created_at'
+
+
+@admin.register(NotificationAll)
+class NotificationAllAdmin(admin.ModelAdmin):
+    list_display = ('title', 'message', 'created_at', 'send_now')
+
+    def send_now(self, obj):
+        """Botão para criar um registo de envio e disparar a notificação"""
+        return format_html(
+            '<a class="button" href="/admin/send_notification_all/{}/">📩 Enviar</a>',
+            obj.id
+        )
+    send_now.short_description = "Enviar Notificação"
+
+
+@admin.register(NotificationAllSent)
+class NotificationAllSentAdmin(admin.ModelAdmin):
+    list_display = ('notification', 'sent_at', 'status')
+
+@admin.register(NotificationUser)
+class NotificationUserAdmin(admin.ModelAdmin):
+    list_display = ('title', 'message', 'created_at')
+
+@admin.register(NotificationUserSent)
+class NotificationUserSentAdmin(admin.ModelAdmin):
+    list_display = ('notification', 'user', 'sent_at', 'status')
+
+

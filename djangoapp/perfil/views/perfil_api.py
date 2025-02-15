@@ -1,26 +1,29 @@
 from django.contrib.auth.models import User
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.permissions import AllowAny
-from rest_framework.decorators import action
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404
-
-from django.http import JsonResponse
-from django.utils import timezone
-
-from ..serializers import (
-    UserRegistrationSerializer, RequestResetPasswordSerializer,
-    ValidateResetCodeSerializer, ResetPasswordSerializer,
-    UserConfirmationSerializer, CancelRegistrationSerializer
-)
-from perfil.models import Perfil
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
 from fidelidade.models import RespostaFidelidade
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from utils.notifications import send_push_notification, send_push_notifications_to_all
 
+from perfil.models import Perfil
+
+from ..models import PushNotificationToken
+from ..serializers import (
+    CancelRegistrationSerializer,
+    RequestResetPasswordSerializer,
+    ResetPasswordSerializer,
+    UserConfirmationSerializer,
+    UserRegistrationSerializer,
+    ValidateResetCodeSerializer,
+)
 
 
 class RegisterUserApiView(viewsets.ModelViewSet):
@@ -219,3 +222,122 @@ class GetCSRFToken(APIView):
     def get(self, request):
         csrf_token = get_token(request)
         return JsonResponse({"csrfToken": csrf_token})
+
+    
+class SavePushTokenView(APIView):
+    """
+    API para gerir os tokens de notificação push
+    """
+
+    def post(self, request):
+        """Regista ou atualiza um token de notificação push"""
+        token = request.data.get('token')
+        user_id = request.data.get('user_id')
+
+        print('📩 Token recebido:', token)
+        print('📩 User ID recebido:', user_id)
+        print('request.data:', request.data)
+
+        if not token or not user_id:
+            return Response(
+                {'error': 'Token e User ID são obrigatórios'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Busca o token no banco de dados
+        obj, created = PushNotificationToken.objects.get_or_create(
+            expo_token=token,
+            defaults={'user_id': user_id}  # Define o user apenas na criação
+        )
+
+        # Se o token já existia mas estava associado a outro user, atualiza
+        if not created and obj.user.pk != user_id:
+            print(f'🔄 Token já existe, mas pertence ao user {obj.user.pk}. Atualizando para {user_id}.')
+            obj.user = User.objects.get(pk=user_id)  # Atribui o objeto User em vez do ID
+            obj.save()  # Não esqueça de salvar a alteração
+
+        return Response(
+            {'message': 'Token salvo com sucesso'},
+            status=status.HTTP_200_OK,
+        )
+    
+
+class SendPushNotificationView(APIView):
+    """
+    Envia uma notificação push para o usuário.
+    """
+
+    def post(self, request):
+        """
+        Envia uma notificação push para o usuário.
+        """
+        user = request.user
+        title = request.data.get('title')
+        message = request.data.get('message')
+        data = request.data.get('data')
+
+        if not user:
+            return Response(
+                {'error': 'Usuário não autenticado'},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        
+        if not title or not message:
+            return Response(
+                {'error': 'Título e mensagem são obrigatórios'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+        try:
+            response = send_push_notification(user, title, message, data)
+            print('📩 Notificação push enviada com sucesso')
+            print('📩 Resposta:', response)
+            return Response(
+                {'message': 'Notificação push enviada com sucesso'},
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+        
+class SendPushNotificationToAllView(APIView):
+    """
+    Envia uma notificação push para todos os usuários.
+    """
+
+    def post(self, request):
+        """
+        Envia uma notificação push para todos os usuários.
+        """
+        title = request.data.get('title')
+        message = request.data.get('message')
+        data = request.data.get('data')
+
+        if not title or not message:
+            return Response(
+                {'error': 'Título e mensagem são obrigatórios'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+
+        try:
+            response = send_push_notifications_to_all(title, message, data)
+
+            print('📩 Notificação push enviada com sucesso')
+            print('📩 Resposta:', response)
+            return Response(
+                {'message': 'Notificação push enviada com sucesso'},
+                status=status.HTTP_200_OK,
+            )
+        
+
+
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+        
+        

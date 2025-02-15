@@ -1,15 +1,15 @@
-from typing import Dict, Any
 from collections import OrderedDict
+from typing import Any, Dict
+
 from django.contrib.auth import get_user_model
-from rest_framework import serializers
-from perfil.models import Perfil, PasswordResetToken, RespostaFidelidade
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.validators import validate_email as django_validate_email
 from django.utils import timezone
-from django.contrib.auth.hashers import check_password
-from utils.generate_reset_password_code import generate_reset_password_code
+from rest_framework import serializers
 from utils.email_confirmation import send_confirmation_email, send_reset_password_email
-from django.utils.dateformat import format
+from utils.generate_reset_password_code import generate_reset_password_code
+
+from perfil.models import PasswordResetToken, Perfil, RespostaFidelidade
 
 User = get_user_model()
 
@@ -350,7 +350,7 @@ class RequestResetPasswordSerializer(serializers.Serializer):
             perfil.save()
         except Exception as e:
             print(f"Erro ao salvar o código de redefinição de senha: {e}")
-            raise serializers.ValidationError(f"Surgiu um erro. Por favor, tente novamente mais tarde.")
+            raise serializers.ValidationError("Surgiu um erro. Por favor, tente novamente mais tarde.")
 
 
         # Enviar email com o código
@@ -358,7 +358,7 @@ class RequestResetPasswordSerializer(serializers.Serializer):
             send_reset_password_email(email, reset_code)
         except Exception as e:
             print(f"Erro ao enviar o email com o código de redefinição de senha: {e}")
-            raise serializers.ValidationError(f"Surgiu um erro. Por favor, tente novamente mais tarde.")
+            raise serializers.ValidationError("Surgiu um erro. Por favor, tente novamente mais tarde.")
 
 
 

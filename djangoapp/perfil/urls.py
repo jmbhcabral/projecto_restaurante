@@ -1,10 +1,19 @@
 from django.urls import path
-from perfil import views
 from rest_framework.routers import SimpleRouter
+
+from perfil import views
+
+from .views.admin_views import send_notification_to_all_view
 from .views.perfil_api import (
-    UserConfirmationApiView, ValidateResetCodeApiView, ResetPasswordApiView, 
-    GetCSRFToken, RegisterUserApiView, CancelRegistrationApiView
-    )
+    CancelRegistrationApiView,
+    GetCSRFToken,
+    ResetPasswordApiView,
+    SavePushTokenView,
+    SendPushNotificationToAllView,
+    SendPushNotificationView,
+    UserConfirmationApiView,
+    ValidateResetCodeApiView,
+)
 
 app_name = 'perfil'
 
@@ -51,6 +60,12 @@ urlpatterns = [
     path('perfil/reset_password_api/', ResetPasswordApiView.as_view(), name='reset-password-api'),
     path('perfil/get_csrf_token/', GetCSRFToken.as_view(), name='get-csrf-token'),
     path('perfil/cancel_registration_api/', CancelRegistrationApiView.as_view(), name='cancel-registration-api'),
+    path('perfil/save_push_token/', SavePushTokenView.as_view(), name='save-push-token'),
+    path('perfil/send_push_notification/', SendPushNotificationView.as_view(), name='send-push-notification'),
+    path('perfil/send_push_notification_to_all/', SendPushNotificationToAllView.as_view(), name='send-push-notification-to-all'),
+#     path('admin/send_notification/<int:notification_id>/', send_notification_view, name='admin_send_notification'),
+     path('admin/send_notification_to_all/<int:notification_id>/', send_notification_to_all_view, name='admin_send_notification_to_all'),
 ]
+
 
 urlpatterns += users_api_v1.urls
