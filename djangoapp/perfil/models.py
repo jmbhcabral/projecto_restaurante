@@ -352,15 +352,6 @@ def send_notification_all(sender, instance, created, **kwargs):
         instance.save()
 
 
-@receiver(post_save, sender=NotificationUser)
-def create_notification_user_sent(sender, instance, created, **kwargs):
-    """Cria um registo de envio apenas se o user estiver definido"""
-    if created:
-        NotificationUserSent.objects.create(
-            notification=instance,
-            status="pending"
-        )
-
 @receiver(post_save, sender=NotificationUserSent)
 def send_notification_user(sender, instance, created, **kwargs):
     """Envia notificações individuais automaticamente quando um envio é criado"""
