@@ -122,14 +122,14 @@ class TotalPontosAPIV1(APIView):
                 user, 'perfil') else None
 
             compras_fidelidade = ComprasFidelidade.objects.filter(
-                fidelidade=tipo_fidelidade, utilizador=user
+                utilizador=user
             )
 
             print('compras_fidelidade', compras_fidelidade)
 
 
             ofertas_fidelidade = OfertasFidelidade.objects.filter(
-                fidelidade=tipo_fidelidade, utilizador=user
+                utilizador=user
             )
 
             print('ofertas_fidelidade', ofertas_fidelidade)
