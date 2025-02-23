@@ -1,17 +1,17 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from ..models import (ProdutoFidelidadeIndividual, ComprasFidelidade,
-                      OfertasFidelidade
-                      )
-from ..serializers import ProdutoFidelidadeIndividualSerializer
 from collections import defaultdict
-from django.db.models import Sum, Min
+
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from utils.model_validators import (
-    calcular_total_pontos, calcular_dias_para_expirar, 
-    calcular_pontos_indisponiveis, calcular_total_pontos_disponiveis,
-    calcular_pontos_expirados
-    )
-from decimal import Decimal
+    calcular_dias_para_expirar,
+    calcular_pontos_expirados,
+    calcular_pontos_indisponiveis,
+    calcular_total_pontos,
+    calcular_total_pontos_disponiveis,
+)
+
+from ..models import ComprasFidelidade, OfertasFidelidade, ProdutoFidelidadeIndividual
+from ..serializers import ProdutoFidelidadeIndividualSerializer
 
 
 class ProdutoFidelidadeAPI(APIView):
@@ -125,14 +125,22 @@ class TotalPontosAPIV1(APIView):
                 fidelidade=tipo_fidelidade, utilizador=user
             )
 
+            print('compras_fidelidade', compras_fidelidade)
+
 
             ofertas_fidelidade = OfertasFidelidade.objects.filter(
                 fidelidade=tipo_fidelidade, utilizador=user
             )
 
+            print('ofertas_fidelidade', ofertas_fidelidade)
+
             total_compras = compras_fidelidade.count()
             total_ofertas = ofertas_fidelidade.count()
             total_visitas = total_compras + total_ofertas
+
+            print('total_compras', total_compras)
+            print('total_ofertas', total_ofertas)
+            print('total_visitas', total_visitas)
 
             # Detalhes de compras e ofertas
             detalhes_compras = [
@@ -145,6 +153,8 @@ class TotalPontosAPIV1(APIView):
                 for compra in compras_fidelidade
             ]
 
+            print('detalhes_compras', detalhes_compras)
+
             detalhes_ofertas = [
                 {
                     "pontos_gastos": oferta.pontos_gastos,
@@ -152,6 +162,8 @@ class TotalPontosAPIV1(APIView):
                 }
                 for oferta in ofertas_fidelidade
             ]
+
+            print('detalhes_ofertas', detalhes_ofertas)
 
             total_pontos_adicionados = sum(
                 [compra.pontos_adicionados for compra in compras_fidelidade if compra.pontos_adicionados]
@@ -174,6 +186,12 @@ class TotalPontosAPIV1(APIView):
 
             total_pontos_expirados = calcular_pontos_expirados(user)
 
+            print('saldo_pontos', saldo_pontos)
+            print('pontos_disponiveis', pontos_disponiveis)
+            print('pontos_indisponiveis', pontos_indisponiveis)
+            print('dias_para_expirar', dias_para_expirar)
+            print('total_pontos_expirados', total_pontos_expirados)
+
             resposta = {
                 "utilizador": user.id,
                 "tipo_fidelidade": tipo_fidelidade.nome if tipo_fidelidade else None,
@@ -192,5 +210,7 @@ class TotalPontosAPIV1(APIView):
                 "detalhes_ofertas": detalhes_ofertas,
 
             }
+
+            print('resposta', resposta)
 
             return Response(resposta)
