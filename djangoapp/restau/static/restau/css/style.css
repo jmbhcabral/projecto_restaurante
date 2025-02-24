@@ -1495,3 +1495,30 @@ button {
 	font-size: 28px !important; /* Aumenta o tamanho da fonte */
 	margin-right: 10px; /* Espaço entre as caixas */
 }
+
+/* Termos de uso */
+.container-terms-of-use {
+	max-width: 800px;
+	margin: auto;
+	background: #fff;
+	padding: 20px;
+	border-radius: 5px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.section-terms-of-use {
+	margin-bottom: 2rem;
+}
+
+.section-terms-of-use h1,
+h2,
+h3,
+h4 {
+	color: #333;
+}
+
+.section-terms-of-use p {
+	color: #666;
+	margin-bottom: 1rem;
+	margin-top: 1rem;
+}
