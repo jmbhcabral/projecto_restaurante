@@ -201,7 +201,9 @@ class CancelRegistrationApiView(APIView):
     """Cancela o registo do usuário"""
     def post(self, request):
         serializer = CancelRegistrationSerializer(data=request.data, context={'request': request})
+
         user_id = request.user.id
+
 
         user_instance = get_object_or_404(User, pk=user_id)
         perfil_instance = Perfil.objects.filter(usuario=user_instance).first()

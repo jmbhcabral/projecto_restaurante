@@ -31,6 +31,7 @@ urlpatterns = [
     path('perfil/login/', views.Login.as_view(), name='login'),
     path('perfil/logout/', views.Logout.as_view(), name='logout'),
     path('perfil/conta/', views.Conta.as_view(), name='conta'),
+    path('perfil/conta/cancelar/', views.CancelarConta.as_view(), name='cancelar_conta'),
     path('perfil/conta/regras/',
          views.Regras.as_view(), name='regras'),
     path('perfil/conta/cartao_cliente/',

@@ -1,58 +1,123 @@
-{% extends 'restau/base_front_perfil.html' %}
-{% block content %}
+{% extends 'restau/base_front_perfil.html' %} {% block content %}
 <main class="section-content-wide section-gap front-content">
-    <section class="section-gap-conta white-bg top-background">
-        <div class="separator"></div>
-            <h1 class="center">Hamburgueria artesanal</h1>
-        <div class="separator"></div>
-        {% include "restau/partials/_messages.html" %}
-    </section>
-    <section class="conta">
-        {% include "perfil/partials/_conta_menu.html" %}
-        <div class="conta-content-perfil">
-            <p>Olá {{ user.first_name }}, bem-vindo à sua área de utilizador.
-            Aqui, pode atualizar os seus dados, explorar as suas vantagens exclusivas e muito mais.
-            </p>
-            {% if total_pontos > 0 %}
-            <p>
-                <strong>Estado da sua conta de fidelidade:</strong><br>
-                <strong>Total pontos disponíveis:</strong> {{ total_pontos_disponiveis|floatformat:2 }}<br>
-                <strong>Pontos hoje:</strong> {{ pontos_hoje_decimal|floatformat:2 }}<br>
-                <strong>Total pontos acumulados:</strong> {{ total_pontos_ganhos_decimal|floatformat:2 }}<br>
-                <strong>Total pontos utilizados:</strong> {{ total_ofertas_decimal|floatformat:2 }}<br>
-                <strong>Total pontos expirados:</strong> {{ total_pontos_expirados|floatformat:2 }}<br>
-            </p>
-            <p>
-                Esteve a última vez em {{ ultima_presenca }}.
-            </p>
-            <p>
-                Os seus pontos expiram em {{ data_expiracao }}. Faltam {{ dias_expiracao }} dias.
-            </p>
-            {% elif total_pontos == 0 and total_pontos_ganhos_decimal > 0 %}
-            <p>
-                <strong>Estado da sua conta de fidelidade:</strong><br>
-                <strong>Total pontos disponíveis:</strong> {{ total_pontos_disponiveis|floatformat:2 }}<br>
-                <strong>Pontos hoje:</strong> {{ pontos_hoje_decimal|floatformat:2 }}<br>
-                <strong>Total pontos acumulados:</strong> {{ total_pontos_ganhos_decimal|floatformat:2 }}<br>
-                <strong>Total pontos utilizados:</strong> {{ total_ofertas_decimal|floatformat:2 }}<br>
-                <strong>Total pontos expirados:</strong> {{ total_pontos_expirados|floatformat:2 }}<br>
-            </p>
-            <p>
-                Visite-nos para acumular mais pontos e desfrutar de ofertas exclusivas.
-            </p>
-            {% else %}
-            <p>
-                <strong>Estado da sua conta de fidelidade:</strong><br>
-                <strong>Pontos disponíveis:</strong> 0<br>
-                <strong>Pontos acumulados:</strong> 0<br>
-                <strong>Pontos utilizados:</strong> 0<br>
-                <strong>Pontos expirados:</strong> 0<br>
-            </p>
-            <p>
-                Visite-nos para acumular pontos e desfrutar de ofertas exclusivas.
-            </p>
-            {% endif %}
-        </div>
-    </section>
+	<section class="section-gap-conta white-bg top-background">
+		<div class="separator"></div>
+		<h1 class="center">Hamburgueria artesanal</h1>
+		<div class="separator"></div>
+		{% include "restau/partials/_messages.html" %}
+	</section>
+	<section class="conta">
+		{% include "perfil/partials/_conta_menu.html" %}
+		<div class="conta-content-perfil">
+			<p>
+				Olá {{ user.first_name }}, bem-vindo à sua área de utilizador. Aqui,
+				pode atualizar os seus dados, explorar as suas vantagens exclusivas e
+				muito mais.
+			</p>
+			{% if total_pontos > 0 %}
+			<p>
+				<strong>Estado da sua conta de fidelidade:</strong><br />
+				<strong>Total pontos disponíveis:</strong>
+				{{ total_pontos_disponiveis|floatformat:2 }}<br />
+				<strong>Pontos hoje:</strong>
+				{{ pontos_hoje_decimal|floatformat:2 }}<br />
+				<strong>Total pontos acumulados:</strong>
+				{{ total_pontos_ganhos_decimal|floatformat:2 }}<br />
+				<strong>Total pontos utilizados:</strong>
+				{{ total_ofertas_decimal|floatformat:2 }}<br />
+				<strong>Total pontos expirados:</strong>
+				{{ total_pontos_expirados|floatformat:2 }}<br />
+			</p>
+			<p>Esteve a última vez em {{ ultima_presenca }}.</p>
+			<p>
+				Os seus pontos expiram em {{ data_expiracao }}. Faltam 
+                {{ dias_expiracao }} dias.
+			</p>
+			{% elif total_pontos == 0 and total_pontos_ganhos_decimal > 0 %}
+			<p>
+				<strong>Estado da sua conta de fidelidade:</strong><br />
+				<strong>Total pontos disponíveis:</strong> 
+                {{ total_pontos_disponiveis|floatformat:2 }}<br />
+				<strong>Pontos hoje:</strong> {{ pontos_hoje_decimal|floatformat:2 }}<br />
+				<strong>Total pontos acumulados:</strong> 
+                {{ total_pontos_ganhos_decimal|floatformat:2 }}<br />
+				<strong>Total pontos utilizados:</strong>
+				{{ total_ofertas_decimal|floatformat:2 }}<br />
+				<strong>Total pontos expirados:</strong>
+				{{ total_pontos_expirados|floatformat:2 }}<br />
+			</p>
+			<p>
+				Visite-nos para acumular mais pontos e desfrutar de ofertas exclusivas.
+			</p>
+			{% else %}
+			<p>
+				<strong>Estado da sua conta de fidelidade:</strong><br />
+				<strong>Pontos disponíveis:</strong> 0<br />
+				<strong>Pontos acumulados:</strong> 0<br />
+				<strong>Pontos utilizados:</strong> 0<br />
+				<strong>Pontos expirados:</strong> 0<br />
+			</p>
+			<p>Visite-nos para acumular pontos e desfrutar de ofertas exclusivas.</p>
+			{% endif %}
+		</div>
+	</section>
 </main>
+<div id="confirmacao-popup" class="popup">
+	<div class="popup-content">
+		<p>Tem a certeza que deseja cancelar a sua conta?</p>
+		<button id="confirmar-cancelamento" class="btn btn-danger">Sim</button>
+		<button id="fechar-popup" class="btn btn-secondary">Não</button>
+	</div>
+</div>
+
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+	    const popup = document.getElementById("confirmacao-popup");
+	    const cancelarBtn = document.getElementById("cancelar-conta-btn");
+	    const confirmarBtn = document.getElementById("confirmar-cancelamento");
+	    const fecharBtn = document.getElementById("fechar-popup");
+
+	    cancelarBtn.addEventListener("click", function(event) {
+	        event.preventDefault(); // Impede a navegação
+	        popup.style.display = "block";
+	    });
+
+	    fecharBtn.addEventListener("click", function() {
+	        popup.style.display = "none";
+	    });
+
+	    confirmarBtn.addEventListener("click", function() {
+            fetch("{% url 'perfil:cancelar_conta' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify({ "user_id": {{ user.id }} })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Erro na resposta da API");
+                }
+                return response.json().catch(() => {
+                    throw new Error("Resposta não é JSON");
+                });
+            })
+            .then(data => {
+                console.log("Resposta JSON recebida:", data);
+                window.location.href = "{% url 'perfil:criar' %}?message=" + encodeURIComponent(data.message);
+            })
+            .catch(error => {
+                console.error("Erro:", error);
+                const messageSection = document.querySelector('.section-gap-conta');
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'message error';
+                errorDiv.textContent = "Ocorreu um erro ao cancelar a conta. Tente novamente.";
+                messageSection.appendChild(errorDiv);
+            });
+        
+            popup.style.display = "none";
+        });
+	});
+</script>
 {% endblock content %}

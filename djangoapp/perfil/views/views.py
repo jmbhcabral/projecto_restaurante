@@ -9,6 +9,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import models
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -497,23 +498,46 @@ class Conta(BasePerfil):
             'dias_expiracao': dias_expiracao,
         }
 
+        print('Contexto: ', self.context)
+
         return render(self.request, self.template_name, self.context)
 
-# class Deletar(View):
-#     def get(self, *args, **kwargs):
-#         if not self.request.user.is_authenticated:
-#             return redirect('perfil:criar')
+class CancelarConta(View):
+    def post(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('perfil:criar')
 
-#         usuario = get_object_or_404(
-#             User, username=self.request.user.username)
+        user = self.request.user
+        user_id = user.pk
 
-#         usuario.delete()
+        # Atualiza o usuário usando first()
+        updated_user = User.objects.filter(id=user_id).first()
+        if updated_user:
+            updated_user.username = f'{user_id}-Cancelado'
+            updated_user.email = f'{user_id}-cancelado@extremeway.pt'
+            updated_user.first_name = f'{user_id}-Cancelado'
+            updated_user.last_name = f'{user_id}-Cancelado'
+            updated_user.is_active = False
+            updated_user.save()
 
-#         messages.success(
-#             self.request,
-#             'Conta deletada com sucesso!'
-#         )
-#         return redirect('restau:index')
+            # Atualiza a senha
+            updated_user.set_password(f'{user_id:09d}')
+            updated_user.save()
+
+        # Atualiza o perfil
+        perfil = perfil_models.Perfil.objects.filter(usuario=user).first()
+        if perfil:
+            perfil.telemovel = f'{user_id:09d}'
+            perfil.data_cancelamento = timezone.now()
+            perfil.save()
+
+        messages.success(
+            self.request,
+            'Conta cancelada com sucesso!'
+        )
+
+        return JsonResponse({'message': 'Conta cancelada com sucesso!',
+                             'redirect_url': reverse('perfil:criar')}, status=200)
 
 
 @method_decorator(login_required, name='dispatch')
