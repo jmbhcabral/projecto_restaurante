@@ -580,6 +580,7 @@ class Regras(View):
 
         if not user.is_authenticated:
             return redirect('perfil:criar')
+        
 
         perfil = user.perfil
         tipo_fidelidade = perfil.tipo_fidelidade
@@ -607,7 +608,17 @@ class Regras(View):
 class ResendConfirmationEmail(View):
     def get(self, request, username):
         user = get_object_or_404(User, username=username)
-        send_confirmation_email(user)
+
+        temp_user = request.session.get('temp_user')
+
+        if not temp_user:
+            messages.error(
+                request,
+                'Não foi possível encontrar o usuário. Por favor, tente novamente.'
+            )
+            return redirect('perfil:criar')
+
+        send_confirmation_email(user, temp_user['username'], temp_user['email'], temp_user['code'])
         messages.success(
             request,
             'Email de confirmação reenviado com sucesso. Por favor, verifique seu email.'
@@ -666,7 +677,7 @@ class RequestResetPasswordView(View):
         user.perfil.reset_password_code_expires = timezone.now()
         user.perfil.save()
 
-        send_reset_password_email(request, email, reset_code)
+        send_reset_password_email(email, reset_code)
 
         messages.success(
             request,
@@ -770,7 +781,7 @@ class ResendResetCodeView(View):
         user.perfil.reset_password_code_expires = timezone.now()
         user.perfil.save()
 
-        send_reset_password_email(request, email, reset_code)
+        send_reset_password_email(email, reset_code)
 
         messages.success(
             request,
