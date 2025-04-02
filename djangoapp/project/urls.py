@@ -3,9 +3,10 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 
 urlpatterns = [
+    path('', include('app_version.urls')),
     path('', include('senhas.urls', namespace='senhas')),
     path('', include('restau.urls')),
     path('', include('perfil.urls')),
