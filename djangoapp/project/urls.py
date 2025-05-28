@@ -7,6 +7,7 @@ from django.urls import include, path
 
 urlpatterns = [
     path('', include('app_version.urls')),
+    path('', include('google_reviews.urls', namespace='google_reviews')),
     path('', include('senhas.urls', namespace='senhas')),
     path('', include('restau.urls')),
     path('', include('perfil.urls')),

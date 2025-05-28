@@ -1,4 +1,136 @@
 {% extends 'restau/base.html' %}
 {% block content %}
- <h1>Admin Home</h1>
+<div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    <h1 style="text-align: center; color: #333; margin-bottom: 30px;">Área de Administração</h1>
+    
+    <div class="admin-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+        
+        <!-- Card Google Reviews -->
+        <div class="admin-card" style="background: white; border-radius: 10px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e0e0e0;">
+            <h3 style="color: #4285f4; margin-bottom: 15px; display: flex; align-items: center;">
+                <span style="font-size: 24px; margin-right: 10px;">📝</span>
+                Google Reviews
+            </h3>
+            <p style="color: #666; margin-bottom: 20px; line-height: 1.5;">
+                Atualize as reviews do Google Maps do restaurante. Esta ação busca as últimas avaliações e comentários dos clientes.
+            </p>
+            <button onclick="updateGoogleReviews()" class="btn-update-reviews" 
+                    style="background-color: #4285f4; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; transition: all 0.3s ease;">
+                📝 Atualizar Google Reviews
+            </button>
+            <div id="update-status" style="margin-top: 15px; padding: 12px; border-radius: 6px; display: none;"></div>
+        </div>
+        
+        <!-- Placeholder para outros cards de administração -->
+        <div class="admin-card" style="background: white; border-radius: 10px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e0e0e0;">
+            <h3 style="color: #28a745; margin-bottom: 15px; display: flex; align-items: center;">
+                <span style="font-size: 24px; margin-right: 10px;">⚙️</span>
+                Configurações
+            </h3>
+            <p style="color: #666; margin-bottom: 20px; line-height: 1.5;">
+                Gerir configurações gerais do sistema e do restaurante.
+            </p>
+            <button style="background-color: #28a745; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%;">
+                Acessar Configurações
+            </button>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+async function updateGoogleReviews() {
+    const button = document.querySelector('.btn-update-reviews');
+    const statusDiv = document.getElementById('update-status');
+    
+    // Desabilitar botão e mostrar carregamento
+    button.disabled = true;
+    button.style.opacity = '0.7';
+    button.innerHTML = '⏳ Atualizando...';
+    statusDiv.style.display = 'block';
+    statusDiv.style.backgroundColor = '#e3f2fd';
+    statusDiv.style.color = '#1976d2';
+    statusDiv.style.border = '1px solid #bbdefb';
+    statusDiv.innerHTML = '<p style="margin: 0; font-weight: 500;">🔄 Buscando novas reviews do Google...</p>';
+    
+    try {
+        const response = await fetch('/update-reviews/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            statusDiv.style.backgroundColor = '#e8f5e8';
+            statusDiv.style.color = '#2e7d32';
+            statusDiv.style.border = '1px solid #c8e6c9';
+            statusDiv.innerHTML = '<p style="margin: 0; font-weight: 500;">✅ ' + data.message + '</p>';
+        } else {
+            statusDiv.style.backgroundColor = '#ffebee';
+            statusDiv.style.color = '#c62828';
+            statusDiv.style.border = '1px solid #ffcdd2';
+            statusDiv.innerHTML = '<p style="margin: 0; font-weight: 500;">❌ Erro ao atualizar reviews</p>';
+        }
+    } catch (error) {
+        statusDiv.style.backgroundColor = '#ffebee';
+        statusDiv.style.color = '#c62828';
+        statusDiv.style.border = '1px solid #ffcdd2';
+        statusDiv.innerHTML = '<p style="margin: 0; font-weight: 500;">❌ Erro de conexão</p>';
+    }
+    
+    // Reabilitar botão
+    button.disabled = false;
+    button.style.opacity = '1';
+    button.innerHTML = '📝 Atualizar Google Reviews';
+    
+    // Esconder status após 5 segundos
+    setTimeout(() => {
+        statusDiv.style.display = 'none';
+    }, 5000);
+}
+
+// Hover effects
+document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        });
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+});
+</script>
+
+<style>
+.admin-card {
+    transition: all 0.3s ease;
+}
+
+.admin-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15) !important;
+}
+
+button {
+    transition: all 0.3s ease !important;
+}
+
+button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+@media (max-width: 768px) {
+    .admin-cards {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
 {% endblock content %}
