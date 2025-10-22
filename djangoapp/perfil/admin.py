@@ -1,12 +1,9 @@
 from django.contrib import admin
-from django.utils.html import format_html
+from django.urls import reverse
 
 from perfil.models import (
     Morada,
-    NotificationAll,
-    NotificationAllSent,
-    NotificationUser,
-    NotificationUserSent,
+    Notification,
     PasswordResetToken,
     Perfil,
     PushNotificationToken,
@@ -45,30 +42,17 @@ class PushNotificationTokenAdmin(admin.ModelAdmin):
     list_display_links = 'id', 'user'
     search_fields = 'id', 'user', 'expo_token', 'created_at'
 
-
-@admin.register(NotificationAll)
-class NotificationAllAdmin(admin.ModelAdmin):
-    list_display = ('title', 'message', 'created_at', 'send_now')
-
-    def send_now(self, obj):
-        """Botão para criar um registo de envio e disparar a notificação"""
-        return format_html(
-            '<a class="button" href="/admin/send_notification_all/{}/">📩 Enviar</a>',
-            obj.id
-        )
-    send_now.short_description = "Enviar Notificação"
-
-
-@admin.register(NotificationAllSent)
-class NotificationAllSentAdmin(admin.ModelAdmin):
-    list_display = ('notification', 'sent_at', 'status')
-
-@admin.register(NotificationUser)
-class NotificationUserAdmin(admin.ModelAdmin):
-    list_display = ('title', 'message', 'created_at')
-
-@admin.register(NotificationUserSent)
-class NotificationUserSentAdmin(admin.ModelAdmin):
-    list_display = ('notification', 'user', 'sent_at', 'status')
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'title', 'created_at', 'read_at')
+    list_display_links = ('id', 'user', 'title')
+    search_fields = ('title', 'body', 'user__username', 'user__email')
+    list_filter = ('created_at', 'read_at')
+    
+    def changelist_view(self, request, extra_context=None):
+        """Adiciona um link para o broadcast de notificações na página de listagem."""
+        extra_context = extra_context or {}
+        extra_context['broadcast_url'] = reverse('perfil:notification_broadcast_admin')
+        return super().changelist_view(request, extra_context=extra_context)
 
 

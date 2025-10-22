@@ -3,10 +3,11 @@ from rest_framework.routers import SimpleRouter
 
 from perfil import views
 
-from .views.admin_views import send_notification_to_all_view
+from .views.admin_views import NotificationBroadcastAdminView
 from .views.perfil_api import (
     CancelRegistrationApiView,
     GetCSRFToken,
+    NotificationBroadcastView,
     ResetPasswordApiView,
     SavePushTokenView,
     SendPushNotificationToAllView,
@@ -64,8 +65,10 @@ urlpatterns = [
     path('perfil/save_push_token/', SavePushTokenView.as_view(), name='save-push-token'),
     path('perfil/send_push_notification/', SendPushNotificationView.as_view(), name='send-push-notification'),
     path('perfil/send_push_notification_to_all/', SendPushNotificationToAllView.as_view(), name='send-push-notification-to-all'),
-#     path('admin/send_notification/<int:notification_id>/', send_notification_view, name='admin_send_notification'),
-     path('admin/send_notification_to_all/<int:notification_id>/', send_notification_to_all_view, name='admin_send_notification_to_all'),
+    path('perfil/notifications/broadcast/', NotificationBroadcastView.as_view(), name='notification-broadcast'),
+    
+    # Admin URLs
+    path('admin/perfil/notification-broadcast/', NotificationBroadcastAdminView.as_view(), name='notification_broadcast_admin'),
 ]
 
 

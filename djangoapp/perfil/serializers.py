@@ -193,7 +193,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             estudante = perfil_data['estudante']
             
             if isinstance(estudante, RespostaFidelidade):
-                perfil_data['estudante'] = estudante.id  # Converte para inteiro
+                perfil_data['estudante'] = estudante.pk  # Converte para inteiro
             elif isinstance(estudante, int):
                 pass  # Já é um ID, não precisa fazer nada
             else:
@@ -260,8 +260,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
         if perfil_instance:
             # Extraímos os valores corretamente
-            notificacoes_email = self.initial_data.get("perfil", {}).get("notificacoes_email", perfil_instance.notificacoes_email)
-            notificacoes_telemovel = self.initial_data.get("perfil", {}).get("notificacoes_telemovel", perfil_instance.notificacoes_telemovel)
+            notificacoes_email = perfil_data.get("notificacoes_email", perfil_instance.notificacoes_email)
+            notificacoes_telemovel = perfil_data.get("notificacoes_telemovel", perfil_instance.notificacoes_telemovel)
 
             # Atualizamos apenas se o valor for diferente do atual
             if notificacoes_email is not None:
@@ -483,5 +483,50 @@ class CancelRegistrationSerializer(serializers.Serializer):
             return {"message": "Utilizador cancelado com sucesso."}
         else:
             return {"message": "Utilizador não encontrado."}
+
+
+class NotificationBroadcastSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=200, required=False, allow_blank=True)
+    body = serializers.CharField(required=False, allow_blank=True)
+    notification_data = serializers.JSONField(required=False, default={})
+    target = serializers.ChoiceField(choices=("all", "group", "user"))
+    group_name = serializers.CharField(required=False)
+    user_id = serializers.IntegerField(required=False)
+    email = serializers.EmailField(required=False)
+
+    def validate(self, attrs):
+        title = attrs.get("title", "")
+        body = attrs.get("body", "")
+        if not title and not body:
+            raise serializers.ValidationError("Informe pelo menos o título ou a mensagem.")
+
+        target = attrs.get("target")
+
+        if target == "group" and not attrs.get("group_name"):
+            raise serializers.ValidationError({"group_name": "Este campo é obrigatório quando o target é 'group'."})
+
+        if target == "user" and not (attrs.get("user_id") or attrs.get("email")):
+            raise serializers.ValidationError(
+                {"target": "Forneça 'user_id' ou 'email' para enviar a um único utilizador."}
+            )
+
+        attrs.setdefault("notification_data", {})
+        return attrs
+
+    def validate_notification_data(self, value):
+        if value is None or value == "" or value == "{}":
+            return {}
+        if isinstance(value, str):
+            try:
+                import json
+                parsed_value = json.loads(value)
+                if not isinstance(parsed_value, dict):
+                    raise serializers.ValidationError("O campo data deve ser um objeto JSON.")
+                return parsed_value
+            except json.JSONDecodeError:
+                raise serializers.ValidationError("O campo data deve ser um objeto JSON válido.")
+        if not isinstance(value, dict):
+            raise serializers.ValidationError("O campo data deve ser um objeto JSON.")
+        return value
 
 

@@ -1,0 +1,203 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:perfil_notification_changelist' %}">{% trans 'Notifications' %}</a>
+&rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="module aligned">
+    <h1>{{ title }}</h1>
+    
+    <form method="post" id="notification-broadcast-form">
+        {% csrf_token %}
+        
+        <fieldset class="module aligned">
+            <h2>Conteúdo da Notificação</h2>
+            
+            <div class="form-row">
+                <div>
+                    <label for="id_title" class="required">Título:</label>
+                    <input type="text" name="title" id="id_title" 
+                           value="{{ form_data.title|default:'' }}" 
+                           maxlength="200" class="vTextField" 
+                           placeholder="Ex: Nova Promoção Disponível">
+                    <p class="help">Título da notificação (opcional, mas recomendado)</p>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div>
+                    <label for="id_body" class="required">Mensagem:</label>
+                    <textarea name="body" id="id_body" rows="4" cols="40" 
+                              class="vLargeTextField" 
+                              placeholder="Ex: Confira as ofertas especiais de hoje no nosso restaurante!">{{ form_data.body|default:'' }}</textarea>
+                    <p class="help">Mensagem principal da notificação</p>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div>
+                    <label for="id_notification_data">Dados Adicionais (JSON):</label>
+                    <textarea name="notification_data" id="id_notification_data" 
+                              rows="3" cols="40" class="vLargeTextField" 
+                              placeholder='{"type": "promocao", "id": 123}' 
+                              onblur="validateJson(this)">{{ form_data.notification_data|default:'' }}</textarea>
+                    <p class="help">Dados extras em formato JSON (opcional). Deixe vazio ou use {} para dados vazios.</p>
+                    <div id="json-error" style="color: red; font-size: 12px; margin-top: 5px;"></div>
+                </div>
+            </div>
+        </fieldset>
+        
+        <fieldset class="module aligned">
+            <h2>Destinatários</h2>
+            
+            <div class="form-row">
+                <div>
+                    <label for="id_target" class="required">Enviar para:</label>
+                    <select name="target" id="id_target" onchange="toggleTargetFields()">
+                        <option value="all" {% if form_data.target == 'all' or not form_data.target %}selected{% endif %}>
+                            Todos os utilizadores
+                        </option>
+                        <option value="group" {% if form_data.target == 'group' %}selected{% endif %}>
+                            Grupo específico
+                        </option>
+                        <option value="user" {% if form_data.target == 'user' %}selected{% endif %}>
+                            Utilizador específico
+                        </option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row" id="group-field" style="display: none;">
+                <div>
+                    <label for="id_group_name">Grupo:</label>
+                    <select name="group_name" id="id_group_name">
+                        <option value="">Selecione um grupo</option>
+                        {% for group in groups %}
+                        <option value="{{ group.name }}" 
+                                {% if form_data.group_name == group.name %}selected{% endif %}>
+                            {{ group.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row" id="user-fields" style="display: none;">
+                <div>
+                    <label for="id_user_id">ID do Utilizador:</label>
+                    <input type="number" name="user_id" id="id_user_id" 
+                           value="{{ form_data.user_id|default:'' }}" 
+                           class="vIntegerField" 
+                           placeholder="Ex: 123">
+                    <p class="help">ID numérico do utilizador (opcional se fornecer email)</p>
+                </div>
+            </div>
+            
+            <div class="form-row" id="email-field" style="display: none;">
+                <div>
+                    <label for="id_email">Email do Utilizador:</label>
+                    <input type="email" name="email" id="id_email" 
+                           value="{{ form_data.email|default:'' }}" 
+                           class="vEmailField" 
+                           placeholder="Ex: utilizador@exemplo.com">
+                    <p class="help">Email do utilizador (opcional se fornecer ID)</p>
+                </div>
+            </div>
+        </fieldset>
+        
+        <div class="submit-row">
+            <input type="submit" value="Enviar Notificação" class="default" 
+                   onclick="return confirm('Tem certeza que deseja enviar esta notificação?')">
+        </div>
+    </form>
+</div>
+
+<script>
+function toggleTargetFields() {
+    const target = document.getElementById('id_target').value;
+    const groupField = document.getElementById('group-field');
+    const userFields = document.getElementById('user-fields');
+    const emailField = document.getElementById('email-field');
+    
+    // Esconder todos os campos
+    groupField.style.display = 'none';
+    userFields.style.display = 'none';
+    emailField.style.display = 'none';
+    
+    // Mostrar campos relevantes
+    if (target === 'group') {
+        groupField.style.display = 'block';
+    } else if (target === 'user') {
+        userFields.style.display = 'block';
+        emailField.style.display = 'block';
+    }
+}
+
+// Executar na carga da página
+document.addEventListener('DOMContentLoaded', function() {
+    toggleTargetFields();
+});
+
+function validateJson(textarea) {
+    const value = textarea.value.trim();
+    const errorDiv = document.getElementById('json-error');
+    
+    // Se estiver vazio ou for {}, é válido
+    if (!value || value === '{}') {
+        errorDiv.textContent = '';
+        return true;
+    }
+    
+    try {
+        JSON.parse(value);
+        errorDiv.textContent = '';
+        return true;
+    } catch (e) {
+        errorDiv.textContent = 'JSON inválido: ' + e.message;
+        return false;
+    }
+}
+</script>
+
+<style>
+.form-row {
+    margin-bottom: 15px;
+}
+
+.form-row label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-row input, .form-row select, .form-row textarea {
+    width: 100%;
+    max-width: 500px;
+}
+
+.help {
+    font-size: 11px;
+    color: #666;
+    margin-top: 5px;
+}
+
+fieldset {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    padding: 15px;
+}
+
+fieldset h2 {
+    margin-top: 0;
+    color: #333;
+}
+</style>
+{% endblock %}
