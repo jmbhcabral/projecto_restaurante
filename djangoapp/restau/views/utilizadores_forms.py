@@ -1,18 +1,21 @@
 ''' Este módulo contém as views para as operações de compra e oferta de pontos de fidelidade. '''
 
 import logging
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import render, redirect, get_object_or_404
+
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
-from fidelidade.forms import ComprasFidelidadeForm, OfertasFidelidadeForm
-from fidelidade.models import ComprasFidelidade, OfertasFidelidade
-from django.db import models, IntegrityError
+from django.db import IntegrityError
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from utils.scanner_input_interpreter import interpretar_dados
+from fidelidade.forms import ComprasFidelidadeForm, OfertasFidelidadeForm
+from fidelidade.models import ComprasFidelidade
+from perfil.views.perfil_api import send_push_notification
 from utils.model_validators import (
-    calcular_total_pontos, calcular_total_pontos_disponiveis
+    calcular_total_pontos,
+    calcular_total_pontos_disponiveis,
 )
+from utils.scanner_input_interpreter import interpretar_dados
 
 logger = logging.getLogger(__name__)
 
@@ -80,6 +83,9 @@ def compras_utilizador(request, utilizador_pk):
                                 perfil = user.perfil
                                 perfil.ultima_actividade = timezone.now()
                                 perfil.save()
+
+                                # Enviar notificação push para o utilizador
+                                send_push_notification(user, 'Pontos adicionados', f'Compra registada com sucesso. Adicionou {compra_fidelidade.pontos_adicionados} pontos.')
 
                                 logger.info(
                                     'LOGGER: Compra registada com sucesso.')
