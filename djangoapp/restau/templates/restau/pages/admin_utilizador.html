@@ -18,6 +18,11 @@
             <span>Aniversário: {{ perfil.data_nascimento }}</span>
         </div>
         <div class="content">   
+            {% if ultima_visita %}
+            <p>Ultima visita: {{ ultima_visita.criado_em }}</p>
+            {% else %}
+            <p>Ultima visita: Nenhuma visita recente.</p>
+            {% endif %}
             {% if ultima_compra %}
             <p>Ultima compra: {{ ultima_compra.criado_em }}</p>
             {% else %}

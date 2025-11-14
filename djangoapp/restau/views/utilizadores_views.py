@@ -1,15 +1,17 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.contrib.auth.models import User
-from perfil.models import Perfil
-from fidelidade.models import ComprasFidelidade, OfertasFidelidade
-from django.db import models
-from operator import attrgetter
 from datetime import datetime
+
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from utils.model_validators import (calcular_total_pontos,
-                                    calcular_total_pontos_disponiveis)
-from utils.listar_compras_ofertas import listar_compras_ofertas
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from fidelidade.ledger import get_movimentos_pontos
+from fidelidade.models import ComprasFidelidade, OfertasFidelidade
+from perfil.models import Perfil
+from utils.model_validators import (
+    calcular_total_pontos,
+    calcular_total_pontos_disponiveis,
+)
 
 
 @login_required
@@ -47,6 +49,11 @@ def admin_utilizadores(request, *args, **kwargs):
 def admin_utilizador(request, utilizador_pk):
     user = get_object_or_404(User, pk=utilizador_pk)
 
+    hoje = timezone.localdate()
+    ultima_visita = ComprasFidelidade.objects.filter(
+        utilizador=user,
+        criado_em__date__lt=hoje
+    ).order_by('-criado_em').first()
     ultima_compra = ComprasFidelidade.objects.filter(
         utilizador=user).order_by('-criado_em').first()
 
@@ -76,6 +83,7 @@ def admin_utilizador(request, utilizador_pk):
         'perfil': user.perfil,
         'total_pontos': total_pontos,
         'total_pontos_disponiveis': total_pontos_disponiveis,
+        'ultima_visita': ultima_visita,
         'ultima_compra': ultima_compra,
         'ultima_oferta': ultima_oferta,
         'dias_sem_comprar': dias_sem_comprar,
@@ -108,7 +116,7 @@ def movimentos(request, utilizador_id):
     #     reverse=True
     # )
 
-    movimentos_user = listar_compras_ofertas(user)
+    movimentos_user = get_movimentos_pontos(user)
 
     context = {
         'movimentos': movimentos_user,

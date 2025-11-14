@@ -1,9 +1,13 @@
 # fidelidade/ledger.py
 from datetime import timedelta
+from typing import TYPE_CHECKING, cast
 
 from django.apps import apps
 from django.db.models import Max, Sum
 from django.utils import timezone
+
+if TYPE_CHECKING:
+    from fidelidade.models import MovimentoPontos
 
 
 def _get_movimento_model():
@@ -115,3 +119,32 @@ def get_days_to_expiry(utilizador, dias_inatividade=45, fidelidade=None):
 
     today = timezone.localdate()
     return (expiry_date - today).days
+
+def get_movimentos_pontos(utilizador):
+    """
+    Lista de movimentos de pontos para um utilizador.
+    """
+    MovimentoPontos = _get_movimento_model()
+    qs = MovimentoPontos.objects.filter(
+        utilizador=utilizador,
+        status="CONFIRMADO",
+        tipo__in=["CREDITO", "DEBITO_RES", "DEBITO_EXP", "AJUSTE"],
+    ).order_by("-criado_em")
+
+    movimentos = []
+    for movimento_raw in qs:
+        movimento = cast("MovimentoPontos", movimento_raw)
+        tipo_display = movimento.get_tipo_display()  # type: ignore[attr-defined]
+        criado_em_local = timezone.localtime(movimento.criado_em)
+        disponivel_amanha = timezone.localdate() <= criado_em_local.date()
+        expirado = movimento.tipo == 'DEBITO_EXP'
+        pontos = float(movimento.pontos)
+        movimentos.append({
+            'data': criado_em_local.strftime('%Y-%m-%d'),
+            'tipo': tipo_display,
+            'pontos': '-' + str(pontos) if movimento.tipo == 'DEBITO_EXP' or movimento.tipo == 'DEBITO_RES' else pontos,
+            'cor': 'orange' if disponivel_amanha else 'red' if expirado else 'green' if movimento.tipo == 'CREDITO' else 'blue',
+            'disponivel_amanha': disponivel_amanha,
+            'expirado': expirado,
+        })
+    return movimentos
