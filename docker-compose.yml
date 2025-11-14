@@ -17,12 +17,57 @@ services:
       - ./dotenv_files/.env
     depends_on:
       - psql
+      - redis   # 👈 novo: garantir que redis arranca antes
+
+  celery_worker:
+    container_name: celery_worker
+    build:
+      context: .
+    command: celery -A project worker -l info
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./djangoapp:/djangoapp
+      - ./data/web/static:/data/web/static/
+      - ./data/web/media:/data/web/media/
+    env_file:
+      - ./dotenv_files/.env
+    depends_on:
+      - psql
+      - redis
+
+  celery_beat:
+    container_name: celery_beat
+    build:
+      context: .
+    command: celery -A project beat -l info
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./djangoapp:/djangoapp
+      - ./data/web/static:/data/web/static/
+      - ./data/web/media:/data/web/media/
+    env_file:
+      - ./dotenv_files/.env
+    depends_on:
+      - psql
+      - redis
+
+  redis:
+    container_name: redis
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    # Se quiseres persistir dados do Redis (não é obrigatório para Celery):
+    # volumes:
+    #   - ./data/redis:/data
+
   psql:
     container_name: psql
     image: postgres:13-alpine
     volumes:
       - ./data/postgres/data:/var/lib/postgresql/data/
     ports:
-    - 5433:5432
+      - 5433:5432
     env_file:
       - ./dotenv_files/.env

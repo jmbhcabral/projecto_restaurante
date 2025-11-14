@@ -1,9 +1,9 @@
 ''' Este ficheiro contém os modelos de dados da aplicação fidelidade '''
 
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 from django.utils import timezone
-from restau.models import Products, Ementa
+from restau.models import Ementa, Products
 from utils.model_validators import calcular_pontos
 
 
@@ -142,6 +142,81 @@ class OfertasFidelidade(models.Model):
 
     def __str__(self):
         return f" {self.fidelidade} - {self.utilizador} "
+    
+
+class MovimentoPontos(models.Model):
+    class Tipo(models.TextChoices):
+        CREDITO = "CREDITO", "Crédito"          # compras, bónus
+        DEBITO_RES = "DEBITO_RES", "Resgate"    # oferta / consumo
+        DEBITO_EXP = "DEBITO_EXP", "Expiração"  # expiração por inatividade
+        AJUSTE = "AJUSTE", "Ajuste"             # correções manuais
+
+    class Status(models.TextChoices):
+        PENDENTE = "PENDENTE", "Pendente"
+        CONFIRMADO = "CONFIRMADO", "Confirmado"
+        CANCELADO = "CANCELADO", "Cancelado"
+
+    utilizador = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="movimentos_pontos",
+    )
+
+    fidelidade = models.ForeignKey(
+        "Fidelidade",
+        on_delete=models.CASCADE,
+        related_name="movimentos_pontos",
+    )
+
+    tipo = models.CharField(
+        max_length=20,
+        choices=Tipo.choices,
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.CONFIRMADO,
+    )
+
+    # pontos POSITIVOS; o sinal é dado pelo tipo (crédito vs débito)
+    pontos = models.DecimalField(
+        max_digits=10,
+        decimal_places=3,
+    )
+
+    # ligações aos registos antigos (opcional mas muito útil para auditoria)
+    compra = models.ForeignKey(
+        "ComprasFidelidade",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="movimentos_pontos",
+    )
+
+    oferta = models.ForeignKey(
+        "OfertasFidelidade",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="movimentos_pontos",
+    )
+
+    criado_em = models.DateTimeField(
+        default=timezone.now,
+    )
+
+    class Meta:
+        verbose_name = "Movimento de Pontos"
+        verbose_name_plural = "Movimentos de Pontos"
+        indexes = [
+            models.Index(fields=["utilizador", "fidelidade", "status"]),
+            models.Index(fields=["utilizador", "criado_em"]),
+            models.Index(fields=["tipo"]),
+        ]
+
+    def __str__(self):
+        return f"{self.utilizador} - {self.tipo} - {self.pontos}"
 
 
 class Perguntas(models.Model):

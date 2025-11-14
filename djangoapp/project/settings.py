@@ -13,6 +13,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from celery.schedules import crontab  # type: ignore
 from django.contrib.messages import constants
 from dotenv import load_dotenv
 
@@ -239,3 +240,28 @@ EMAIL_USE_SSL = bool(os.getenv('EMAIL_USE_SSL', None))
 
 # Frontend URL
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'change-me')
+
+# Forçar import explícito de tasks
+CELERY_IMPORTS = ("fidelidade.tasks",)
+
+CELERY_BROKER_URL = os.getenv(
+    "CELERY_BROKER_URL",
+    "redis://redis:6379/0",  # default para Docker
+)
+CELERY_RESULT_BACKEND = os.getenv(
+    "CELERY_RESULT_BACKEND",
+    "redis://redis:6379/1",
+)
+
+CELERY_TIMEZONE = "Europe/Lisbon"
+CELERY_ENABLE_UTC = False
+
+
+
+CELERY_BEAT_SCHEDULE = {
+    "expirar_pontos_inativos_diariamente": {
+        "task": "fidelidade.tasks.expirar_pontos_inativos_task",
+        "schedule": crontab(hour=9, minute=0),  # todos os dias às 09:00
+        "args": (45,),  # dias de inactividade
+    },
+}

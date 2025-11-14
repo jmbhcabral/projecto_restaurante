@@ -1,8 +1,14 @@
 from django.contrib import admin
+
 from fidelidade.models import (
-    Fidelidade, ProdutoFidelidadeIndividual,
-    ComprasFidelidade, OfertasFidelidade, Perguntas, Respostas,
-    RespostaFidelidade
+    ComprasFidelidade,
+    Fidelidade,
+    MovimentoPontos,
+    OfertasFidelidade,
+    Perguntas,
+    ProdutoFidelidadeIndividual,
+    RespostaFidelidade,
+    Respostas,
 )
 
 
@@ -67,6 +73,13 @@ class OfertasFidelidadeAdmin(admin.ModelAdmin):
                 )
     list_editable = ('processado',)
 
+
+@admin.register(MovimentoPontos)
+class MovimentoPontosAdmin(admin.ModelAdmin):
+    list_display = ('id', 'utilizador', 'fidelidade', 'tipo', 'status', 'pontos', 'criado_em')
+    search_fields = ('id', 'utilizador__username', 'fidelidade__nome', 'tipo', 'status', 'pontos', 'criado_em')
+    list_filter = ('id', 'utilizador__username', 'fidelidade__nome', 'tipo', 'status', 'pontos', 'criado_em')
+    ordering = ('id', 'utilizador__username', 'fidelidade__nome', 'tipo', 'status', 'pontos', 'criado_em')
 
 @admin.register(Perguntas)
 class PerguntasAdmin(admin.ModelAdmin):
