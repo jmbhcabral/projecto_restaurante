@@ -1,0 +1,37 @@
+# Tipo de commit (escolhe um e apaga os outros):
+# feat:     Nova funcionalidade
+# fix:      Correção de bug
+# style:    Ajuste de estilos (CSS, layout, classes Tailwind)
+# refactor: Reestruturação de código sem alteração funcional
+# test:     Adição ou modificação de testes
+# chore:    Tarefas auxiliares (configs, dependências, CI)
+# docs:     Documentação
+# ci:       Integração contínua (CI/CD)
+# build:    Alterações de build (vite, next.config, etc)
+# revert:   Reversão de commit
+
+<tipo>(<escopo>): <mensagem curta no infinitivo>
+
+# Linha em branco
+# Descrição longa opcional (usa se necessário) – explica o porquê da alteração,
+# o que mudou tecnicamente, ou quais os efeitos secundários.
+
+# Exemplos:
+
+# feat(auth): adicionar login de utilizadores
+#
+# Implementa autenticação com e-mail e password via Firebase.
+# Inclui verificação de erros com toast e redirecionamento por role.
+
+# fix(onboarding): corrigir falha ao guardar dados incompletos
+#
+# Corrige erro causado por falta de verificação no schema Zod.
+# Agora bloqueia submissão caso o nome esteja vazio.
+
+# style(hero): ajustar espaçamento e cores no call to action
+
+# refactor(auth): simplificar lógica de verificação de e-mail
+
+# chore(firebase): atualizar regras de acesso ao Firestore
+
+# docs(readme): adicionar instruções de deploy na Vercel
