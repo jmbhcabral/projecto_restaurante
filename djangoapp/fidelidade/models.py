@@ -266,3 +266,31 @@ class RespostaFidelidade(models.Model):
 
     def __str__(self):
         return f"{self.resposta}"
+
+
+class NotificacaoAutomatica(models.Model):
+    TIPO_CHOICES = [
+        ('birthday_minus_8', 'Aniversário -8 dias'),
+        ('birthday_day', 'Aniversário - dia'),
+        ('points_minus_15', 'Pontos -15 dias'),
+        ('points_minus_7', 'Pontos -7 dia'),
+        ('points_minus_1', 'Pontos -1 dia'),
+    ]
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE)
+    
+    tipo = models.CharField(
+        max_length=50,
+        choices=TIPO_CHOICES,
+    )
+
+    referencia_data = models.DateField()
+    enviado_em = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    class Meta:
+        unique_together = ('user', 'tipo', 'referencia_data')
+        # garante que não mandas 2x a mesma notificação para o mesmo user / mesmo evento
