@@ -179,7 +179,8 @@ def ofertas_utilizador(request, utilizador_id):
 
         if form.is_valid():
             ofertas = form.save(commit=False)
-            if ofertas.pontos_gastos is not None and \
+            
+            if (ofertas.pontos_gastos is not None and ofertas.pontos_gastos > 0) and \
                     total_pontos_disponiveis >= ofertas.pontos_gastos:
                 ofertas.utilizador = user
                 ofertas.fidelidade = user.perfil.tipo_fidelidade
