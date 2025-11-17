@@ -95,7 +95,6 @@ def enviar_avisos_aniversario_task():
             user=user,
             title="Falta pouco para o teu aniversário 🎂",
             body="Garante já a tua reserva para a festa na Hamburgueria Extreme Way!",
-            data={"tipo": "birthday_minus_8"},
         )
 
         NotificacaoAutomatica.objects.create(
@@ -129,7 +128,6 @@ def enviar_avisos_aniversario_task():
             user=user,
             title="Parabéns! 🎂",
             body="Passa por cá hoje e celebra o teu dia connosco!",
-            data={"tipo": "birthday_day"},
         )
 
         NotificacaoAutomatica.objects.create(
@@ -194,12 +192,7 @@ def enviar_avisos_pontos_a_expirar_task():
         send_push_notification(
             user=user,
             title=subject,
-            body=f"Tens {balance} pontos que expiram em {remaining_days} dia(s). Aproveita!",
-            data={
-                "tipo": tipo,
-                "remaining_days": remaining_days,
-                "expiration_date": str(expiration_date),
-            },
+            body=f"Tens {balance:.2f} pontos que expiram em {remaining_days} dia(s). Aproveita!",
         )
 
         NotificacaoAutomatica.objects.create(
