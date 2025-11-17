@@ -242,26 +242,36 @@ EMAIL_USE_SSL = bool(os.getenv('EMAIL_USE_SSL', None))
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'change-me')
 
 # Forçar import explícito de tasks
-CELERY_IMPORTS = ("fidelidade.tasks",)
+CELERY_IMPORTS = ('fidelidade.tasks',)
 
 CELERY_BROKER_URL = os.getenv(
-    "CELERY_BROKER_URL",
-    "redis://redis:6379/0",  # default para Docker
+    'CELERY_BROKER_URL',
+    'redis://redis:6379/0',  # default para Docker
 )
 CELERY_RESULT_BACKEND = os.getenv(
-    "CELERY_RESULT_BACKEND",
-    "redis://redis:6379/1",
+    'CELERY_RESULT_BACKEND',
+    'redis://redis:6379/1',
 )
 
-CELERY_TIMEZONE = "Europe/Lisbon"
+CELERY_TIMEZONE = 'Europe/Lisbon'
 CELERY_ENABLE_UTC = False
 
 
 
 CELERY_BEAT_SCHEDULE = {
-    "expirar_pontos_inativos_diariamente": {
-        "task": "fidelidade.tasks.expirar_pontos_inativos_task",
-        "schedule": crontab(hour=9, minute=0),  # todos os dias às 09:00
-        "args": (45,),  # dias de inactividade
+    'expirar_pontos_inativos_diariamente': {
+        'task': 'fidelidade.tasks.expirar_pontos_inativos_task',
+        'schedule': crontab(hour=9, minute=0),  # todos os dias às 09:00
+        'args': (45,),  # dias de inactividade
+    },
+
+    'avisos_aniversario_diarios': {
+        'task': 'fidelidade.tasks.enviar_avisos_aniversario_task',
+        'schedule': crontab(hour=10, minute=0),  # todos os dias às 10:00
+    },
+
+    'avisos_pontos_a_expirar_diarios': {
+        'task': 'fidelidade.tasks.enviar_avisos_pontos_a_expirar_task',
+        'schedule': crontab(hour=10, minute=5),  # todos os dias às 10:05
     },
 }
