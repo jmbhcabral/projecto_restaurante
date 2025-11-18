@@ -1,16 +1,10 @@
 from django.urls import path
-from restau import views
-from restau.views.versao_api_view import UltimaVersaoAPIView
-from restau.views import (
-    MyTokenObtainPairView, MyTokenRefreshView
-)
 from rest_framework.routers import SimpleRouter
-from rest_framework_simplejwt.views import (
-    # TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView
-)
+from rest_framework_simplejwt.views import TokenVerifyView  # TokenObtainPairView,
 
+from restau import views
+from restau.views import MyTokenObtainPairView, MyTokenRefreshView
+from restau.views.versao_api_view import UltimaVersaoAPIView
 
 # namespace
 app_name = 'restau'
@@ -453,6 +447,12 @@ urlpatterns = [
         views.editar_horario,  # type: ignore
         name='editar_horario'
     ),
+    # Admin-Estatisticas
+    path(
+        'restau/pages/admin_estatisticas/',
+        views.admin_estatisticas,  # type: ignore
+        name='admin_estatisticas'
+    ),  
     # Admin-Utilizadores
     path(
         'restau/pages/admin_utilizadores/',

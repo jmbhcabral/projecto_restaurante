@@ -1,0 +1,35 @@
+{% extends "restau/base.html" %}
+{% block content %}
+<div class="section-content-wide content">
+    {% include "restau/partials/_estatisticas_menu.html" %}
+    <div>
+        {% include 'restau/partials/_messages.html' %}
+    </div>
+    <div class="conta-content">
+            <h2>Estatísticas Gerais</h2>
+            <div class="conta-row">
+            <div class="content">
+                <h3>Utilizadores</h3>
+                <p>utilizadores: {{ utilizadores.count }}</p>
+                <p>utilizadores ativos: {{ utilizadores_ativos.count }}</p>
+                <p>utilizadores inativos: {{ utilizadores_inativos.count }}</p>
+            </div>
+
+            <div class="content">
+                <h3>Pontos</h3>
+                <p>Total de Pontos ganhos: {{ total_pontos_ganhos|floatformat:2 }}</p>
+                <p>Total de Pontos gastos: {{ total_pontos_gastos|floatformat:2 }}</p>
+                <p>Total de Pontos expirados: {{ total_pontos_expirados|floatformat:2 }}</p>
+            </div>
+
+            <div class="content">
+                <h3>Compras/Ofertas</h3>
+                <p>Total de compras: {{ total_compras }}</p>
+                <p>Total de ofertas: {{ total_ofertas }}</p>
+            </div>
+            </div>
+        </div>
+          
+    </div>
+</div>
+{% endblock %}

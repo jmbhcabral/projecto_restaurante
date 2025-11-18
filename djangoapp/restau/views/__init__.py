@@ -16,3 +16,4 @@ from .galeria_views import *
 from .utilizadores_views import *
 from .utilizadores_forms import *
 from .produtos_api import *
+from .estatisticas_views import *
