@@ -4,6 +4,7 @@ from fidelidade.models import (
     ComprasFidelidade,
     Fidelidade,
     MovimentoPontos,
+    NotificacaoAutomatica,
     OfertasFidelidade,
     Perguntas,
     ProdutoFidelidadeIndividual,
@@ -103,3 +104,11 @@ class RespostaFidelidadeAdmin(admin.ModelAdmin):
     search_fields = ('id', 'resposta__resposta', 'tipo_fidelidade__nome')
     list_filter = ('id', 'resposta__resposta', 'tipo_fidelidade__nome')
     ordering = ('id', 'resposta__resposta', 'tipo_fidelidade__nome')
+
+
+@admin.register(NotificacaoAutomatica)
+class NotificacaoAutomaticaAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'tipo', 'referencia_data', 'enviado_em')
+    search_fields = ('id', 'user__username', 'tipo', 'referencia_data', 'enviado_em')
+    list_filter = ('id', 'user__username', 'tipo', 'referencia_data', 'enviado_em')
+    ordering = ('id', 'user__username', 'tipo', 'referencia_data', 'enviado_em')
