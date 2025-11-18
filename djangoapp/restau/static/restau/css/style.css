@@ -1222,7 +1222,12 @@ body.frontend {
 
 .popup-content {
 	text-align: center;
-}
+	gap: 1rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	}
 
 .menu-btn:hover {
 	filter: brightness(90%);
