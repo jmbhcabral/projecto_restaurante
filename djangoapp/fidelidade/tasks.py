@@ -134,7 +134,7 @@ def enviar_avisos_aniversario_task():
             user=user, tipo="birthday_day", referencia_data=data_ref
         )
 
-
+@shared_task
 def enviar_avisos_pontos_a_expirar_task():
     """
     Task periódica que:
