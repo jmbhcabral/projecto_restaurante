@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'senhas',
     'app_version',
     'google_reviews',
+    'commerce',
     'crispy_forms',
 ]
 
