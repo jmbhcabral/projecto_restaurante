@@ -12,6 +12,9 @@ urlpatterns = [
     path('', include('restau.urls')),
     path('', include('perfil.urls')),
     path('', include('fidelidade.urls')),
+    path('api/catalog/', include('commerce.api.catalog_urls')),
+    path('api/commerce/', include('commerce.api.urls')),
+    path('api/commerce/admin/', include('commerce.api.admin_urls')),
     path('admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL,
            document_root=settings.MEDIA_ROOT)
