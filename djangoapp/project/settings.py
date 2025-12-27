@@ -17,9 +17,6 @@ from celery.schedules import crontab  # type: ignore
 from django.contrib.messages import constants
 from dotenv import load_dotenv
 
-load_dotenv()
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR.parent / 'data' / 'web'
@@ -81,7 +78,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'project.urls'
+ROOT_URLCONF = 'djangoapp.project.urls'
 
 TEMPLATES = [
     {
@@ -100,7 +97,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'project.wsgi.application'
+WSGI_APPLICATION = 'djangoapp.project.wsgi.application'
 
 
 # Database
@@ -235,15 +232,22 @@ EMAIL_HOST = os.getenv('EMAIL_HOST', 'change-me')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', 'change-me'))
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'change-me')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'change-me')
-EMAIL_USE_TLS = bool(os.getenv('EMAIL_USE_TLS', None))
-EMAIL_USE_SSL = bool(os.getenv('EMAIL_USE_SSL', None))
+
+def env_bool(key: str, default: bool = False) -> bool:
+    v = os.getenv(key)
+    if v is None:
+        return default
+    return v.strip().lower() in ("1", "true", "yes", "on")
+
+EMAIL_USE_TLS = env_bool('EMAIL_USE_TLS', False)
+EMAIL_USE_SSL = env_bool('EMAIL_USE_SSL', False)
 
 
 # Frontend URL
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'change-me')
 
 # Forçar import explícito de tasks
-CELERY_IMPORTS = ('fidelidade.tasks',)
+CELERY_IMPORTS = ('djangoapp.fidelidade.tasks',)
 
 CELERY_BROKER_URL = os.getenv(
     'CELERY_BROKER_URL',
@@ -253,26 +257,27 @@ CELERY_RESULT_BACKEND = os.getenv(
     'CELERY_RESULT_BACKEND',
     'redis://redis:6379/1',
 )
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
-CELERY_TIMEZONE = 'Europe/Lisbon'
+CELERY_TIMEZONE = TIME_ZONE
 CELERY_ENABLE_UTC = False
 
 
 
 CELERY_BEAT_SCHEDULE = {
     'expirar_pontos_inativos_diariamente': {
-        'task': 'fidelidade.tasks.expirar_pontos_inativos_task',
+        'task': 'djangoapp.fidelidade.tasks.expirar_pontos_inativos_task',
         'schedule': crontab(hour=9, minute=0),  # todos os dias às 09:00
         'args': (45,),  # dias de inactividade
     },
 
     'avisos_aniversario_diarios': {
-        'task': 'fidelidade.tasks.enviar_avisos_aniversario_task',
+        'task': 'djangoapp.fidelidade.tasks.enviar_avisos_aniversario_task',
         'schedule': crontab(hour=10, minute=0),  # todos os dias às 10:00
     },
 
     'avisos_pontos_a_expirar_diarios': {
-        'task': 'fidelidade.tasks.enviar_avisos_pontos_a_expirar_task',
+        'task': 'djangoapp.fidelidade.tasks.enviar_avisos_pontos_a_expirar_task',
         'schedule': crontab(hour=10, minute=5),  # todos os dias às 10:05
     },
 }
