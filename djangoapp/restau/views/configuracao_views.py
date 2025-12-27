@@ -338,7 +338,7 @@ def horario(request):
 
     horarios_ordenados = sorted(
         horarios,
-        key=lambda x: dict_horarios.get(x.dia_semana, 0),  # type: ignore
+        key=lambda x: dict_horarios.get(x.dia_semana, 0),
     )
 
     active_setup = ActiveSetup.objects.first()

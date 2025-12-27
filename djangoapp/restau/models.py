@@ -1,11 +1,14 @@
 from decimal import Decimal
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional, cast
 
 from django.db import models
 
 from djangoapp.utils.images import resize_image
 from djangoapp.utils.model_validators import positive_price
 
+if TYPE_CHECKING:
+    # Only for typing, never imported at runtime
+    ManyRelatedManager = Any
 
 class Category(models.Model):
     class Meta:
@@ -48,7 +51,7 @@ class Percentage(models.Model):
         max_digits=5,
         decimal_places=2,
         help_text='Percentagem de desconto (de 0 a 100)',
-        default=0.0  # type: ignore
+        default=0.0
     )
 
     def __str__(self):
@@ -665,11 +668,15 @@ class ActiveSetup(models.Model):
         blank=True,
     )
 
-    active_horario = models.ManyToManyField(
-        'Horario',
-        related_name='active_horario_set',
-        blank=True,
+    active_horario = cast(
+        Any,
+        models.ManyToManyField(
+            "Horario",
+            related_name="active_horario_set",
+            blank=True,
+        ),
     )
+    
 
     def __str__(self):
         return 'Configurações ativas'

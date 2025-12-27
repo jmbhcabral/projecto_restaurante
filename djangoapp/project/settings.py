@@ -13,7 +13,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
-from celery.schedules import crontab  # type: ignore
+from celery.schedules import crontab
 from django.contrib.messages import constants
 from dotenv import load_dotenv
 

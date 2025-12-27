@@ -73,9 +73,9 @@ class ComprasFidelidade(models.Model):
 
     utilizador = models.ForeignKey(
         User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        on_delete=models.PROTECT,
+        null=False,
+        blank=False,
         default=None,
     )
 
@@ -121,9 +121,9 @@ class OfertasFidelidade(models.Model):
 
     utilizador = models.ForeignKey(
         User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        on_delete=models.PROTECT,
+        null=False,
+        blank=False,
         default=None,
     )
 

@@ -134,7 +134,7 @@ def get_movimentos_pontos(utilizador):
     movimentos = []
     for movimento_raw in qs:
         movimento = cast("MovimentoPontos", movimento_raw)
-        tipo_display = movimento.get_tipo_display()  # type: ignore[attr-defined]
+        tipo_display = movimento.get_tipo_display()
         criado_em_local = timezone.localtime(movimento.criado_em)
         disponivel_amanha = timezone.localdate() <= criado_em_local.date() if movimento.tipo == 'CREDITO' else False
         expirado = movimento.tipo == 'DEBITO_EXP'

@@ -160,7 +160,7 @@ def escolher_logo(request,):
                 active_setup = ActiveSetup.objects.first()
 
                 if active_setup:
-                    active_setup.active_imagem_logo = logo  # type: ignore
+                    active_setup.active_imagem_logo = logo
                     active_setup.save()
 
                 messages.success(
@@ -280,7 +280,7 @@ def escolher_imagem_topo(request,):
                 active_setup = ActiveSetup.objects.first()
 
                 if active_setup:
-                    active_setup.active_imagem_topo = imagem  # type: ignore
+                    active_setup.active_imagem_topo = imagem
                     active_setup.save()
 
                 messages.success(
@@ -393,7 +393,7 @@ def escolher_intro(request,):
                 active_setup = ActiveSetup.objects.first()
 
                 if active_setup:
-                    active_setup.active_intro = (  # type: ignore
+                    active_setup.active_intro = (
                         texto
                     )
                     active_setup.save()
@@ -516,7 +516,7 @@ def escolher_intro_imagem(request,):
                 active_setup = ActiveSetup.objects.first()
 
                 if active_setup:
-                    active_setup.active_intro_imagem = imagem  # type: ignore
+                    active_setup.active_intro_imagem = imagem
                     active_setup.save()
 
                 messages.success(
@@ -630,7 +630,7 @@ def escolher_frase_cima(request,):
                 active_setup = ActiveSetup.objects.first()
 
                 if active_setup:
-                    active_setup.active_frase_cima = (  # type: ignore
+                    active_setup.active_frase_cima = (
                         texto
                     )
                     active_setup.save()
@@ -754,7 +754,7 @@ def escolher_imagem_frase_cima(request,):
                 active_setup = ActiveSetup.objects.first()
 
                 if active_setup:
-                    active_setup.active_imagem_frase_cima = (  # type: ignore
+                    active_setup.active_imagem_frase_cima = (
                         imagem
                     )
                     active_setup.save()
@@ -988,7 +988,7 @@ def escolher_frase_baixo(request,):
                 active_setup = ActiveSetup.objects.first()
 
                 if active_setup:
-                    active_setup.active_frase_baixo = (  # type: ignore
+                    active_setup.active_frase_baixo = (
                         texto
                     )
                     active_setup.save()
@@ -1112,7 +1112,7 @@ def escolher_imagem_frase_baixo(request,):
                 active_setup = ActiveSetup.objects.first()
 
                 if active_setup:
-                    active_setup.active_imagem_frase_baixo = (  # type: ignore
+                    active_setup.active_imagem_frase_baixo = ( 
                         imagem
                     )
                     active_setup.save()
@@ -1236,7 +1236,7 @@ def escolher_imagem_padrao(request,):
                 active_setup = ActiveSetup.objects.first()
 
                 if active_setup:
-                    active_setup.active_imagem_padrao = (  # type: ignore
+                    active_setup.active_imagem_padrao = (
                         imagem
                     )
                     active_setup.save()
