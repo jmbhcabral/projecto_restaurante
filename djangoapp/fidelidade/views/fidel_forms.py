@@ -1,3 +1,8 @@
+# djangoapp/fidelidade/views/fidel_forms.py
+from __future__ import annotations
+
+from typing import Any, cast
+
 from django.contrib import messages
 from django.forms import formset_factory
 from django.shortcuts import get_object_or_404, redirect, render
@@ -133,10 +138,11 @@ def pontos_produtos_fidelidade(request, fidelidade_id):
                   .all()
                   .order_by('ordem'))
     subcategorias = SubCategory.objects.all().order_by('ordem')
-    produtos = (ementa.produtos
-                .select_related('categoria', 'subcategoria')
-                .all()
-                .order_by('ordem'))
+    produtos = (
+        cast(Any,ementa).produtos
+        .select_related('categoria', 'subcategoria')
+        .all()
+        .order_by('ordem'))
 
     form_action = reverse(
         'fidelidade:pontos_produtos_fidelidade', args=(fidelidade_id,))
