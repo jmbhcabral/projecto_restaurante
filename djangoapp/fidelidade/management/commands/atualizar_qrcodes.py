@@ -12,9 +12,9 @@ class Command(BaseCommand):
     help = 'Atualiza os QR codes de todos os perfis'
 
     def handle(self, *args, **kwargs):
-        perfis = Perfil.objects.all()
+        perfis = Perfil.objects.select_related("usuario").all()
+
         for perfil in perfis:
-            # Gere o QR Code com base nas informações do perfil
             dados_perfil = {
                 "Username": perfil.usuario.username,
                 "Email": perfil.usuario.email,
@@ -23,10 +23,8 @@ class Command(BaseCommand):
                 "Telemovel": perfil.telemovel,
             }
 
-            # Convertendo os dados para JSON
             dados_json = json.dumps(dados_perfil)
 
-            # Configuração do Qr Code
             qr = qrcode.QRCode(
                 version=1,
                 error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -34,22 +32,20 @@ class Command(BaseCommand):
                 border=4,
             )
 
-            # Adicionando os dados JSON ao Qr Code
             qr.add_data(dados_json)
             qr.make(fit=True)
 
-            # Criar um buffer para o QR Code
             img_qr = qr.make_image(fill_color="black", back_color="white")
 
             img_io = BytesIO()
-            img_qr.save(img_io, 'PNG')
-            filename = f'qrcode_{perfil.numero_cliente}.png'
-            perfil.qr_code.save(
-                filename, File(img_io), save=True)
+            img_qr.save(img_io, format="PNG")
+            img_io.seek(0)
 
-            print(f'QR Code atualizado para {perfil.numero_cliente}')
+            filename = f"qrcode_{perfil.numero_cliente}.png"
+            perfil.qr_code.save(filename, File(img_io), save=True)
+
             self.stdout.write(self.style.SUCCESS(
-                f'QR Code atualizado para {perfil.numero_cliente}'
+                f"QR Code atualizado para {perfil.numero_cliente}"
             ))
 
-        print('Todos os QR Codes atualizados')
+        self.stdout.write(self.style.SUCCESS("Todos os QR Codes atualizados"))
