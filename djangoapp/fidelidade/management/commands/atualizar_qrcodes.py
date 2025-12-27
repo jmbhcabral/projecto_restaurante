@@ -1,9 +1,11 @@
-from django.core.management.base import BaseCommand
-from models import Perfil
-from io import BytesIO
-from django.core.files import File
-import qrcode
 import json
+from io import BytesIO
+
+import qrcode
+from django.core.files import File
+from django.core.management.base import BaseCommand
+
+from djangoapp.perfil.models import Perfil
 
 
 class Command(BaseCommand):
