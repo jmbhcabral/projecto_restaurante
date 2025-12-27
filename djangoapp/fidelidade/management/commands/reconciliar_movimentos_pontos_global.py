@@ -1,4 +1,5 @@
 # fidelidade/management/commands/reconciliar_movimentos_pontos_global.py
+from __future__ import annotations
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
