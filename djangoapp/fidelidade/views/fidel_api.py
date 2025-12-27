@@ -1,4 +1,8 @@
+# djangoapp/fidelidade/views/fidel_api.py
+from __future__ import annotations
+
 from collections import defaultdict
+from typing import Any, DefaultDict
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -48,31 +52,32 @@ class ProdutoFidelidadeAPI(APIView):
             data = serializer.data
 
             # Restruturar dados para serem apresentados no frontend
-            categorias = defaultdict(lambda: defaultdict(list))
+            categorias: DefaultDict[Any, DefaultDict[Any, list[Any]]] = defaultdict(lambda: defaultdict(list))
+
             for item in data:
-                categoria = item['nome_categoria']
-                subcategoria = item.get('nome_subcategoria')
-                if categoria:  # Verificar se existe categoria
+                categoria = item["nome_categoria"]
+                subcategoria = item.get("nome_subcategoria")
+                if categoria:
                     produto = {
-                        'nome_produto': item['nome_produto'],
-                        'pontos_recompensa': item['pontos_recompensa'],
-                        'pontos_para_oferta': item['pontos_para_oferta'],
+                        "nome_produto": item["nome_produto"],
+                        "pontos_recompensa": item["pontos_recompensa"],
+                        "pontos_para_oferta": item["pontos_para_oferta"],
                     }
                     if subcategoria:
                         categorias[categoria][subcategoria].append(produto)
                     else:
-                        categorias[categoria]['Sem subcategoria'].append(
-                            produto)
-            # Remover categorias e subcategorias vazias
-            categorias = {cat: subcats for cat,
-                          subcats in categorias.items() if subcats}
-            for cat in categorias:
-                categorias[cat] = {subcat: prods for subcat,
-                                   prods in categorias[cat].items() if prods}
+                        categorias[categoria]["Sem subcategoria"].append(produto)
+
+            # Remover categorias e subcategorias vazias (sem mudar o tipo de `categorias`)
+            categorias_filtradas: dict[Any, dict[Any, list[Any]]] = {
+                cat: {subcat: prods for subcat, prods in subcats.items() if prods}
+                for cat, subcats in categorias.items()
+                if subcats
+            }
 
             # Converter a estrutura de dicionario para uma lista de categorias
             resultado_ordenado = []
-            for categoria, subcats in categorias.items():
+            for categoria, subcats in categorias_filtradas.items():
                 categoria_dict = {
                     'categoria': categoria,
                     'subcategorias': []
