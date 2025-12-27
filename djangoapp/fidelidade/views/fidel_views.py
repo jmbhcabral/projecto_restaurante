@@ -1,3 +1,6 @@
+# djangoapp/fidelidade/views/fidel_views.py
+from __future__ import annotations
+
 from itertools import zip_longest
 
 from django.contrib import messages
@@ -46,79 +49,72 @@ def fidelidade(request, fidelidade_id):
 
 
 def util_ind_fidelidade(request, utilizador_pk):
-    user = get_object_or_404(
-        User, pk=utilizador_pk
+    user = get_object_or_404(User, pk=utilizador_pk)
+
+    tipo_fidelidade = user.perfil.tipo_fidelidade
+    if tipo_fidelidade is None:
+        messages.error(request, "O utilizador não tem uma fidelidade associada no perfil.")
+        return redirect("fidelidade:fidelidades") # TODO: ajustar para uma rota que faça sentido no projecto
+    pontos_ganhos = ComprasFidelidade.objects.filter(utilizador=user).aggregate(
+        total_pontos_ganhos=models.Sum("pontos_adicionados")
+    )
+    pontos_gastos = OfertasFidelidade.objects.filter(utilizador=user).aggregate(
+        total_pontos_gastos=models.Sum("pontos_gastos")
     )
 
-    pontos_ganhos = ComprasFidelidade.objects.filter(
-        utilizador=user).aggregate(
-        total_pontos_ganhos=models.Sum('pontos_adicionados'))
-    pontos_gastos = OfertasFidelidade.objects.filter(
-        utilizador=user).aggregate(
-        total_pontos_gastos=models.Sum('pontos_gastos'))
-
-    pontos_ganhos_decimal = pontos_ganhos['total_pontos_ganhos'] or 0
-    pontos_gastos_decimal = pontos_gastos['total_pontos_gastos'] or 0
-
+    pontos_ganhos_decimal = pontos_ganhos["total_pontos_ganhos"] or 0
+    pontos_gastos_decimal = pontos_gastos["total_pontos_gastos"] or 0
     total_pontos = pontos_ganhos_decimal - pontos_gastos_decimal
 
-    if request.method == 'POST':
-        form_type = request.POST.get('form_type', None)
-        if form_type == 'compras':
+    if request.method == "POST":
+        form_type = request.POST.get("form_type", None)
+
+        if form_type == "compras":
             initial_data_compras = {
-                'fidelidade': user.perfil.tipo_fidelidade.id,
-                'utilizador': utilizador_pk,
+                "fidelidade": tipo_fidelidade.id,
+                "utilizador": utilizador_pk,
             }
-            compras_form = ComprasFidelidadeForm(
-                request.POST, initial=initial_data_compras)
+            compras_form = ComprasFidelidadeForm(request.POST, initial=initial_data_compras)
 
             if compras_form.is_valid():
                 compras = compras_form.save(commit=False)
-                compras.fidelidade_id = user.perfil.tipo_fidelidade.id
+                compras.fidelidade_id = tipo_fidelidade.id
                 compras.utilizador_id = utilizador_pk
                 compras.save()
-                return redirect(
-                    'fidelidade:util_ind_fidelidade',
-                    utilizador_pk=utilizador_pk
-                )
-            else:
+                return redirect("fidelidade:util_ind_fidelidade", utilizador_pk=utilizador_pk)
 
-                print('compras_form.errors: ', compras_form.errors)
-        elif form_type == 'ofertas':
+            print("compras_form.errors: ", compras_form.errors)
+
+        elif form_type == "ofertas":
             initial_data_ofertas = {
-                'fidelidade': user.perfil.tipo_fidelidade.id,
-                'utilizador': utilizador_pk,
+                "fidelidade": tipo_fidelidade.id,
+                "utilizador": utilizador_pk,
             }
-            ofertas_form = OfertasFidelidadeForm(
-                request.POST, initial=initial_data_ofertas)
+            ofertas_form = OfertasFidelidadeForm(request.POST, initial=initial_data_ofertas)
 
             if ofertas_form.is_valid():
                 ofertas = ofertas_form.save(commit=False)
-                if ofertas.pontos_gastos is not None and \
-                        total_pontos >= ofertas.pontos_gastos:
-                    ofertas.fidelidade_id = user.perfil.tipo_fidelidade.id
+                if ofertas.pontos_gastos is not None and total_pontos >= ofertas.pontos_gastos:
+                    ofertas.fidelidade_id = tipo_fidelidade.id
                     ofertas.utilizador_id = utilizador_pk
                     ofertas.save()
 
-                    return redirect(
-                        'fidelidade:util_ind_fidelidade',
-                        utilizador_pk=utilizador_pk
-                    )
-                else:
-                    messages.error(
-                        request,
-                        'Preencha o campo pontos gastos com um valor válido')
+                    return redirect("fidelidade:util_ind_fidelidade", utilizador_pk=utilizador_pk)
+
+                messages.error(request, "Preencha o campo pontos gastos com um valor válido")
             else:
-                print('ofertas_form.errors: ', ofertas_form.errors)
+                print("ofertas_form.errors: ", ofertas_form.errors)
+
     context = {
-        'compras_form': ComprasFidelidadeForm(),
-        'ofertas_form': OfertasFidelidadeForm(),
-        'total_pontos': total_pontos,
-        'utilizador': user,
-        'perfil': user.perfil,
+        "compras_form": ComprasFidelidadeForm(),
+        "ofertas_form": OfertasFidelidadeForm(),
+        "total_pontos": total_pontos,
+        "utilizador": user,
+        "perfil": user.perfil,
     }
 
     return render(
         request,
-        'fidelidade/pages/util_ind_fidelidade.html',
-        context)
+        "fidelidade/pages/util_ind_fidelidade.html",
+        context,
+    )
