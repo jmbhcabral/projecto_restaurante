@@ -1,4 +1,5 @@
 from collections import defaultdict
+from typing import Any, ClassVar
 
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import (
@@ -17,6 +18,11 @@ from djangoapp.restau.models import (
 
 
 class ProdutoSerializer(serializers.ModelSerializer):
+    categoria_nome: ClassVar[serializers.StringRelatedField]
+    categoria_links: ClassVar[serializers.HyperlinkedRelatedField]
+    subcategoria_nome: ClassVar[serializers.StringRelatedField]
+    subcategoria_links: ClassVar[serializers.HyperlinkedRelatedField]
+
     class Meta:
         model = Products
         fields = [
@@ -33,7 +39,6 @@ class ProdutoSerializer(serializers.ModelSerializer):
     )
     categoria_links = serializers.HyperlinkedRelatedField(
         source='categoria',
-        # queryset=Category.objects.all(),
         view_name='restau:produto_categoria_api_v1',
         read_only=True,
     )
@@ -58,17 +63,16 @@ class CategoriaSerializer(serializers.ModelSerializer):
 
 
 class SubCategoriaSerializer(serializers.ModelSerializer):
+    categoria_nome: ClassVar[serializers.StringRelatedField]
+    categoria_links: ClassVar[serializers.HyperlinkedRelatedField]
+
     class Meta:
         model = SubCategory
         fields = [
             'id', 'nome', 'categoria', 'categoria_nome', 'categoria_links',
             'ordem'
         ]
-    # id = serializers.IntegerField()
-    # nome = serializers.CharField(max_length=200)
-    # categoria = serializers.PrimaryKeyRelatedField(
-    #     queryset=Category.objects.all(),
-    # )
+
     categoria_nome = serializers.StringRelatedField(
         source='categoria.nome',
     )
@@ -77,11 +81,10 @@ class SubCategoriaSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(),
         view_name='restau:produto_categoria_api_v1'
     )
-    # ordem = serializers.IntegerField()
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    def validate(self, attrs):
+    def validate(self, attrs: dict[str, Any]) -> Any:
         try:
             data = super().validate(attrs)
             
@@ -109,7 +112,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class MyTokenRefreshSerializer(TokenRefreshSerializer):
 
-    def validate(self, attrs):
+    def validate(self, attrs: dict[str, Any]) -> Any:
         # Chame o método validate da classe pai para
         # realizar a validação padrão
         data = super().validate(attrs)

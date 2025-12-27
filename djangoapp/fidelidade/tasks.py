@@ -2,7 +2,7 @@
 
 from datetime import timedelta
 
-from celery import shared_task  # type: ignore
+from celery import shared_task
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.utils import timezone
