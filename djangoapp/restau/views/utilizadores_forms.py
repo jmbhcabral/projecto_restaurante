@@ -8,7 +8,6 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from utils.scanner_input_interpreter import interpretar_dados
 
 from djangoapp.fidelidade.forms import ComprasFidelidadeForm, OfertasFidelidadeForm
 from djangoapp.fidelidade.models import ComprasFidelidade
@@ -18,6 +17,7 @@ from djangoapp.utils.model_validators import (
     calcular_total_pontos,
     calcular_total_pontos_disponiveis,
 )
+from djangoapp.utils.scanner_input_interpreter import interpretar_dados
 
 logger = logging.getLogger(__name__)
 
