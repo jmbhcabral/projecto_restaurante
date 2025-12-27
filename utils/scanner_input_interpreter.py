@@ -1,0 +1,1 @@
+from djangoapp.utils.scanner_input_interpreter import *  # noqa: F401,F403

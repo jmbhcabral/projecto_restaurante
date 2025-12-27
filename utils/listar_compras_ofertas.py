@@ -1,0 +1,1 @@
+from djangoapp.utils.listar_compras_ofertas import *  # noqa: F401,F403

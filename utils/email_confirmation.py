@@ -1,0 +1,1 @@
+from djangoapp.utils.email_confirmation import *  # noqa: F401,F403
