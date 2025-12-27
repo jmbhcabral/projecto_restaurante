@@ -80,12 +80,12 @@ class ComprasFidelidade(models.Model):
     )
 
     compra = models.DecimalField(
-        max_digits=10, decimal_places=3, null=True, blank=True,
+        max_digits=10, decimal_places=3, null=False, blank=False,
         verbose_name='Compra',
     )
 
     pontos_adicionados = models.DecimalField(
-        max_digits=10, decimal_places=3, null=True, blank=True,
+        max_digits=10, decimal_places=3, null=False, blank=False,
         verbose_name='Pontos Adicionados',
     )
 
@@ -128,7 +128,7 @@ class OfertasFidelidade(models.Model):
     )
 
     pontos_gastos = models.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True,
+        max_digits=10, decimal_places=2, null=False, blank=False,
         verbose_name='Pontos Gastos',
     )
     processado = models.BooleanField(
