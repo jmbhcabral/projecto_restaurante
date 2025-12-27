@@ -166,21 +166,18 @@ class ActiveSetupAdmin(admin.ModelAdmin):
 
 @admin.register(Fotos)
 class FotosAdmin(admin.ModelAdmin):
-    list_display = ('id', 'imagem',
-                    'image_thumb', 'is_visible', 'ordem',)
-    list_display_links = ('id', 'imagem',)
-    list_editable = ('is_visible', 'ordem',)
+    list_display = ('id', 'imagem', 'image_thumb', 'is_visible', 'ordem')
+    list_display_links = ('id', 'imagem')
+    list_editable = ('is_visible', 'ordem')
 
+    @admin.display(description='Miniatura')
     def image_thumb(self, obj):
         if obj.imagem:
             return format_html(
-                '<img src="{}" width="50" height="50" />'.format(
-                    obj.imagem.url)
+                '<img src="{}" width="50" height="50" />',
+                obj.imagem.url,
             )
         return 'Sem Imagem'
-
-    image_thumb.short_description = 'Miniatura'  # type: ignore
-
 
 @admin.register(Ementa)
 class EmentaAdmin(admin.ModelAdmin):
@@ -192,12 +189,11 @@ class EmentaAdmin(admin.ModelAdmin):
 
 @admin.register(ProdutosEmenta)
 class ProdutosEmentaAdmin(admin.ModelAdmin):
-    list_display = ('ementa', 'produtos_in_ementa',)
+    list_display = ('ementa', 'produtos_in_ementa')
 
+    @admin.display(description='Produtos na Ementa')
     def produtos_in_ementa(self, obj):
-        return ", ".join([str(p) for p in obj.produto.all()])
-
-    produtos_in_ementa.short_description = 'Produtos na Ementa'
+        return ", ".join(str(p) for p in obj.produto.all())
 
 
 @admin.register(VersaoApp)
