@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import GoogleReview
+from djangoapp.google_reviews.models import GoogleReview
 
 
 @admin.register(GoogleReview)

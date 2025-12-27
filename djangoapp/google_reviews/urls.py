@@ -1,6 +1,9 @@
 from django.urls import path
 
-from .views import GoogleReviewsListView, UpdateGoogleReviewsView
+from djangoapp.google_reviews.views import (
+    GoogleReviewsListView,
+    UpdateGoogleReviewsView,
+)
 
 app_name = 'google_reviews'
 

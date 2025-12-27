@@ -4,7 +4,8 @@ import requests
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from utils.services import fetch_and_store_google_reviews
+
+from djangoapp.utils.services import fetch_and_store_google_reviews
 
 
 class GoogleReviewsListView(APIView):
