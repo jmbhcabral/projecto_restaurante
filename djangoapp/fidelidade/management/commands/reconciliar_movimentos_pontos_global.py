@@ -94,11 +94,11 @@ class Command(BaseCommand):
         ))
 
         # users que têm pelo menos uma compra ou oferta
-        user_ids = set(
-            list(ComprasFidelidade.objects.values_list("utilizador_id", flat=True)) +
-            list(OfertasFidelidade.objects.values_list("utilizador_id", flat=True))
+        raw_ids = (
+            list(ComprasFidelidade.objects.values_list("utilizador_id", flat=True))
+            + list(OfertasFidelidade.objects.values_list("utilizador_id", flat=True))
         )
-        user_ids.discard(None)
+        user_ids: set[int] = {uid for uid in raw_ids if uid is not None}
 
         total = len(user_ids)
         self.stdout.write(f"🔎 A analisar {total} utilizadores...")
