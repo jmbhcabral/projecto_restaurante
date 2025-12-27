@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from celery import shared_task  # type: ignore
+from celery import shared_task
 
 from djangoapp.commerce.models import Order
 
