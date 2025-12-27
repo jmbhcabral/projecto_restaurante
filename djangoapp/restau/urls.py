@@ -2,9 +2,9 @@ from django.urls import path
 from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt.views import TokenVerifyView  # TokenObtainPairView,
 
-from restau import views
-from restau.views import MyTokenObtainPairView, MyTokenRefreshView
-from restau.views.versao_api_view import UltimaVersaoAPIView
+from djangoapp.restau import views
+from djangoapp.restau.views import MyTokenObtainPairView, MyTokenRefreshView
+from djangoapp.restau.views.versao_api_view import UltimaVersaoAPIView
 
 # namespace
 app_name = 'restau'

@@ -7,12 +7,12 @@ from django.db.models import Max, Sum
 from django.utils import timezone
 
 if TYPE_CHECKING:
-    from fidelidade.models import MovimentoPontos
+    from djangoapp.fidelidade.models import MovimentoPontos
 
 
 def _get_movimento_model():
     """
-    Evita import circular: em vez de `from fidelidade.models import MovimentoPontos`,
+    Evita import circular: em vez de `from djangoapp.fidelidade.models import MovimentoPontos`,
     usamos apps.get_model.
     """
     return apps.get_model("fidelidade", "MovimentoPontos")

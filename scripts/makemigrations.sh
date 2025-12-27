@@ -1,3 +1,6 @@
 #!/bin/sh
-echo 'Executando Makemigrations.sh'
-python manage.py makemigrations --noinput
+set -e
+echo "Executando Makemigrations.sh"
+
+# Use venv python explicitly
+/venv/bin/python manage.py makemigrations --noinput

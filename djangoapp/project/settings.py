@@ -58,14 +58,14 @@ INSTALLED_APPS = [
     # 'restau.apps.RestauConfig',
     'rest_framework_simplejwt',
     'rest_framework',
-    'perfil',
-    'restau',
-    'site_setup',
-    'fidelidade',
-    'senhas',
-    'app_version',
-    'google_reviews',
-    'commerce',
+    "djangoapp.perfil.apps.PerfilConfig",
+    'djangoapp.restau',
+    'djangoapp.site_setup',
+    'djangoapp.fidelidade',
+    'djangoapp.senhas',
+    'djangoapp.app_version',
+    'djangoapp.google_reviews',
+    'djangoapp.commerce',
     'crispy_forms',
 ]
 
@@ -276,3 +276,11 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(hour=10, minute=5),  # todos os dias às 10:05
     },
 }
+
+# Google Cloud Storage configuration
+
+GCS_BUCKET_NAME = os.getenv("GCS_BUCKET_NAME", "change-me")
+GCS_PUBLIC_BASE_URL = os.getenv(
+    "GCS_PUBLIC_BASE_URL",
+    "change-me",
+)

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from fidelidade.models import (
+from djangoapp.fidelidade.models import (
     ComprasFidelidade,
     Fidelidade,
     MovimentoPontos,

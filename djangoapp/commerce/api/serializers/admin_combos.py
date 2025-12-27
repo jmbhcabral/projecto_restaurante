@@ -3,8 +3,13 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from commerce.models import ComboChoiceGroup, ComboChoiceOption, Product
 from rest_framework import serializers
+
+from djangoapp.commerce.models import (
+    ComboChoiceGroup,
+    ComboChoiceOption,
+    Product,
+)
 
 # ---------------------------
 # Admin: Combos (Groups/Options)

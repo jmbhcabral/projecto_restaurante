@@ -1,3 +1,5 @@
 #!/bin/sh
-echo 'Executando collectstatic.sh'
-python manage.py collectstatic  --noinput
+set -e
+echo "Executando collectstatic.sh"
+
+/venv/bin/python manage.py collectstatic --noinput

@@ -1,14 +1,16 @@
 ''' Módulo de views do app senhas '''
 
 import json
-from django.shortcuts import render, redirect
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.contrib import messages
 from django.utils import timezone
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Senhas, FrasePub
+
+from djangoapp.senhas.models import FrasePub, Senhas
 
 
 @login_required(login_url='/perfil')

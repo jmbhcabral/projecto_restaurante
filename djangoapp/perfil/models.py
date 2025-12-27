@@ -11,8 +11,9 @@ from django.db import models
 from django.forms import ValidationError
 from django.utils import timezone
 from django.utils.timezone import now
-from fidelidade.models import Fidelidade, RespostaFidelidade
-from utils.model_validators import validar_nif
+
+from djangoapp.fidelidade.models import Fidelidade, RespostaFidelidade
+from djangoapp.utils.model_validators import validar_nif
 
 User = get_user_model()
 

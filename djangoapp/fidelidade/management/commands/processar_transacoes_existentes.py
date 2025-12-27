@@ -1,8 +1,8 @@
 '''Este script processa todas as transações existentes para todos os perfis de utilizadores'''
 
 from django.core.management.base import BaseCommand
-from perfil.models import Perfil
-from utils.model_validators import processar_transacoes_existentes
+
+from djangoapp.utils.model_validators import processar_transacoes_existentes
 
 
 class Command(BaseCommand):

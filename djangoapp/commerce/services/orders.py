@@ -4,9 +4,10 @@ Services for orders.
 """
 from __future__ import annotations
 
-from commerce.models import Order, TicketCounter
 from django.db import transaction
 from django.utils import timezone
+
+from djangoapp.commerce.models import Order, TicketCounter
 
 
 @transaction.atomic

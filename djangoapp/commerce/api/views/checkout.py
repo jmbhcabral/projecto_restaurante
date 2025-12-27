@@ -3,24 +3,25 @@ from __future__ import annotations
 
 import secrets
 
-from commerce.api.permissions import IsCartOwner
+from django.db import transaction
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
-# from commerce.api.serializers.cart import CartSerializer
-from commerce.api.serializers.checkout import CheckoutInputSerializer
-from commerce.api.views.cart import get_or_create_active_cart
-from commerce.models import (
+from djangoapp.commerce.api.permissions import IsCartOwner
+
+# from djangoapp.commerce.api.serializers.cart import CartSerializer
+from djangoapp.commerce.api.serializers.checkout import CheckoutInputSerializer
+from djangoapp.commerce.api.views.cart import get_or_create_active_cart
+from djangoapp.commerce.models import (
     Order,
     OrderItem,
     OrderItemAddOn,
     OrderItemComboSelection,
     OrderItemRemovedIngredient,
 )
-from commerce.services.cart_loader import load_cart
-from commerce.services.pricing import calc_cart_totals
-from django.db import transaction
-from rest_framework import status, viewsets
-from rest_framework.decorators import action
-from rest_framework.response import Response
+from djangoapp.commerce.services.cart_loader import load_cart
+from djangoapp.commerce.services.pricing import calc_cart_totals
 
 
 class CheckoutViewSet(viewsets.ViewSet):

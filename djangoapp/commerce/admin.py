@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import (
+from djangoapp.commerce.models import (
     AddOnGroup,
     AddOnOption,
     Cart,

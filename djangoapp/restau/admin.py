@@ -1,11 +1,29 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from restau.models import (
-    Category, SubCategory, Percentage, Products, Ementa,
-    ProdutosEmenta, Fotos, ActiveSetup, ImagemLogo, ImagemTopo, Intro,
-    IntroImagem, FraseInspiradora, ImagemFraseCima, FraseCima, FraseBaixo,
-    ImagemFraseBaixo, ImagemPadrao, ContactosSite, GoogleMaps, Horario,
-    VersaoApp
+
+from djangoapp.restau.models import (
+    ActiveSetup,
+    Category,
+    ContactosSite,
+    Ementa,
+    Fotos,
+    FraseBaixo,
+    FraseCima,
+    FraseInspiradora,
+    GoogleMaps,
+    Horario,
+    ImagemFraseBaixo,
+    ImagemFraseCima,
+    ImagemLogo,
+    ImagemPadrao,
+    ImagemTopo,
+    Intro,
+    IntroImagem,
+    Percentage,
+    Products,
+    ProdutosEmenta,
+    SubCategory,
+    VersaoApp,
 )
 
 

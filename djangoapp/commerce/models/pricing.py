@@ -6,7 +6,7 @@ from decimal import Decimal
 from django.db import models
 from django.db.models import Q
 
-from .catalog import Ingredient, Product, TimeStampedModel
+from djangoapp.commerce.models.catalog import Ingredient, Product, TimeStampedModel
 
 
 class AddOnGroup(TimeStampedModel):

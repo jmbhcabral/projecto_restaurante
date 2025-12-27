@@ -25,10 +25,12 @@ from .order import (
     OrderItemRemovedIngredient,
 )
 from .pricing import AddOnGroup, AddOnOption
+from .product_image import ProductImage
 
 __all__ = [
     "Category",
     "Product",
+    "ProductImage",
     "Ingredient",
     "IngredientPrice",
     "ProductDefaultIngredient",

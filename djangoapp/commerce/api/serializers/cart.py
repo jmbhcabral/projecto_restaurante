@@ -1,7 +1,9 @@
 # djangoapp/commerce/api/serializers/cart.py
 from __future__ import annotations
 
-from commerce.models import (
+from rest_framework import serializers
+
+from djangoapp.commerce.models import (
     AddOnOption,
     Cart,
     CartItem,
@@ -11,8 +13,7 @@ from commerce.models import (
     Ingredient,
     Product,
 )
-from commerce.services.pricing import calc_cart_item_total, calc_cart_totals
-from rest_framework import serializers
+from djangoapp.commerce.services.pricing import calc_cart_item_total, calc_cart_totals
 
 # ---------------------------
 # Read serializers

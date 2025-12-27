@@ -1,12 +1,16 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
-from restau.forms import EmentaForm, ProdutosEmentaForm
-from restau.models import (
-    Ementa, Products, Category,
-    SubCategory, ProdutosEmenta
-)
-from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+
+from djangoapp.restau.forms import EmentaForm, ProdutosEmentaForm
+from djangoapp.restau.models import (
+    Category,
+    Ementa,
+    Products,
+    ProdutosEmenta,
+    SubCategory,
+)
 
 
 @login_required

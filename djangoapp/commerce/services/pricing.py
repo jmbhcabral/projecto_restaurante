@@ -3,7 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from decimal import Decimal
 
-from commerce.models import Cart, CartItem, CartItemAddOn, CartItemComboSelection
+from djangoapp.commerce.models import (
+    Cart,
+    CartItem,
+    CartItemAddOn,
+    CartItemComboSelection,
+)
 
 
 @dataclass(frozen=True)

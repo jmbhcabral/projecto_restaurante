@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from commerce.models import Cart, CartItem
 from django.db.models import Prefetch
+
+from djangoapp.commerce.models import Cart, CartItem
 
 
 def load_cart(cart_id: int) -> Cart:

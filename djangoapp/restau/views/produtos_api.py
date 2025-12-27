@@ -1,24 +1,21 @@
-from rest_framework.decorators import api_view
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView, TokenRefreshView
-)
-from ..serializers import (
-    MyTokenObtainPairSerializer, MyTokenRefreshSerializer
-)
-
-from rest_framework.response import Response
-from ..models import Products, Category, SubCategory
-from ..serializers import (
-    ProdutoSerializer, CategoriaSerializer, SubCategoriaSerializer
-)
 from django.shortcuts import get_object_or_404
-
+from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.viewsets import ModelViewSet
-from ..permissions import IsAcessoRestritoOrReadOnly
+from rest_framework.response import Response
 from rest_framework.views import APIView
-from ..serializers import ProdutosEmentaSerializer
-from ..models import Ementa
+from rest_framework.viewsets import ModelViewSet
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+from ..models import Category, Ementa, Products, SubCategory
+from ..permissions import IsAcessoRestritoOrReadOnly
+from ..serializers import (
+    CategoriaSerializer,
+    MyTokenObtainPairSerializer,
+    MyTokenRefreshSerializer,
+    ProdutosEmentaSerializer,
+    ProdutoSerializer,
+    SubCategoriaSerializer,
+)
 
 
 class ProdutosAPIv1Pagination(PageNumberPagination):

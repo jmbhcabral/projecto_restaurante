@@ -1,7 +1,8 @@
 ''' Admin do app senhas '''
 
 from django.contrib import admin
-from .models import Senhas, FrasePub
+
+from djangoapp.senhas.models import FrasePub, Senhas
 
 
 @admin.register(Senhas)

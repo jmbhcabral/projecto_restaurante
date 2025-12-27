@@ -1,22 +1,49 @@
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from restau.models import (
-    ActiveSetup, ImagemLogo, ImagemTopo, Intro, IntroImagem, FraseCima,
-    ImagemFraseCima, FraseInspiradora, FraseBaixo, ImagemFraseBaixo,
-    ImagemPadrao, ContactosSite, GoogleMaps, Horario
-)
-from restau.forms import (
-    ImagemLogoForm, LogosFormSet, ImagemTopoForm, TopoFormSet, IntroForm,
-    IntroFormSet, IntroImagemForm, IntroImagemFormSet, FraseCimaForm,
-    FraseCimaFormSet, ImagemFraseCimaForm, ImagemFraseCimaFormSet,
-    FraseInspiradoraForm, FraseInspiradoraFormSet, FraseBaixoForm,
-    FraseBaixoFormSet, ImagemFraseBaixoForm, ImagemFraseBaixoFormSet,
-    ImagemPadraoForm, ImagemPadraoFormSet, ContactosSiteForm, GoogleMapsForm,
+from djangoapp.restau.forms import (
+    ContactosSiteForm,
+    FraseBaixoForm,
+    FraseBaixoFormSet,
+    FraseCimaForm,
+    FraseCimaFormSet,
+    FraseInspiradoraForm,
+    FraseInspiradoraFormSet,
+    GoogleMapsForm,
     HorarioForm,
+    ImagemFraseBaixoForm,
+    ImagemFraseBaixoFormSet,
+    ImagemFraseCimaForm,
+    ImagemFraseCimaFormSet,
+    ImagemLogoForm,
+    ImagemPadraoForm,
+    ImagemPadraoFormSet,
+    ImagemTopoForm,
+    IntroForm,
+    IntroFormSet,
+    IntroImagemForm,
+    IntroImagemFormSet,
+    LogosFormSet,
+    TopoFormSet,
 )
-from django.contrib.auth.decorators import login_required, user_passes_test
+from djangoapp.restau.models import (
+    ActiveSetup,
+    ContactosSite,
+    FraseBaixo,
+    FraseCima,
+    FraseInspiradora,
+    GoogleMaps,
+    Horario,
+    ImagemFraseBaixo,
+    ImagemFraseCima,
+    ImagemLogo,
+    ImagemPadrao,
+    ImagemTopo,
+    Intro,
+    IntroImagem,
+)
 
 
 @login_required

@@ -1,10 +1,19 @@
-from rest_framework import serializers
-from .models import Category, SubCategory, Products
-from rest_framework_simplejwt.serializers import (
-    TokenObtainPairSerializer, TokenRefreshSerializer
-)
-from .models import Ementa, VersaoApp, ProdutosEmenta
 from collections import defaultdict
+
+from rest_framework import serializers
+from rest_framework_simplejwt.serializers import (
+    TokenObtainPairSerializer,
+    TokenRefreshSerializer,
+)
+
+from djangoapp.restau.models import (
+    Category,
+    Ementa,
+    Products,
+    ProdutosEmenta,
+    SubCategory,
+    VersaoApp,
+)
 
 
 class ProdutoSerializer(serializers.ModelSerializer):

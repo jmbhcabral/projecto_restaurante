@@ -1,7 +1,12 @@
 ''' Arquivo de configuração de URL para o aplicativo senhas '''
 
 from django.urls import path
-from .views import sistema_vez, adicionar_senha, listar_senhas
+
+from djangoapp.senhas.views import (
+    adicionar_senha,
+    listar_senhas,
+    sistema_vez,
+)
 
 app_name = 'senhas'
 

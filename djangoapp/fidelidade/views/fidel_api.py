@@ -2,16 +2,20 @@ from collections import defaultdict
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from utils.model_validators import (
+
+from djangoapp.fidelidade.models import (
+    ComprasFidelidade,
+    OfertasFidelidade,
+    ProdutoFidelidadeIndividual,
+)
+from djangoapp.fidelidade.serializers import ProdutoFidelidadeIndividualSerializer
+from djangoapp.utils.model_validators import (
     calcular_dias_para_expirar,
     calcular_pontos_expirados,
     calcular_pontos_indisponiveis,
     calcular_total_pontos,
     calcular_total_pontos_disponiveis,
 )
-
-from ..models import ComprasFidelidade, OfertasFidelidade, ProdutoFidelidadeIndividual
-from ..serializers import ProdutoFidelidadeIndividualSerializer
 
 
 class ProdutoFidelidadeAPI(APIView):

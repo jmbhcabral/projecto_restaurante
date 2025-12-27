@@ -5,10 +5,11 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from fidelidade.ledger import get_movimentos_pontos
-from fidelidade.models import ComprasFidelidade, OfertasFidelidade
-from perfil.models import Perfil
-from utils.model_validators import (
+
+from djangoapp.fidelidade.ledger import get_movimentos_pontos
+from djangoapp.fidelidade.models import ComprasFidelidade, OfertasFidelidade
+from djangoapp.perfil.models import Perfil
+from djangoapp.utils.model_validators import (
     calcular_total_pontos,
     calcular_total_pontos_disponiveis,
 )

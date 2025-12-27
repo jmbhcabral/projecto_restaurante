@@ -7,8 +7,8 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Q
 
-from .catalog import Product, TimeStampedModel
-from .pricing import AddOnOption
+from djangoapp.commerce.models.catalog import Product, TimeStampedModel
+from djangoapp.commerce.models.pricing import AddOnOption
 
 
 class Order(TimeStampedModel):

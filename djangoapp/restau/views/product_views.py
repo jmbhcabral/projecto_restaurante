@@ -1,10 +1,16 @@
-from django.shortcuts import render, get_object_or_404
-from restau.models import (
-    Products, Category, SubCategory, ActiveSetup, ProdutosEmenta
-    )
-from django.db.models import Prefetch
 from collections import defaultdict
+
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import Prefetch
+from django.shortcuts import get_object_or_404, render
+
+from djangoapp.restau.models import (
+    ActiveSetup,
+    Category,
+    Products,
+    ProdutosEmenta,
+    SubCategory,
+)
 
 
 def encomendas(request):

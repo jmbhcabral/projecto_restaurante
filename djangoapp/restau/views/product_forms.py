@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
-from restau.forms import ProductForm
-from restau.models import Products, SubCategory, Category
-from django.forms import modelformset_factory
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.forms import modelformset_factory
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+
+from djangoapp.restau.forms import ProductForm
+from djangoapp.restau.models import Category, Products, SubCategory
 
 
 @login_required

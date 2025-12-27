@@ -1,10 +1,12 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from fidelidade.models import Fidelidade, ComprasFidelidade, OfertasFidelidade
-from fidelidade.forms import ComprasFidelidadeForm, OfertasFidelidadeForm
-from django.contrib import messages
-from django.db import models
-from django.contrib.auth.models import User
 from itertools import zip_longest
+
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.db import models
+from django.shortcuts import get_object_or_404, redirect, render
+
+from djangoapp.fidelidade.forms import ComprasFidelidadeForm, OfertasFidelidadeForm
+from djangoapp.fidelidade.models import ComprasFidelidade, Fidelidade, OfertasFidelidade
 
 
 def fidelidades(request):
@@ -89,7 +91,6 @@ def util_ind_fidelidade(request, utilizador_pk):
             }
             ofertas_form = OfertasFidelidadeForm(
                 request.POST, initial=initial_data_ofertas)
-            cleaned_data = ofertas_form.cleaned_data
 
             if ofertas_form.is_valid():
                 ofertas = ofertas_form.save(commit=False)
