@@ -871,7 +871,7 @@ def escolher_frase_central(request,):
                 active_setup = ActiveSetup.objects.first()
 
                 if active_setup:
-                    active_setup.active_frase_inspiradora = (  # type: ignore
+                    active_setup.active_frase_inspiradora = (
                         texto
                     )
                     active_setup.save()

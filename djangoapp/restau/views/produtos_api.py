@@ -1,3 +1,4 @@
+# djangoapp/restau/views/produtos_api.py
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
@@ -105,12 +106,12 @@ def subcategoria_api_detalhe(request, pk):
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
+    serializer_class = MyTokenObtainPairSerializer # type: ignore[assignment]
 
 
 
 class MyTokenRefreshView(TokenRefreshView):
-    serializer_class = MyTokenRefreshSerializer
+    serializer_class = MyTokenRefreshSerializer # type: ignore[assignment]
 
 
 class UserEmentaAPIView(APIView):

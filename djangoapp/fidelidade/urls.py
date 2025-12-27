@@ -1,3 +1,4 @@
+# djangoapp/fidelidade/urls.py
 from django.urls import path
 
 from djangoapp.fidelidade.views import (

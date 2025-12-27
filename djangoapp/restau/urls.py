@@ -1,9 +1,13 @@
+# djangoapp/restau/urls.py
 from django.urls import path
 from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt.views import TokenVerifyView  # TokenObtainPairView,
 
 from djangoapp.restau import views
-from djangoapp.restau.views import MyTokenObtainPairView, MyTokenRefreshView
+from djangoapp.restau.views.produtos_api import (
+    MyTokenObtainPairView,
+    MyTokenRefreshView,
+)
 from djangoapp.restau.views.versao_api_view import UltimaVersaoAPIView
 
 # namespace
@@ -21,462 +25,462 @@ produto_api_v1_router.register(
 urlpatterns = [
     path(
         '',
-        views.index,  # type: ignore
+        views.index,  
         name='index'
     ),
     path(
         'restau/pages/politicadeprivacidade/',
-        views.politicadeprivacidade,  # type: ignore
+        views.politicadeprivacidade,  
         name='politicadeprivacidade'
     ),
     path(
         'restau/pages/encomendas/',
-        views.encomendas,  # type: ignore
+        views.encomendas,  
         name='encomendas'
     ),
     path(
         'restau/pages/programa_fidelidade/',
-        views.programa_fidelidade,  # type: ignore
+        views.programa_fidelidade,  
         name='programa_fidelidade'
     ),
     path(
         'restau/pages/admin_home/',
-        views.admin_home,  # type: ignore
+        views.admin_home,  
         name='admin_home'
     ),
     # product
     path(
         'restau/pages/produtos/',
-        views.produtos,  # type: ignore
+        views.produtos,  
         name='produtos'
     ),
     path(
         'restau/pages/<int:produto_id>/',
-        views.produto,  # type: ignore
+        views.produto,  
         name='produto'
     ),
     path(
         'restau/pages/criar_produto/',
-        views.criar_produto,  # type: ignore
+        views.criar_produto,  
         name='criar_produto'
     ),
     path(
         'restau/pages/<int:produto_id>/atualizar_produto/',
-        views.atualizar_produto,  # type: ignore
+        views.atualizar_produto,  
         name='atualizar_produto'
     ),
     path(
         'restau/pages/<int:produto_id>/apagar_produto/',
-        views.apagar_produto,  # type: ignore
+        views.apagar_produto,  
         name='apagar_produto'
     ),
     path(
         'restau/pages/ordenar_produtos/',
-        views.ordenar_produtos,  # type: ignore
+        views.ordenar_produtos,  
         name='ordenar_produtos'
     ),
     # category
     path(
         'restau/pages/categorias/',
-        views.categorias,  # type: ignore
+        views.categorias,  
         name='categorias'
     ),
     path(
         'restau/pages/categoria/<int:categoria_id>/',
-        views.categoria,  # type: ignore
+        views.categoria,  
         name='categoria'
     ),
     path(
         'restau/pages/criar_categoria/',
-        views.criar_categoria,  # type: ignore
+        views.criar_categoria,  
         name='criar_categoria'
     ),
     path(
         'restau/pages/<int:categoria_id>/atualizar_categoria/',
-        views.atualizar_categoria,  # type: ignore
+        views.atualizar_categoria,  
         name='atualizar_categoria'
     ),
     path(
         'restau/pages/<int:categoria_id>/apagar_categoria/',
-        views.apagar_categoria,  # type: ignore
+        views.apagar_categoria,  
         name='apagar_categoria'
     ),
     path(
         'restau/pages/ordenar_categorias/',
-        views.ordenar_categorias,  # type: ignore
+        views.ordenar_categorias,  
         name='ordenar_categorias'
     ),
     # subcategoria
     path(
         'restau/pages/subcategorias/',
-        views.Subcategorias,  # type: ignore
+        views.Subcategorias,  
         name='subcategorias'
     ),
     path(
         'restau/pages/subcategoria/<int:subcategoria_id>/',
-        views.subcategoria,  # type: ignore
+        views.subcategoria,  
         name='subcategoria'
     ),
     path(
         'restau/pages/criar_subcategoria/',
-        views.criar_subcategoria,  # type: ignore
+        views.criar_subcategoria,  
         name='criar_subcategoria'),
     path(
         'restau/pages/<int:subcategoria_id>/atualizar_subcategoria/',
-        views.atualizar_subcategoria,  # type: ignore
+        views.atualizar_subcategoria,  
         name='atualizar_subcategoria'
     ),
     path(
         'restau/pages/<int:subcategoria_id>/apagar_subcategoria/',
-        views.apagar_subcategoria,  # type: ignore
+        views.apagar_subcategoria,  
         name='apagar_subcategoria'
     ),
     path(
         'restau/pages/ordenar_subcategorias/',
-        views.ordenar_subcategorias,  # type: ignore
+        views.ordenar_subcategorias,  
         name='ordenar_subcategorias'
     ),
     # Ementas
     path(
         'restau/pages/criar_ementa/',
-        views.criar_ementa,  # type: ignore
+        views.criar_ementa,  
         name='criar_ementa'
     ),
     path(
         'restau/pages/<int:ementa_id>/atualizar_ementa/',
-        views.atualizar_ementa,  # type: ignore
+        views.atualizar_ementa,  
         name='atualizar_ementa'
     ),
     path(
         'restau/pages/<int:ementa_id>/apagar_ementa/',
-        views.apagar_ementa,  # type: ignore
+        views.apagar_ementa,  
         name='apagar_ementa'
     ),
     path(
         'restau/pages/ementa/<int:ementa_id>/',
-        views.ementa,  # type: ignore
+        views.ementa,  
         name='ementa'
     ),
     path(
         'restau/pages/ementas/',
-        views.ementas,  # type: ignore
+        views.ementas,  
         name='ementas'
     ),
     path(
         'restau/pages/povoar_ementa/<int:ementa_id>/',
-        views.povoar_ementa,  # type: ignore
+        views.povoar_ementa,  
         name='povoar_ementa'
     ),
     # Configuração
     path(
         'restau/pages/configuracao/',
-        views.configuracao,  # type: ignore
+        views.configuracao,  
         name='configuracao'
     ),
     # Galeria
     path(
         'restau/pages/galeria/',
-        views.galeria,  # type: ignore
+        views.galeria,  
         name='galeria'
     ),
     path(
         'restau/pages/adicionar_foto/',
-        views.adicionar_foto,  # type: ignore
+        views.adicionar_foto,  
         name='adicionar_foto'
     ),
     path(
         'restau/pages/povoar_galeria/',
-        views.povoar_galeria,  # type: ignore
+        views.povoar_galeria,  
         name='povoar_galeria'
     ),
     # ImagemLogo
     path(
         'restau/pages/logos/',
-        views.imagem_logo,  # type: ignore
+        views.imagem_logo,  
         name='imagem_logo'
     ),
     path(
         'restau/pages/criar_logo/',
-        views.criar_logo,  # type: ignore
+        views.criar_logo,  
         name='criar_logo'
     ),
     path(
         'restau/pages/apagar_logo/',
-        views.apagar_logo,  # type: ignore
+        views.apagar_logo,  
         name='apagar_logo'
     ),
     path(
         'restau/pages/escolher_logo/',
-        views.escolher_logo,  # type: ignore
+        views.escolher_logo,  
         name='escolher_logo'
     ),
     # ImagemTopo
     path(
         'restau/pages/imagem_topo/',
-        views.imagem_topo,  # type: ignore
+        views.imagem_topo,  
         name='imagem_topo'
     ),
     path(
         'restau/pages/criar_imagem_topo/',
-        views.criar_imagem_topo,  # type: ignore
+        views.criar_imagem_topo,  
         name='criar_imagem_topo'
     ),
     path(
         'restau/pages/apagar_imagem_topo/',
-        views.apagar_imagem_topo,  # type: ignore
+        views.apagar_imagem_topo,  
         name='apagar_imagem_topo'
     ),
     path(
         'restau/pages/escolher_imagem_topo/',
-        views.escolher_imagem_topo,  # type: ignore
+        views.escolher_imagem_topo,  
         name='escolher_imagem_topo'
     ),
     # Intro
     path(
         'restau/pages/intro/',
-        views.intro,  # type: ignore
+        views.intro,  
         name='intro'
     ),
     path(
         'restau/pages/criar_intro/',
-        views.criar_intro,  # type: ignore
+        views.criar_intro,  
         name='criar_intro'
     ),
     path(
         'restau/pages/apagar_intro/',
-        views.apagar_intro,  # type: ignore
+        views.apagar_intro,  
         name='apagar_intro'
     ),
     path(
         'restau/pages/escolher_intro/',
-        views.escolher_intro,  # type: ignore
+        views.escolher_intro,  
         name='escolher_intro'
     ),
     # Intro Imagem
     path(
         'restau/pages/intro_imagem/',
-        views.intro_imagem,  # type: ignore
+        views.intro_imagem,  
         name='intro_imagem'
     ),
     path(
         'restau/pages/criar_intro_imagem/',
-        views.criar_intro_imagem,  # type: ignore
+        views.criar_intro_imagem,  
         name='criar_intro_imagem'
     ),
     path(
         'restau/pages/apagar_intro_imagem/',
-        views.apagar_intro_imagem,  # type: ignore
+        views.apagar_intro_imagem,  
         name='apagar_intro_imagem'
     ),
     path(
         'restau/pages/escolher_intro_imagem/',
-        views.escolher_intro_imagem,  # type: ignore
+        views.escolher_intro_imagem,  
         name='escolher_intro_imagem'
     ),
     # Frase Cima
     path(
         'restau/pages/frase_cima/',
-        views.frase_cima,  # type: ignore
+        views.frase_cima,  
         name='frase_cima'
     ),
     path(
         'restau/pages/criar_frase_cima/',
-        views.criar_frase_cima,  # type: ignore
+        views.criar_frase_cima,  
         name='criar_frase_cima'
     ),
     path(
         'restau/pages/apagar_frase_cima/',
-        views.apagar_frase_cima,  # type: ignore
+        views.apagar_frase_cima,  
         name='apagar_frase_cima'
     ),
     path(
         'restau/pages/escolher_frase_cima/',
-        views.escolher_frase_cima,  # type: ignore
+        views.escolher_frase_cima,  
         name='escolher_frase_cima'
     ),
     # Imagem Frase Cima
     path(
         'restau/pages/imagem_frase_cima/',
-        views.imagem_frase_cima,  # type: ignore
+        views.imagem_frase_cima,  
         name='imagem_frase_cima'
     ),
     path(
         'restau/pages/criar_imagem_frase_cima/',
-        views.criar_imagem_frase_cima,  # type: ignore
+        views.criar_imagem_frase_cima,  
         name='criar_imagem_frase_cima'
     ),
     path(
         'restau/pages/apagar_imagem_frase_cima/',
-        views.apagar_imagem_frase_cima,  # type: ignore
+        views.apagar_imagem_frase_cima,  
         name='apagar_imagem_frase_cima'
     ),
     path(
         'restau/pages/escolher_imagem_frase_cima/',
-        views.escolher_imagem_frase_cima,  # type: ignore
+        views.escolher_imagem_frase_cima,  
         name='escolher_imagem_frase_cima'
     ),
     # Imagem Frase Central
     path(
         'restau/pages/frase_central/',
-        views.frase_central,  # type: ignore
+        views.frase_central,  
         name='frase_central'
     ),
     path(
         'restau/pages/criar_frase_central/',
-        views.criar_frase_central,  # type: ignore
+        views.criar_frase_central,  
         name='criar_frase_central'
     ),
     path(
         'restau/pages/apagar_frase_central/',
-        views.apagar_frase_central,  # type: ignore
+        views.apagar_frase_central,  
         name='apagar_frase_central'
     ),
     path(
         'restau/pages/escolher_frase_central/',
-        views.escolher_frase_central,  # type: ignore
+        views.escolher_frase_central,  
         name='escolher_frase_central'
     ),
     # Frase baixo
     path(
         'restau/pages/frase_baixo/',
-        views.frase_baixo,  # type: ignore
+        views.frase_baixo,  
         name='frase_baixo'
     ),
     path(
         'restau/pages/criar_frase_baixo/',
-        views.criar_frase_baixo,  # type: ignore
+        views.criar_frase_baixo,  
         name='criar_frase_baixo'
     ),
     path(
         'restau/pages/apagar_frase_baixo/',
-        views.apagar_frase_baixo,  # type: ignore
+        views.apagar_frase_baixo,  
         name='apagar_frase_baixo'
     ),
     path(
         'restau/pages/escolher_frase_baixo/',
-        views.escolher_frase_baixo,  # type: ignore
+        views.escolher_frase_baixo,  
         name='escolher_frase_baixo'
     ),
     # Imagem Frase baixo
     path(
         'restau/pages/imagem_frase_baixo/',
-        views.imagem_frase_baixo,  # type: ignore
+        views.imagem_frase_baixo,  
         name='imagem_frase_baixo'
     ),
     path(
         'restau/pages/criar_imagem_frase_baixo/',
-        views.criar_imagem_frase_baixo,  # type: ignore
+        views.criar_imagem_frase_baixo,  
         name='criar_imagem_frase_baixo'
     ),
     path(
         'restau/pages/apagar_imagem_frase_baixo/',
-        views.apagar_imagem_frase_baixo,  # type: ignore
+        views.apagar_imagem_frase_baixo,  
         name='apagar_imagem_frase_baixo'
     ),
     path(
         'restau/pages/escolher_imagem_frase_baixo/',
-        views.escolher_imagem_frase_baixo,  # type: ignore
+        views.escolher_imagem_frase_baixo,  
         name='escolher_imagem_frase_baixo'
     ),
     # Imagem Padrao
     path(
         'restau/pages/imagem_padrao/',
-        views.imagem_padrao,  # type: ignore
+        views.imagem_padrao,  
         name='imagem_padrao'
     ),
     path(
         'restau/pages/criar_imagem_padrao/',
-        views.criar_imagem_padrao,  # type: ignore
+        views.criar_imagem_padrao,  
         name='criar_imagem_padrao'
     ),
     path(
         'restau/pages/apagar_imagem_padrao/',
-        views.apagar_imagem_padrao,  # type: ignore
+        views.apagar_imagem_padrao,  
         name='apagar_imagem_padrao'
     ),
     path(
         'restau/pages/escolher_imagem_padrao/',
-        views.escolher_imagem_padrao,  # type: ignore
+        views.escolher_imagem_padrao,  
         name='escolher_imagem_padrao'
     ),
     # Contatos Site
     path(
         'restau/pages/contatos_site/',
-        views.contatos_site,  # type: ignore
+        views.contatos_site,  
         name='contatos_site'
     ),
     path(
         'restau/pages/criar_contatos_site/',
-        views.criar_contatos_site,  # type: ignore
+        views.criar_contatos_site,  
         name='criar_contatos_site'
     ),
     path(
         'restau/pages/editar_contatos_site/<int:contato_id>',
-        views.editar_contatos_site,  # type: ignore
+        views.editar_contatos_site,  
         name='editar_contatos_site'
     ),
     # Google Maps
     path(
         'restau/pages/google_maps/',
-        views.google_maps,  # type: ignore
+        views.google_maps,  
         name='google_maps'
     ),
     path(
         'restau/pages/criar_google_maps/',
-        views.criar_google_maps,  # type: ignore
+        views.criar_google_maps,  
         name='criar_google_maps'
     ),
     path(
         'restau/pages/editar_google_maps/<int:map_id>',
-        views.editar_google_maps,  # type: ignore
+        views.editar_google_maps,  
         name='editar_google_maps'
     ),
     # Horário
     path(
         'restau/pages/horario/',
-        views.horario,  # type: ignore
+        views.horario,  
         name='horario'
     ),
     path(
         'restau/pages/criar_horario/',
-        views.criar_horario,  # type: ignore
+        views.criar_horario,  
         name='criar_horario'
     ),
     path(
         'restau/pages/editar_horario/<int:horario_id>',
-        views.editar_horario,  # type: ignore
+        views.editar_horario,  
         name='editar_horario'
     ),
     # Admin-Estatisticas
     path(
         'restau/pages/admin_estatisticas/',
-        views.admin_estatisticas,  # type: ignore
+        views.admin_estatisticas,  
         name='admin_estatisticas'
     ),  
     # Admin-Utilizadores
     path(
         'restau/pages/admin_utilizadores/',
-        views.admin_utilizadores,  # type: ignore
+        views.admin_utilizadores,  
         name='admin_utilizadores'
     ),
     path(
         'restau/pages/admin_utilizador/<int:utilizador_pk>/',
-        views.admin_utilizador,  # type: ignore
+        views.admin_utilizador,  
         name='admin_utilizador'
     ),
     path(
         'restau/pages/compras_utilizador/<int:utilizador_pk>/',
-        views.compras_utilizador,  # type: ignore
+        views.compras_utilizador,  
         name='compras_utilizador'
     ),
     path(
         'restau/pages/ofertas_utilizador/<int:utilizador_id>/',
-        views.ofertas_utilizador,  # type: ignore
+        views.ofertas_utilizador,  
         name='ofertas_utilizador'
     ),
     path(
         'restau/pages/movimentos/<int:utilizador_id>/',
-        views.movimentos,  # type: ignore
+        views.movimentos,  
         name='movimentos'),
     # Versão API
     path(
@@ -497,12 +501,12 @@ urlpatterns = [
     ),
     path(
         'produtos/api/v1/categoria/<int:pk>/',
-        views.categoria_api_detalhe,  # type: ignore
+        views.categoria_api_detalhe,  
         name='produto_categoria_api_v1'
     ),
     path(
         'produtos/api/v1/subcategoria/<int:pk>/',
-        views.subcategoria_api_detalhe,  # type: ignore
+        views.subcategoria_api_detalhe,  
         name='produto_subcategoria_api_v1'
     ),
     path(
