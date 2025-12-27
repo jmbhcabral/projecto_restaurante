@@ -45,7 +45,7 @@ class FidelidadeForm(forms.ModelForm):
         )
 
     def clean(self):
-        cleaned_data = super().clean()
+        cleaned_data = super().clean() or {}
 
         nome = cleaned_data.get("nome")
         desconto_raw = cleaned_data.get("desconto")
@@ -69,8 +69,6 @@ class FidelidadeForm(forms.ModelForm):
 
         desconto = int(desconto_raw)
 
-        # Se queres impedir descontos repetidos, usa exists()
-        # (ignora o próprio registo em edição)
         qs = Fidelidade.objects.filter(desconto=desconto)
         if instance and instance.pk:
             qs = qs.exclude(pk=instance.pk)
