@@ -1,21 +1,25 @@
 # fidelidade/ledger.py
+from __future__ import annotations
+
 from datetime import timedelta
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from django.apps import apps
 from django.db.models import Max, Sum
 from django.utils import timezone
 
 if TYPE_CHECKING:
-    from djangoapp.fidelidade.models import MovimentoPontos
+    from djangoapp.fidelidade.models import MovimentoPontos as MovimentoPontosModel
+else:
+    MovimentoPontosModel = Any  # type: ignore[misc,assignment]
 
 
-def _get_movimento_model():
+def _get_movimento_model() -> type["MovimentoPontosModel"]:
     """
     Evita import circular: em vez de `from djangoapp.fidelidade.models import MovimentoPontos`,
-    usamos apps.get_model.
+    usamos apps.get_model, mas mantendo typing para o mypy.
     """
-    return apps.get_model("fidelidade", "MovimentoPontos")
+    return cast(type["MovimentoPontosModel"], apps.get_model("fidelidade", "MovimentoPontos"))
 
 
 def get_ledger_balance(utilizador, fidelidade=None):
@@ -23,9 +27,9 @@ def get_ledger_balance(utilizador, fidelidade=None):
     Saldo de pontos baseado apenas no ledger:
     (CREDITO + AJUSTE) - (DEBITO_RES + DEBITO_EXP)
     """
-    MovimentoPontos = _get_movimento_model()
+    MovimentoPontosCls = _get_movimento_model()
 
-    qs = MovimentoPontos.objects.filter(
+    qs = MovimentoPontosCls.objects.filter(
         utilizador=utilizador,
         status="CONFIRMADO",
     )
@@ -54,10 +58,10 @@ def get_today_credited_points(utilizador, fidelidade=None):
     Pontos adicionados HOJE (movimentos CREDITO).
     Equivalente aos pontos indisponíveis do sistema antigo.
     """
-    MovimentoPontos = _get_movimento_model()
+    MovimentoPontosCls = _get_movimento_model()
     hoje = timezone.localdate()
 
-    qs = MovimentoPontos.objects.filter(
+    qs = MovimentoPontosCls.objects.filter(
         utilizador=utilizador,
         status="CONFIRMADO",
         tipo="CREDITO",
@@ -84,9 +88,9 @@ def get_last_purchase_dt(utilizador, fidelidade=None):
     Última compra relevante para expiração.
     (movimentos de tipo CREDITO)
     """
-    MovimentoPontos = _get_movimento_model()
+    MovimentoPontosCls = _get_movimento_model()
 
-    qs = MovimentoPontos.objects.filter(
+    qs = MovimentoPontosCls.objects.filter(
         utilizador=utilizador,
         status="CONFIRMADO",
         tipo="CREDITO",
@@ -120,31 +124,53 @@ def get_days_to_expiry(utilizador, dias_inatividade=45, fidelidade=None):
     today = timezone.localdate()
     return (expiry_date - today).days
 
+
 def get_movimentos_pontos(utilizador):
     """
     Lista de movimentos de pontos para um utilizador.
     """
-    MovimentoPontos = _get_movimento_model()
-    qs = MovimentoPontos.objects.filter(
+    MovimentoPontosCls = _get_movimento_model()
+    qs = MovimentoPontosCls.objects.filter(
         utilizador=utilizador,
         status="CONFIRMADO",
         tipo__in=["CREDITO", "DEBITO_RES", "DEBITO_EXP", "AJUSTE"],
     ).order_by("-criado_em")
 
-    movimentos = []
+    movimentos: list[dict[str, object]] = []
+    today = timezone.localdate()
+
     for movimento_raw in qs:
-        movimento = cast("MovimentoPontos", movimento_raw)
+        movimento = cast("MovimentoPontosModel", movimento_raw)
+
         tipo_display = movimento.get_tipo_display()
         criado_em_local = timezone.localtime(movimento.criado_em)
-        disponivel_amanha = timezone.localdate() <= criado_em_local.date() if movimento.tipo == 'CREDITO' else False
-        expirado = movimento.tipo == 'DEBITO_EXP'
-        pontos = float(movimento.pontos)
-        movimentos.append({
-            'data': criado_em_local.strftime('%Y-%m-%d'),
-            'tipo': tipo_display,
-            'pontos': '-' + str(pontos) if movimento.tipo == 'DEBITO_EXP' or movimento.tipo == 'DEBITO_RES' else pontos,
-            'cor': 'orange' if disponivel_amanha else 'red' if expirado else 'green' if movimento.tipo == 'CREDITO' else 'blue',
-            'disponivel_amanha': disponivel_amanha,
-            'expirado': expirado,
-        })
+
+        # Se o crédito foi criado hoje, só fica disponível amanhã
+        disponivel_amanha = movimento.tipo == "CREDITO" and criado_em_local.date() == today
+        expirado = movimento.tipo == "DEBITO_EXP"
+
+        pontos_float = float(movimento.pontos)
+        pontos_valor: object
+        if movimento.tipo in ("DEBITO_EXP", "DEBITO_RES"):
+            pontos_valor = f"-{pontos_float}"
+        else:
+            pontos_valor = pontos_float
+
+        movimentos.append(
+            {
+                "data": criado_em_local.strftime("%Y-%m-%d"),
+                "tipo": tipo_display,
+                "pontos": pontos_valor,
+                "cor": "orange"
+                if disponivel_amanha
+                else "red"
+                if expirado
+                else "green"
+                if movimento.tipo == "CREDITO"
+                else "blue",
+                "disponivel_amanha": disponivel_amanha,
+                "expirado": expirado,
+            }
+        )
+
     return movimentos
