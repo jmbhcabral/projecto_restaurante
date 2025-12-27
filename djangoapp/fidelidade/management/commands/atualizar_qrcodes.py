@@ -1,15 +1,19 @@
+# djangoapp/fidelidade/management/commands/atualizar_qrcodes.py
+from __future__ import annotations
+
 import json
 from io import BytesIO
 
 import qrcode
 from django.core.files import File
 from django.core.management.base import BaseCommand
+from qrcode.image.pil import PilImage
 
 from djangoapp.perfil.models import Perfil
 
 
 class Command(BaseCommand):
-    help = 'Atualiza os QR codes de todos os perfis'
+    help = "Atualiza os QR codes de todos os perfis"
 
     def handle(self, *args, **kwargs):
         perfis = Perfil.objects.select_related("usuario").all()
@@ -35,7 +39,12 @@ class Command(BaseCommand):
             qr.add_data(dados_json)
             qr.make(fit=True)
 
-            img_qr = qr.make_image(fill_color="black", back_color="white")
+            # ✅ Force PIL image so save(..., format="PNG") matches typing
+            img_qr = qr.make_image(
+                fill_color="black",
+                back_color="white",
+                image_factory=PilImage,
+            )
 
             img_io = BytesIO()
             img_qr.save(img_io, format="PNG")
@@ -44,8 +53,8 @@ class Command(BaseCommand):
             filename = f"qrcode_{perfil.numero_cliente}.png"
             perfil.qr_code.save(filename, File(img_io), save=True)
 
-            self.stdout.write(self.style.SUCCESS(
-                f"QR Code atualizado para {perfil.numero_cliente}"
-            ))
+            self.stdout.write(
+                self.style.SUCCESS(f"QR Code atualizado para {perfil.numero_cliente}")
+            )
 
         self.stdout.write(self.style.SUCCESS("Todos os QR Codes atualizados"))
