@@ -51,12 +51,6 @@ def get_or_create_active_cart(request) -> Cart:
 
 
 def _apply_combo_selections(item: CartItem, selections: list[dict[str, Any]]) -> None:
-    """
-    English comments:
-    - Validate selections belong to the combo
-    - Enforce min/max constraints per group
-    - Persist CartItemComboSelection rows
-    """
     combo = item.product
 
     groups = (
@@ -65,16 +59,14 @@ def _apply_combo_selections(item: CartItem, selections: list[dict[str, Any]]) ->
         .order_by("sort_order", "pk")
     )
 
-    group_by_id = {g.pk: g for g in groups}
-    counts: dict[int, int] = {g.pk: 0 for g in groups}
+    group_by_id = {group.pk: group for group in groups}
+    counts: dict[int, int] = {group.pk: 0 for group in groups}
 
-    # If combo has required groups, selections must be provided
     if groups.exists() and not selections:
-        for g in groups:
-            if g.min_select > 0:
+        for group in groups:
+            if group.min_select > 0:
                 raise ValueError("Este menu requer seleções obrigatórias (ex: bebida e acompanhamento).")
 
-    # Prevent duplicate options in payload (better than hitting DB unique constraint)
     seen_option_ids: set[int] = set()
 
     for s in selections:
@@ -90,7 +82,7 @@ def _apply_combo_selections(item: CartItem, selections: list[dict[str, Any]]) ->
         seen_option_ids.add(option_id)
 
         g = group_by_id.get(group_id)
-        if not g:
+        if g is None:
             raise ValueError("Seleção inválida: grupo não pertence a este combo.")
 
         try:
@@ -119,15 +111,13 @@ def _apply_combo_selections(item: CartItem, selections: list[dict[str, Any]]) ->
         )
         counts[g.pk] += qty
 
-        # Early max check (fail fast)
         if counts[g.pk] > g.max_select:
             raise ValueError(f"Selecionaste demasiado em '{g.name}'.")
 
-    # Enforce min per group
-    for g in groups:
-        c = counts[g.pk]
-        if c < g.min_select:
-            raise ValueError(f"Falta selecionar em '{g.name}'.")
+    for group in groups:
+        c = counts[group.pk]
+        if c < group.min_select:
+            raise ValueError(f"Falta selecionar em '{group.name}'.")
 
 
 class CartViewSet(viewsets.ViewSet):

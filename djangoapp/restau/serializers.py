@@ -89,7 +89,9 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             data = super().validate(attrs)
             
             # Adiciona o ID do usuário aos dados retornados
-            data['user_id'] = self.user.id
+            user = getattr(self, "user", None)
+            if user is not None:
+                data["user_id"] = str(user.id)
             
             
             return data

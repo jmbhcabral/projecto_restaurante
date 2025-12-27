@@ -1,5 +1,6 @@
 from collections import OrderedDict
-from typing import Any, Dict
+from typing import Any, Dict, cast
+from uuid import UUID
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -395,17 +396,14 @@ class ValidateResetCodeSerializer(serializers.Serializer):
         data['reset_token'] = reset_token.token
         return data
 
-
 class ResetPasswordSerializer(serializers.Serializer):
     reset_token = serializers.UUIDField()
     new_password = serializers.CharField(write_only=True, min_length=8)
 
     def validate(self, attrs: Dict[str, Any]) -> Dict[str, Any]:
-        """Valida o token e a nova senha antes de redefinir."""
-        token = attrs.get("reset_token")
-        new_password = attrs.get("new_password", "")
+        token = cast(UUID, attrs["reset_token"])          # ✅ existe sempre, porque o field valida
+        new_password = cast(str, attrs["new_password"])   # ✅ existe sempre
 
-        # Verifica se o token é válido
         token_obj = PasswordResetToken.objects.filter(token=token).first()
         if not token_obj:
             raise serializers.ValidationError("O token é inválido ou já foi utilizado.")
@@ -413,33 +411,29 @@ class ResetPasswordSerializer(serializers.Serializer):
         if token_obj.is_expired():
             raise serializers.ValidationError("O token expirou. Solicite um novo código.")
 
-        # Valida a senha
-        if len(new_password) < 8:
-            raise serializers.ValidationError("A nova senha deve ter pelo menos 8 caracteres.")
         if " " in new_password:
             raise serializers.ValidationError("A nova senha não pode conter espaços.")
 
+        # opcional: guardas para reusar no save sem query extra
+        attrs["_token_obj"] = token_obj
         return attrs
 
     def save(self, **kwargs):
-        """Redefine a senha do utilizador e remove o token."""
-        if not isinstance(self.validated_data, dict):
-            raise serializers.ValidationError("Erro interno: os dados não foram validados corretamente.")
+        data = cast(dict[str, Any], self.validated_data)
 
-        token = self.validated_data.get("reset_token")
-        new_password = self.validated_data.get("new_password")
+        token_obj = data.get("_token_obj")
+        if token_obj is None:
+            token = cast(UUID, data["reset_token"])
+            token_obj = PasswordResetToken.objects.filter(token=token).first()
+            if not token_obj:
+                raise serializers.ValidationError("O token é inválido ou já foi utilizado.")
 
-        # Busca o token validado
-        token_obj = PasswordResetToken.objects.filter(token=token).first()
-        if not token_obj:
-            raise serializers.ValidationError("O token é inválido ou já foi utilizado.")
+        new_password = cast(str, data["new_password"])
 
-        # Atualiza a senha do utilizador
         user = token_obj.user
         user.set_password(new_password)
-        user.save()
+        user.save(update_fields=["password"])
 
-        # Apaga o token após uso
         token_obj.delete()
 
         return {"message": "Senha redefinida com sucesso."}

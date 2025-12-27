@@ -1,5 +1,8 @@
 # djangoapp/restau/urls.py
+from typing import List, Union
+
 from django.urls import path
+from django.urls.resolvers import URLPattern, URLResolver
 from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt.views import TokenVerifyView  # TokenObtainPairView,
 
@@ -22,7 +25,7 @@ produto_api_v1_router.register(
 # se não tiver outras urls sem ser de api
 # urlpatterns = produto_api_v1_router.urls
 
-urlpatterns = [
+urlpatterns: List[Union[URLPattern, URLResolver]] = [
     path(
         '',
         views.index,  

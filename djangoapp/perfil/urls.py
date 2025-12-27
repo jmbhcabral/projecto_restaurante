@@ -1,4 +1,7 @@
+from typing import List, Union
+
 from django.urls import path
+from django.urls.resolvers import URLPattern, URLResolver
 from rest_framework.routers import SimpleRouter
 
 from djangoapp.perfil import views
@@ -23,7 +26,7 @@ users_api_v1.register(
 )
 
 
-urlpatterns = [
+urlpatterns: List[Union[URLPattern, URLResolver]] = [
     path('perfil/', views.Criar.as_view(), name='criar'),
     path('perfil/user_verification_code/', views.VerificationCodeView.as_view(),
          name='user_verification_code'),
