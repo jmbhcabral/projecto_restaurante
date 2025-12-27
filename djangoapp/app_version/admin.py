@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import AppVersion
+from djangoapp.app_version.models import AppVersion
 
 
 @admin.register(AppVersion)

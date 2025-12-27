@@ -1,7 +1,9 @@
 # djangoapp/commerce/api/admin_urls.py
 from __future__ import annotations
 
-from commerce.api.views.admin_catalog import (
+from rest_framework.routers import DefaultRouter
+
+from djangoapp.commerce.api.views.admin_catalog import (
     AdminAddOnGroupViewSet,
     AdminAddOnOptionViewSet,
     AdminCategoryViewSet,
@@ -11,11 +13,10 @@ from commerce.api.views.admin_catalog import (
     AdminProductPriceViewSet,
     AdminProductViewSet,
 )
-from commerce.api.views.admin_combos import (
+from djangoapp.commerce.api.views.admin_combos import (
     AdminComboChoiceGroupViewSet,
     AdminComboChoiceOptionViewSet,
 )
-from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 

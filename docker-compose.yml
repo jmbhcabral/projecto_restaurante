@@ -1,36 +1,43 @@
-
 services:
   djangoapp:
     container_name: djangoapp
     build:
       context: .
-    stdin_open: true # equivalente ao -i do docker run
-    tty: true        # equivalente ao -t do docker run
+    stdin_open: true
+    tty: true
     ports:
       - 8000:8000
+    working_dir: /app/djangoapp
     volumes:
-      - ./djangoapp:/djangoapp
+      - .:/app
       - ./data/web/static:/data/web/static/
       - ./data/web/media:/data/web/media/
     env_file:
-      - ./dotenv_files/.env
+      - ./dotenv_files/.env.docker
+    environment:
+      - PYTHONPATH=/app
+      - DJANGO_SETTINGS_MODULE=djangoapp.project.settings
     depends_on:
       - psql
-      - redis   # 👈 novo: garantir que redis arranca antes
+      - redis
 
   celery_worker:
     container_name: celery_worker
     build:
       context: .
-    command: celery -A project worker -l info
+    command: /venv/bin/celery -A djangoapp.project worker -l info
     stdin_open: true
     tty: true
+    working_dir: /app/djangoapp
     volumes:
-      - ./djangoapp:/djangoapp
+      - .:/app
       - ./data/web/static:/data/web/static/
       - ./data/web/media:/data/web/media/
     env_file:
-      - ./dotenv_files/.env
+      - ./dotenv_files/.env.docker
+    environment:
+      - PYTHONPATH=/app
+      - DJANGO_SETTINGS_MODULE=djangoapp.project.settings
     depends_on:
       - psql
       - redis
@@ -39,15 +46,19 @@ services:
     container_name: celery_beat
     build:
       context: .
-    command: celery -A project beat -l info
+    command: /venv/bin/celery -A djangoapp.project beat -l info
     stdin_open: true
     tty: true
+    working_dir: /app/djangoapp
     volumes:
-      - ./djangoapp:/djangoapp
+      - .:/app
       - ./data/web/static:/data/web/static/
       - ./data/web/media:/data/web/media/
     env_file:
-      - ./dotenv_files/.env
+      - ./dotenv_files/.env.docker
+    environment:
+      - PYTHONPATH=/app
+      - DJANGO_SETTINGS_MODULE=djangoapp.project.settings
     depends_on:
       - psql
       - redis
@@ -57,9 +68,6 @@ services:
     image: redis:7-alpine
     ports:
       - "6379:6379"
-    # Se quiseres persistir dados do Redis (não é obrigatório para Celery):
-    # volumes:
-    #   - ./data/redis:/data
 
   psql:
     container_name: psql
@@ -69,4 +77,4 @@ services:
     ports:
       - 5433:5432
     env_file:
-      - ./dotenv_files/.env
+      - ./dotenv_files/.env.docker

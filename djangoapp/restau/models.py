@@ -1,8 +1,10 @@
-from django.db import models
-from utils.model_validators import positive_price
-from utils.images import resize_image
 from decimal import Decimal
 from typing import Any, Optional
+
+from django.db import models
+
+from djangoapp.utils.images import resize_image
+from djangoapp.utils.model_validators import positive_price
 
 
 class Category(models.Model):

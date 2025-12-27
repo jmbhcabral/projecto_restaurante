@@ -1,6 +1,6 @@
 from django.contrib import admin
-from site_setup.models import MenuLink, SiteSetup
 
+from djangoapp.site_setup.models import MenuLink, SiteSetup
 
 # @admin.register(MenuLink)
 # class MenuLinkAdmin(admin.ModelAdmin):

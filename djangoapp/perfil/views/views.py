@@ -17,20 +17,23 @@ from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
 from django.views import View
 from django.views.decorators.cache import never_cache
-from fidelidade import models as fidelidade_models
-from restau.models import ActiveSetup
-from utils.email_confirmation import send_confirmation_email, send_reset_password_email
-from utils.generate_reset_password_code import generate_reset_password_code
-from utils.listar_compras_ofertas import listar_compras_ofertas
-from utils.model_validators import (
+
+from djangoapp.fidelidade import models as fidelidade_models
+from djangoapp.perfil import forms as perfil_forms
+from djangoapp.perfil import models as perfil_models
+from djangoapp.perfil.forms import RequestResetPasswordForm, ResetPasswordForm
+from djangoapp.restau.models import ActiveSetup
+from djangoapp.utils.email_confirmation import (
+    send_confirmation_email,
+    send_reset_password_email,
+)
+from djangoapp.utils.generate_reset_password_code import generate_reset_password_code
+from djangoapp.utils.listar_compras_ofertas import listar_compras_ofertas
+from djangoapp.utils.model_validators import (
     calcular_pontos_expirados,
     calcular_total_pontos,
     calcular_total_pontos_disponiveis,
 )
-
-from perfil import forms as perfil_forms
-from perfil import models as perfil_models
-from perfil.forms import RequestResetPasswordForm, ResetPasswordForm
 
 
 class BasePerfil(View):
@@ -222,7 +225,7 @@ class VerificationCodeView(BasePerfil):
             if estudante_id:
                 try:
                     estudante = fidelidade_models.RespostaFidelidade.objects.get(id=estudante_id)
-                    perfil = perfil_models.Perfil.objects.create(
+                    perfil_models.Perfil.objects.create(
                         usuario=user,
                         estudante=estudante,  # Passa o objeto diretamente
                         **perfil_data
@@ -231,7 +234,7 @@ class VerificationCodeView(BasePerfil):
                     messages.error(self.request, 'Erro ao recuperar dados de fidelidade.')
                     return render(self.request, self.template_name, self.context)
             else:
-                perfil = perfil_models.Perfil.objects.create(
+                perfil_models.Perfil.objects.create(
                     usuario=user,
                     **perfil_data
                 )

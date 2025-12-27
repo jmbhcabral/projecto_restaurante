@@ -1,11 +1,12 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
-from django.forms import formset_factory
-from fidelidade.models import Fidelidade, ProdutoFidelidadeIndividual
-from restau.models import Category, SubCategory
-from utils.model_validators import calcular_pontos
-from fidelidade.forms import FidelidadeForm, ProdutoFidelidadeIndividualForm
 from django.contrib import messages
+from django.forms import formset_factory
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+
+from djangoapp.fidelidade.forms import FidelidadeForm, ProdutoFidelidadeIndividualForm
+from djangoapp.fidelidade.models import Fidelidade, ProdutoFidelidadeIndividual
+from djangoapp.restau.models import Category, SubCategory
+from djangoapp.utils.model_validators import calcular_pontos
 
 
 def criar_fidelidade(request):

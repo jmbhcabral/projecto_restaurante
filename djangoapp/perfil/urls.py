@@ -1,10 +1,9 @@
 from django.urls import path
 from rest_framework.routers import SimpleRouter
 
-from perfil import views
-
-from .views.admin_views import NotificationBroadcastAdminView
-from .views.perfil_api import (
+from djangoapp.perfil import views
+from djangoapp.perfil.views.admin_views import NotificationBroadcastAdminView
+from djangoapp.perfil.views.perfil_api import (
     CancelRegistrationApiView,
     GetCSRFToken,
     NotificationBroadcastView,

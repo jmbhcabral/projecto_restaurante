@@ -1,7 +1,9 @@
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required, user_passes_test
-from restau.models import ActiveSetup, Fotos, Horario
 from typing import Dict
+
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import render
+
+from djangoapp.restau.models import ActiveSetup, Fotos, Horario
 
 
 @login_required(login_url='/perfil')

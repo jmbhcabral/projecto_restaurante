@@ -1,6 +1,7 @@
 from django.db import models
-from utils.model_validators import validate_png
-from utils.images import resize_image
+
+from djangoapp.utils.images import resize_image
+from djangoapp.utils.model_validators import validate_png
 
 
 class MenuLink(models.Model):

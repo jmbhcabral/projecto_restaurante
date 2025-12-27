@@ -1,13 +1,17 @@
 # djangoapp/commerce/api/views/combos.py
 from __future__ import annotations
 
-from commerce.api.serializers.combos import ComboConfigSerializer, ComboListSerializer
-from commerce.models import ComboChoiceGroup, ComboChoiceOption, Product
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from djangoapp.commerce.api.serializers.combos import (
+    ComboConfigSerializer,
+    ComboListSerializer,
+)
+from djangoapp.commerce.models import ComboChoiceGroup, ComboChoiceOption, Product
 
 
 class ComboViewSet(viewsets.ReadOnlyModelViewSet):

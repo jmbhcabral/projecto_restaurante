@@ -4,7 +4,7 @@ from typing import Iterable, List, Optional, Sequence
 from django.db.models import QuerySet
 from exponent_server_sdk import PushClient, PushMessage
 
-from perfil.models import PushNotificationToken
+from djangoapp.perfil.models import PushNotificationToken
 
 logger = logging.getLogger(__name__)
 

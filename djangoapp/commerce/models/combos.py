@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 
-from .catalog import Product, TimeStampedModel
+from djangoapp.commerce.models.catalog import Product, TimeStampedModel
 
 
 class ComboChoiceGroup(TimeStampedModel):

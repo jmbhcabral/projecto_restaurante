@@ -3,8 +3,9 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
-from restau.models import Ementa, Products
-from utils.model_validators import calcular_pontos
+
+from djangoapp.restau.models import Ementa, Products
+from djangoapp.utils.model_validators import calcular_pontos
 
 
 class Fidelidade(models.Model):

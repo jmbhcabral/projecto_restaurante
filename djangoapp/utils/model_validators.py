@@ -76,7 +76,7 @@ def verificar_expiracao_pontos(utilizador, dias_inatividade=45):
     A expiração real passa a ser feita via ledger (DEBITO_EXP).
     """
 
-    from perfil.models import Perfil
+    from djangoapp.perfil.models import Perfil
 
     try:
         perfil = Perfil.objects.get(usuario=utilizador)
@@ -106,7 +106,7 @@ def calcular_total_pontos(utilizador):
     ANTES: via ComprasFidelidade/OfertasFidelidade.
     AGORA: via ledger, mas mantém assinatura e nome.
     """
-    from fidelidade.ledger import get_ledger_balance
+    from djangoapp.fidelidade.ledger import get_ledger_balance
 
     return get_ledger_balance(utilizador)
 
@@ -117,7 +117,7 @@ def calcular_total_pontos_disponiveis(user):
     ANTES: recalculava diretamente nas tabelas antigas.
     AGORA: delega no ledger.
     """
-    from fidelidade.ledger import get_available_points
+    from djangoapp.fidelidade.ledger import get_available_points
 
     return get_available_points(user)
 
@@ -128,7 +128,7 @@ def calcular_pontos_indisponiveis(user):
     ANTES: somava ComprasFidelidade de hoje.
     AGORA: usa o ledger (CREDITO de hoje).
     """
-    from fidelidade.ledger import get_today_credited_points
+    from djangoapp.fidelidade.ledger import get_today_credited_points
 
     return get_today_credited_points(user)
 
@@ -158,7 +158,7 @@ def calcular_dias_para_expirar(user):
     Calcular quantos dias faltam para os pontos expirarem.
     Agora delega para o ledger (get_days_to_expiry).
     """
-    from fidelidade.ledger import get_days_to_expiry
+    from djangoapp.fidelidade.ledger import get_days_to_expiry
 
     return get_days_to_expiry(user, dias_inatividade=45)
 

@@ -7,23 +7,16 @@ from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
-from fidelidade.models import RespostaFidelidade
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from utils.notifications import (
-    send_push_notification,
-    send_push_notifications_to_all,
-    send_push_notifications_to_users,
-)
 
-from perfil.models import Perfil
-
-from ..models import Notification, PushNotificationToken
-from ..serializers import (
+from djangoapp.fidelidade.models import RespostaFidelidade
+from djangoapp.perfil.models import Notification, Perfil, PushNotificationToken
+from djangoapp.perfil.serializers import (
     CancelRegistrationSerializer,
     NotificationBroadcastSerializer,
     RequestResetPasswordSerializer,
@@ -31,6 +24,11 @@ from ..serializers import (
     UserConfirmationSerializer,
     UserRegistrationSerializer,
     ValidateResetCodeSerializer,
+)
+from djangoapp.utils.notifications import (
+    send_push_notification,
+    send_push_notifications_to_all,
+    send_push_notifications_to_users,
 )
 
 
@@ -209,12 +207,6 @@ class CancelRegistrationApiView(APIView):
     """Cancela o registo do usuário"""
     def post(self, request):
         serializer = CancelRegistrationSerializer(data=request.data, context={'request': request})
-
-        user_id = request.user.id
-
-
-        user_instance = get_object_or_404(User, pk=user_id)
-        perfil_instance = Perfil.objects.filter(usuario=user_instance).first()
 
         print('📩 Dados recebidos para update:', request.data)
         if serializer.is_valid():

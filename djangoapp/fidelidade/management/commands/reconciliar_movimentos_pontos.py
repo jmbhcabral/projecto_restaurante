@@ -6,7 +6,11 @@ from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
 
-from fidelidade.models import ComprasFidelidade, MovimentoPontos, OfertasFidelidade
+from djangoapp.fidelidade.models import (
+    ComprasFidelidade,
+    MovimentoPontos,
+    OfertasFidelidade,
+)
 
 User = get_user_model()
 

@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 
-from .models import AppVersion
+from djangoapp.app_version.models import AppVersion
 
 
 @require_GET

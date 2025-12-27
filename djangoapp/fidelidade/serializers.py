@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import ProdutoFidelidadeIndividual
+
+from djangoapp.fidelidade.models import ProdutoFidelidadeIndividual
 
 
 class ProdutoFidelidadeIndividualSerializer(serializers.ModelSerializer):

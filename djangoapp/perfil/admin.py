@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import reverse
 
-from perfil.models import (
+from djangoapp.perfil.models import (
     Morada,
     Notification,
     PasswordResetToken,

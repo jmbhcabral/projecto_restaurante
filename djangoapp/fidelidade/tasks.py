@@ -6,15 +6,15 @@ from celery import shared_task  # type: ignore
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from utils.notifications import send_push_notification
 
-from fidelidade.models import NotificacaoAutomatica
-from fidelidade.services import expirar_saldo_utilizador
-from fidelidade.services_notificacoes import send_email_notification
-from fidelidade.utils_notifications import (
+from djangoapp.fidelidade.models import NotificacaoAutomatica
+from djangoapp.fidelidade.services import expirar_saldo_utilizador
+from djangoapp.fidelidade.services_notificacoes import send_email_notification
+from djangoapp.fidelidade.utils_notifications import (
     obter_aniversarios_para_notificar,
     obter_utilizadores_pontos_a_expirar,
 )
+from djangoapp.utils.notifications import send_push_notification
 
 User = get_user_model()
 

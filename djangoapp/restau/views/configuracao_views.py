@@ -1,12 +1,25 @@
-from django.shortcuts import render, redirect
-from restau.models import (
-    ActiveSetup, ImagemLogo, ImagemTopo, Intro, IntroImagem, FraseCima,
-    ImagemFraseCima, FraseInspiradora, FraseBaixo, ImagemFraseBaixo,
-    ImagemPadrao, ContactosSite, GoogleMaps, Horario
-)
 from typing import Dict
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import redirect, render
+
+from djangoapp.restau.models import (
+    ActiveSetup,
+    ContactosSite,
+    FraseBaixo,
+    FraseCima,
+    FraseInspiradora,
+    GoogleMaps,
+    Horario,
+    ImagemFraseBaixo,
+    ImagemFraseCima,
+    ImagemLogo,
+    ImagemPadrao,
+    ImagemTopo,
+    Intro,
+    IntroImagem,
+)
 
 
 @login_required

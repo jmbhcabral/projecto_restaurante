@@ -8,15 +8,16 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from fidelidade.forms import ComprasFidelidadeForm, OfertasFidelidadeForm
-from fidelidade.models import ComprasFidelidade
-from fidelidade.services import registar_compra, registar_oferta
-from perfil.views.perfil_api import send_push_notification
-from utils.model_validators import (
+from utils.scanner_input_interpreter import interpretar_dados
+
+from djangoapp.fidelidade.forms import ComprasFidelidadeForm, OfertasFidelidadeForm
+from djangoapp.fidelidade.models import ComprasFidelidade
+from djangoapp.fidelidade.services import registar_compra, registar_oferta
+from djangoapp.perfil.views.perfil_api import send_push_notification
+from djangoapp.utils.model_validators import (
     calcular_total_pontos,
     calcular_total_pontos_disponiveis,
 )
-from utils.scanner_input_interpreter import interpretar_dados
 
 logger = logging.getLogger(__name__)
 

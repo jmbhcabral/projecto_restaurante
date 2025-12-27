@@ -7,9 +7,9 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Q
 
-from .catalog import Ingredient, Product, TimeStampedModel
-from .combos import ComboChoiceGroup, ComboChoiceOption
-from .pricing import AddOnOption
+from djangoapp.commerce.models.catalog import Ingredient, Product, TimeStampedModel
+from djangoapp.commerce.models.combos import ComboChoiceGroup, ComboChoiceOption
+from djangoapp.commerce.models.pricing import AddOnOption
 
 if TYPE_CHECKING:
     from django.db.models.manager import Manager

@@ -2,8 +2,14 @@ from __future__ import annotations
 
 from typing import Any, Mapping, cast
 
-from commerce.api.permissions import IsCartOwner
-from commerce.api.serializers.cart import (
+from django.db import transaction
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+
+from djangoapp.commerce.api.permissions import IsCartOwner
+from djangoapp.commerce.api.serializers.cart import (
     CartAddAddonInputSerializer,
     CartAddItemInputSerializer,
     CartRemoveAddonInputSerializer,
@@ -11,7 +17,7 @@ from commerce.api.serializers.cart import (
     CartSerializer,
     CartUpdateItemInputSerializer,
 )
-from commerce.models import (
+from djangoapp.commerce.models import (
     AddOnOption,
     Cart,
     CartItem,
@@ -23,12 +29,7 @@ from commerce.models import (
     Product,
     ProductDefaultIngredient,
 )
-from commerce.services.cart_loader import load_cart
-from django.db import transaction
-from rest_framework import status, viewsets
-from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
-from rest_framework.response import Response
+from djangoapp.commerce.services.cart_loader import load_cart
 
 
 def get_or_create_active_cart(request) -> Cart:

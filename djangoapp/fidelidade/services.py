@@ -1,8 +1,12 @@
 from django.db import transaction
 from django.utils import timezone
 
-from fidelidade.ledger import get_days_to_expiry, get_ledger_balance
-from fidelidade.models import ComprasFidelidade, MovimentoPontos, OfertasFidelidade
+from djangoapp.fidelidade.ledger import get_days_to_expiry, get_ledger_balance
+from djangoapp.fidelidade.models import (
+    ComprasFidelidade,
+    MovimentoPontos,
+    OfertasFidelidade,
+)
 
 
 def registar_compra(compra: ComprasFidelidade):

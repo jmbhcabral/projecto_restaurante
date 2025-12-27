@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from commerce.api.permissions import IsAccessRestricted
-from commerce.api.serializers.admin_combos import (
+from rest_framework import filters, viewsets
+
+from djangoapp.commerce.api.permissions import IsAccessRestricted
+from djangoapp.commerce.api.serializers.admin_combos import (
     AdminComboChoiceGroupSerializer,
     AdminComboChoiceOptionSerializer,
 )
-from commerce.models import ComboChoiceGroup, ComboChoiceOption
-from rest_framework import filters, viewsets
+from djangoapp.commerce.models import ComboChoiceGroup, ComboChoiceOption
 
 
 class AdminComboChoiceGroupViewSet(viewsets.ModelViewSet):

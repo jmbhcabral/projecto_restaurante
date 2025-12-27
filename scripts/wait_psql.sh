@@ -1,6 +1,8 @@
 #!/bin/sh
-while ! nc -z $POSTGRES_HOST $POSTGRES_PORT; do
-  echo "🟡 Waiting for Postgres Database Startup ($POSTGRES_HOST $POSTGRES_PORT) ..."
+set -e
+
+while ! nc -z "$POSTGRES_HOST" "$POSTGRES_PORT"; do
+  echo "🟡 Waiting for Postgres Database Startup ($POSTGRES_HOST:$POSTGRES_PORT) ..."
   sleep 2
 done
 

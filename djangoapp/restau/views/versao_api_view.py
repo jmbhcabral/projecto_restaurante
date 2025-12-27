@@ -1,7 +1,8 @@
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from restau.models import VersaoApp
-from restau.serializers import VersaoAppSerializer
+from rest_framework.views import APIView
+
+from djangoapp.restau.models import VersaoApp
+from djangoapp.restau.serializers import VersaoAppSerializer
 
 
 class UltimaVersaoAPIView(APIView):

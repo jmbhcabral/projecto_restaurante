@@ -6,10 +6,13 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.validators import validate_email as django_validate_email
 from django.utils import timezone
 from rest_framework import serializers
-from utils.email_confirmation import send_confirmation_email, send_reset_password_email
-from utils.generate_reset_password_code import generate_reset_password_code
 
-from perfil.models import PasswordResetToken, Perfil, RespostaFidelidade
+from djangoapp.perfil.models import PasswordResetToken, Perfil, RespostaFidelidade
+from djangoapp.utils.email_confirmation import (
+    send_confirmation_email,
+    send_reset_password_email,
+)
+from djangoapp.utils.generate_reset_password_code import generate_reset_password_code
 
 User = get_user_model()
 

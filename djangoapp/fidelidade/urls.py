@@ -1,10 +1,15 @@
 from django.urls import path
-from fidelidade.views import (
-    fidelidades, criar_fidelidade, editar_fidelidade, apagar_fidelidade,
-    fidelidade, pontos_produtos_fidelidade, util_ind_fidelidade,
-)
-from fidelidade.views.fidel_api import ProdutoFidelidadeAPI, TotalPontosAPIV1
 
+from djangoapp.fidelidade.views import (
+    apagar_fidelidade,
+    criar_fidelidade,
+    editar_fidelidade,
+    fidelidade,
+    fidelidades,
+    pontos_produtos_fidelidade,
+    util_ind_fidelidade,
+)
+from djangoapp.fidelidade.views.fidel_api import ProdutoFidelidadeAPI, TotalPontosAPIV1
 
 app_name = 'fidelidade'
 

@@ -1,14 +1,15 @@
 # djangoapp/commerce/api/views/catalog.py
 from __future__ import annotations
 
-from commerce.api.serializers.catalog import (
+from django.db.models import Q, QuerySet
+from rest_framework import viewsets
+
+from djangoapp.commerce.api.serializers.catalog import (
     CategorySerializer,
     ProductDetailSerializer,
     ProductListSerializer,
 )
-from commerce.models import Category, Product
-from django.db.models import Q, QuerySet
-from rest_framework import viewsets
+from djangoapp.commerce.models import Category, Product
 
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):

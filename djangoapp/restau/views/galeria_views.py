@@ -1,6 +1,7 @@
-from django.shortcuts import render
-from restau.models import Fotos
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import render
+
+from djangoapp.restau.models import Fotos
 
 
 @login_required

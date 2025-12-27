@@ -1,11 +1,14 @@
 from django import forms
-from decimal import Decimal
 from django.contrib.auth.models import User
-from fidelidade.models import (
-    Fidelidade, ProdutoFidelidadeIndividual, Products,
-    ComprasFidelidade, OfertasFidelidade)
 from django.core.exceptions import ValidationError
-from utils.scanner_input_interpreter import interpretar_dados
+
+from djangoapp.fidelidade.models import (
+    ComprasFidelidade,
+    Fidelidade,
+    OfertasFidelidade,
+    Products,
+    ProdutoFidelidadeIndividual,
+)
 
 
 class FidelidadeForm(forms.ModelForm):

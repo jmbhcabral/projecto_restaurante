@@ -2,9 +2,9 @@ from django import forms
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from fidelidade.models import RespostaFidelidade
 
-from perfil.models import Perfil
+from djangoapp.fidelidade.models import RespostaFidelidade
+from djangoapp.perfil.models import Perfil
 
 from . import models
 
@@ -71,7 +71,6 @@ class PerfilForm(forms.ModelForm):
                 field.label_suffix = ''
 
     def clean(self, *args, **kwargs):
-        data = self.data
         cleaned = self.cleaned_data
         validation_error_msgs = {}
 
@@ -180,7 +179,6 @@ class UserForm(forms.ModelForm):
                 field.label_suffix = ''
 
     def clean(self, *args, **kwargs):
-        data = self.data
         cleaned = self.cleaned_data
         validation_error_msgs = {}
 
@@ -349,5 +347,4 @@ class ResetPasswordForm(forms.Form):
                 validation_error_msgs['password2'] = error_msg_passwords_not_match
 
         if validation_error_msgs:
-            message.error(request, 'Erro ao alterar a palavra-passe.')
             raise (forms.ValidationError(validation_error_msgs))

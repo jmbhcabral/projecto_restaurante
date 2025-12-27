@@ -1,9 +1,10 @@
-from restau.forms import FotosForm, FotosFormSet
-from restau.models import Fotos
-from django.shortcuts import render, redirect
-from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import redirect, render
+from django.urls import reverse
+
+from djangoapp.restau.forms import FotosForm, FotosFormSet
+from djangoapp.restau.models import Fotos
 
 
 @login_required

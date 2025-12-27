@@ -1,7 +1,8 @@
 ''' Função para listar as compras e ofertas de um utilizador '''
 
 from django.utils import timezone
-from fidelidade import models as fidelidade_models
+
+from djangoapp.fidelidade import models as fidelidade_models
 
 
 def listar_compras_ofertas(user):

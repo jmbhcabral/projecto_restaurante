@@ -1,7 +1,8 @@
 ''' Modulo de formulários para o app senhas '''
 
 from django import forms
-from .models import Senhas
+
+from djangoapp.senhas.models import Senhas
 
 
 class SenhasForm(forms.ModelForm):

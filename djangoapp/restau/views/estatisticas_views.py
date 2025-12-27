@@ -2,7 +2,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.db import models
 from django.shortcuts import render
-from fidelidade.models import MovimentoPontos
+
+from djangoapp.fidelidade.models import MovimentoPontos
 
 
 @login_required

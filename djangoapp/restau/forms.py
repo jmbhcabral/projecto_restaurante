@@ -1,13 +1,29 @@
 ''' Modulo de formulários para o app restau. '''
 
-from django.core.exceptions import ValidationError
 from django import forms
+from django.core.exceptions import ValidationError
 from django.forms import modelformset_factory
-from restau.models import (
-    Category, SubCategory, Products, Ementa, ProdutosEmenta,
-    Fotos, ImagemLogo, ImagemTopo, Intro, IntroImagem, FraseInspiradora,
-    FraseCima, ImagemFraseCima, FraseBaixo, ImagemFraseBaixo, ImagemPadrao,
-    ContactosSite, GoogleMaps, Horario
+
+from djangoapp.restau.models import (
+    Category,
+    ContactosSite,
+    Ementa,
+    Fotos,
+    FraseBaixo,
+    FraseCima,
+    FraseInspiradora,
+    GoogleMaps,
+    Horario,
+    ImagemFraseBaixo,
+    ImagemFraseCima,
+    ImagemLogo,
+    ImagemPadrao,
+    ImagemTopo,
+    Intro,
+    IntroImagem,
+    Products,
+    ProdutosEmenta,
+    SubCategory,
 )
 
 

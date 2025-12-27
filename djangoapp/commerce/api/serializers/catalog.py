@@ -1,8 +1,9 @@
 # djangoapp/commerce/api/serializers/catalog.py
 from __future__ import annotations
 
-from commerce.models import Category, Product
 from rest_framework import serializers
+
+from djangoapp.commerce.models import Category, Product
 
 
 class CategorySerializer(serializers.ModelSerializer):

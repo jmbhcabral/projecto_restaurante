@@ -3,7 +3,9 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from commerce.models import (
+from rest_framework import serializers
+
+from djangoapp.commerce.models import (
     AddOnGroup,
     AddOnOption,
     Category,
@@ -11,9 +13,9 @@ from commerce.models import (
     IngredientPrice,
     Product,
     ProductDefaultIngredient,
+    ProductImage,
     ProductPrice,
 )
-from rest_framework import serializers
 
 # ---------------------------
 # Admin: Category / Product
@@ -133,3 +135,40 @@ class AdminAddOnOptionSerializer(serializers.ModelSerializer):
         return value
 
 
+# ---------------------------
+# Admin: Product Images
+# ---------------------------
+
+class AdminProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ("id", "gcs_path", "public_url", "is_primary", "order", "created_at")
+        read_only_fields = ("id", "gcs_path", "public_url", "created_at")
+
+
+class AdminProductWithImagesSerializer(serializers.ModelSerializer):
+    images = AdminProductImageSerializer(many=True, read_only=True)
+    primary_image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = (
+            "id",
+            "sku",
+            "name",
+            "description",
+            "category",
+            "base_price",
+            "status",
+            "is_sellable",
+            "product_type",
+            "images",
+            "primary_image_url",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = ("id", "created_at", "updated_at")
+
+    def get_primary_image_url(self, obj: Product):
+        img = obj.images.filter(is_primary=True).first()
+        return img.public_url if img else None

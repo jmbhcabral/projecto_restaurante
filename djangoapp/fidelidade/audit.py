@@ -1,7 +1,11 @@
 # fidelidade/audit.py
 from django.db.models import Sum
 
-from fidelidade.models import ComprasFidelidade, MovimentoPontos, OfertasFidelidade
+from djangoapp.fidelidade.models import (
+    ComprasFidelidade,
+    MovimentoPontos,
+    OfertasFidelidade,
+)
 
 
 def saldo_old_system(utilizador, fidelidade=None):

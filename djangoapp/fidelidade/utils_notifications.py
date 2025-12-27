@@ -4,10 +4,10 @@ from datetime import timedelta
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils import timezone
-from perfil.models import Perfil
 
-from fidelidade.ledger import get_expiry_date, get_ledger_balance
-from fidelidade.models import MovimentoPontos
+from djangoapp.fidelidade.ledger import get_expiry_date, get_ledger_balance
+from djangoapp.fidelidade.models import MovimentoPontos
+from djangoapp.perfil.models import Perfil
 
 DIAS_INATIVIDADE_EXPIRAR_PONTOS = 45
 

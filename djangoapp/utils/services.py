@@ -2,7 +2,8 @@ from datetime import datetime
 
 import requests
 from django.utils.timezone import make_aware
-from google_reviews.models import GoogleReview
+
+from djangoapp.google_reviews.models import GoogleReview
 
 
 def fetch_and_store_google_reviews(api_key, place_id):

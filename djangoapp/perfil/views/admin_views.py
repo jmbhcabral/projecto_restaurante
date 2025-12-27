@@ -9,10 +9,10 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
-from utils.notifications import send_push_notifications_to_users
 
-from perfil.models import Notification
-from perfil.serializers import NotificationBroadcastSerializer
+from djangoapp.perfil.models import Notification
+from djangoapp.perfil.serializers import NotificationBroadcastSerializer
+from djangoapp.utils.notifications import send_push_notifications_to_users
 
 logger = logging.getLogger(__name__)
 
