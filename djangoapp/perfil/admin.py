@@ -38,9 +38,12 @@ class PasswordResetTokenAdmin(admin.ModelAdmin):
 
 @admin.register(PushNotificationToken)
 class PushNotificationTokenAdmin(admin.ModelAdmin):
-    list_display = 'id', 'user', 'expo_token', 'created_at'
-    list_display_links = 'id', 'user'
-    search_fields = 'id', 'user', 'expo_token', 'created_at'
+    list_display = ('id', 'user', 'expo_token', 'created_at')
+    list_display_links = ('id', 'user')
+    search_fields = ('expo_token', 'user__username', 'user__email')
+    list_filter = ('created_at',)
+    date_hierarchy = 'created_at'
+
 
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
