@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import cast
+from typing import Any, cast
 
 from django import forms
 from django.contrib.auth.models import User
@@ -160,6 +160,11 @@ class ProdutoFidelidadeIndividualForm(forms.ModelForm):
 
 
 class ComprasFidelidadeForm(forms.ModelForm):
+    """
+    compra is optional only for QR flow, because the server fills it from QR payload.
+    For manual flow (no QR), compra becomes required via clean().
+    """
+
     class Meta:
         model = ComprasFidelidade
         fields = [
@@ -187,17 +192,19 @@ class ComprasFidelidadeForm(forms.ModelForm):
             }
         ),
         label="Compra",
-        required=False,
+        required=False,  # kept optional; enforced conditionally in clean()
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         fidelidade_id = kwargs.pop("fidelidade_id", None)
         utilizador_pk = kwargs.pop("utilizador_pk", None)
         super().__init__(*args, **kwargs)
 
+        # Default flag; view may override it: form.is_qr = bool(qr_data)
+        self.is_qr = getattr(self, "is_qr", False)
+
         if fidelidade_id:
             fidelidade_instance = Fidelidade.objects.get(pk=fidelidade_id)
-
             fidelidade_field = cast(forms.ModelChoiceField, self.fields["fidelidade"])
             fidelidade_field.queryset = Fidelidade.objects.filter(
                 ementa__fidelidade__pk=fidelidade_id
@@ -206,10 +213,25 @@ class ComprasFidelidadeForm(forms.ModelForm):
 
         if utilizador_pk:
             utilizador_instance = User.objects.get(pk=utilizador_pk)
-
             utilizador_field = cast(forms.ModelChoiceField, self.fields["utilizador"])
             utilizador_field.queryset = User.objects.filter(perfil__pk=utilizador_pk)
             utilizador_field.initial = utilizador_instance
+
+    def clean(self) -> dict[str, Any]:
+        cleaned = super().clean()
+
+        # Normalize empty string to None for consistent checks
+        compra = cleaned.get("compra")
+        if compra == "":
+            compra = None
+            cleaned["compra"] = None
+
+        # If not QR flow, require compra
+        if not getattr(self, "is_qr", False):
+            if compra is None:
+                self.add_error("compra", "Campo obrigatório.")
+
+        return cleaned
 
 
 class OfertasFidelidadeForm(forms.ModelForm):
