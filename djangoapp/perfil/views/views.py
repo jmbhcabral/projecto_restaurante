@@ -36,6 +36,59 @@ from djangoapp.utils.model_validators import (
 )
 
 
+class SignUpView(View):
+    """Signup with email + password only (creates temp session and sends verification code)."""
+
+    template_name = "perfil/signup.html"
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect("perfil:conta")
+
+        active_setup = ActiveSetup.objects.order_by("-id").first()
+
+        context = {
+            "active_setup": active_setup,
+            "form": perfil_forms.RegisterForm(),
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect("perfil:conta")
+
+        # Clear any stale signup session
+        request.session.pop("temp_user", None)
+
+        form = perfil_forms.RegisterForm(request.POST)
+        if not form.is_valid():
+            for errors in form.errors.values():
+                for err in errors:
+                    messages.error(request, err)
+            return redirect("perfil:signup")
+
+        email = form.cleaned_data["email"]
+        password = form.cleaned_data["password1"]
+
+        # Use email as username (simple approach for default Django User model)
+        username = email
+
+        # Generate and store verification code
+        code = generate_reset_password_code()
+
+        request.session["temp_user"] = {
+            "username": username,
+            "email": email,
+            "password": password,
+            "code": code,
+        }
+
+        # Send confirmation email
+        send_confirmation_email(request, email, username, code)
+
+        messages.success(request, "Verifique o seu email para criar a conta!")
+        return redirect("perfil:user_verification_code")
+
 class BasePerfil(View):
     '''Base class for the perfil views.'''
 

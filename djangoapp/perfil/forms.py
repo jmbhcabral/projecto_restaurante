@@ -1,13 +1,94 @@
+# djangoapp/perfil/forms.py
+from __future__ import annotations
+
 from django import forms
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from djangoapp.fidelidade.models import RespostaFidelidade
 from djangoapp.perfil.models import Perfil
 
-from . import models
+User = get_user_model()
 
+class RegisterForm(forms.Form):
+    """Registration form with email + password only."""
+
+    email = forms.EmailField(required=True, label="Email")
+    password1 = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(),
+        label="Palavra-passe",
+    )
+    password2 = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(),
+        label="Confirmar palavra-passe",
+    )
+
+    def clean_email(self):
+        email = (self.cleaned_data.get("email") or "").strip().lower()
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Este email já existe.")
+        return email
+
+    def clean(self):
+        cleaned = super().clean()
+        p1 = cleaned.get("password1")
+        p2 = cleaned.get("password2")
+
+        if p1 and p2 and p1 != p2:
+            self.add_error("password2", "As palavras-passe não coincidem.")
+
+        # Only validate password strength if we have a password
+        if p1:
+            try:
+                # Configuration in settings.py(AUTH_PASSWORD_VALIDATORS)
+                validate_password(p1)
+            except forms.ValidationError as e:
+                self.add_error("password1", e)
+
+        return cleaned
+
+class OnboardingPerfilForm(forms.ModelForm):
+    class Meta:
+        model = Perfil
+        fields = ("telemovel", "data_nascimento", "estudante")
+
+        widgets = {
+            "data_nascimento": forms.DateInput(attrs={"type": "date"}),
+        }
+
+    estudante = forms.ModelChoiceField(
+        queryset=RespostaFidelidade.objects.all(),
+        required=False,
+        label="Estudante",
+        help_text="Opcional (se aplicável).",
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        telemovel = cleaned.get("telemovel")
+        data_nascimento = cleaned.get("data_nascimento")
+
+        errors = {}
+
+        if telemovel:
+            if len(telemovel) != 9 or not telemovel.isdigit():
+                errors["telemovel"] = "O telemóvel tem de ter 9 dígitos."
+
+            # unique per profile (excluding current)
+            qs = Perfil.objects.filter(telemovel=telemovel).exclude(pk=self.instance.pk)
+            if qs.exists():
+                errors["telemovel"] = "Este número de telemóvel já existe."
+
+        if data_nascimento and data_nascimento > timezone.now().date():
+            errors["data_nascimento"] = "Data de nascimento inválida."
+
+        if errors:
+            raise forms.ValidationError(errors)
+        return cleaned
 
 class PerfilForm(forms.ModelForm):
     '''
@@ -17,7 +98,7 @@ class PerfilForm(forms.ModelForm):
         '''
         Meta Class
         '''
-        model = models.Perfil
+        model = Perfil
         fields = '__all__'
         exclude = (
             'usuario', 'numero_cliente', 'created_at',

@@ -1,4 +1,6 @@
 ''' Este módulo contém os modelos de dados para o aplicativo de perfil. '''
+# djangoapp/perfil/models.py
+from __future__ import annotations
 
 import uuid
 from datetime import timedelta
@@ -176,32 +178,29 @@ class Perfil(models.Model):
         super().save(*args, **kwargs)
 
     def clean(self):
-
         error_messages = {}
 
-        if not self.data_nascimento:
-            error_messages['data_nascimento'] = 'Data de Nascimento \
-            é obrigatória.'
+        # Only require these fields after onboarding, not at registration time
+        # if not self.data_nascimento:
+        #     error_messages['data_nascimento'] = 'Data de Nascimento é obrigatória.'
 
-        # Atualiza a data da última atualização da data de nascimento
         if self.pk:
             original = Perfil.objects.get(pk=self.pk)
             if original.data_nascimento != self.data_nascimento:
                 agora = timezone.now()
                 if self.ultima_atualizacao_data_nascimento:
-                    # 6 meses = aproximadamente 182.5 dias
-                    periodo_minimo = self.ultima_atualizacao_data_nascimento + \
-                        timezone.timedelta(days=182.5)
+                    periodo_minimo = self.ultima_atualizacao_data_nascimento + timezone.timedelta(days=182.5)
                     if agora < periodo_minimo:
                         error_messages['data_nascimento'] = (
-                            'A data de nascimento só pode ser alterada \
-                            passados 6 meses da última alteração.')
+                            'A data de nascimento só pode ser alterada passados 6 meses da última alteração.'
+                        )
                 self.ultima_atualizacao_data_nascimento = agora
 
         if self.nif and not validar_nif(self.nif):
             error_messages['nif'] = 'NIF inválido.'
 
-        raise ValidationError(error_messages)
+        if error_messages:
+            raise ValidationError(error_messages)
 
     def __str__(self):
         return f'{self.usuario.first_name} {self.usuario.last_name}'
@@ -240,17 +239,15 @@ class Morada(models.Model):
         error_messages = {}
         if not self.morada:
             error_messages['morada'] = 'Morada é obrigatória.'
-
         if not self.numero:
             error_messages['numero'] = 'Número é obrigatório.'
-
         if not self.codigo_postal:
             error_messages['codigo_postal'] = 'Código Postal é obrigatório.'
-
         if not self.ext_codigo_postal:
             error_messages['ext_codigo_postal'] = 'Extensão Código Postal é obrigatória.'
 
-        raise ValidationError(error_messages)
+        if error_messages:
+            raise ValidationError(error_messages)
 
     def __str__(self):
         return self.finalidade_morada
