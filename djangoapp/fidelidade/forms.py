@@ -44,7 +44,7 @@ class FidelidadeForm(forms.ModelForm):
             "ementa",
         )
 
-    def clean(self):
+    def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean() or {}
 
         nome = cleaned_data.get("nome")
@@ -58,7 +58,7 @@ class FidelidadeForm(forms.ModelForm):
                     "nome",
                     ValidationError("A fidelidade já existe.", code="invalid"),
                 )
-
+        #TODO: fix to only one return statement
         # Desconto é obrigatório (o mypy quer isto explícito)
         if desconto_raw is None:
             self.add_error(
@@ -218,7 +218,7 @@ class ComprasFidelidadeForm(forms.ModelForm):
             utilizador_field.initial = utilizador_instance
 
     def clean(self) -> dict[str, Any]:
-        cleaned = super().clean()
+        cleaned = super().clean() or {}
 
         # Normalize empty string to None for consistent checks
         compra = cleaned.get("compra")
