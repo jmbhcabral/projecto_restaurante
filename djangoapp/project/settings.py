@@ -289,3 +289,38 @@ GCS_PUBLIC_BASE_URL = os.getenv(
     "GCS_PUBLIC_BASE_URL",
     "change-me",
 )
+
+# Authentication configuration
+# AUTH_USER_MODEL = 'perfil.User'
+# LOGIN_URL = 'perfil:login'
+# LOGOUT_URL = 'perfil:logout'
+# LOGIN_REDIRECT_URL = 'perfil:dashboard'
+# LOGOUT_REDIRECT_URL = 'perfil:login'
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "OPTIONS": {
+            "message": "A palavra-passe não pode ser igual ao nome de utilizador.",
+        },
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": 8,
+            "message": "A palavra-passe deve ter no mínimo 8 caracteres.",
+        },
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+        "OPTIONS": {
+            "message": "A palavra-passe não pode ser uma palavra comum.",
+        },
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+        "OPTIONS": {
+            "message": "A palavra-passe não pode ser uma palavra numérica.",
+        },
+    },
+]

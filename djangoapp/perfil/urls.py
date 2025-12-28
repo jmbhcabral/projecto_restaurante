@@ -1,3 +1,6 @@
+# djangoapp/perfil/urls.py
+from __future__ import annotations
+
 from typing import List, Union
 
 from django.urls import path
@@ -71,6 +74,9 @@ urlpatterns: List[Union[URLPattern, URLResolver]] = [
     
     # Admin URLs
     path('admin/perfil/notification-broadcast/', NotificationBroadcastAdminView.as_view(), name='notification_broadcast_admin'),
+
+    # New Auth flow
+    path("signup/", views.SignUpView.as_view(), name="signup"),
 ]
 
 
