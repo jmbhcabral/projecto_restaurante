@@ -1,4 +1,8 @@
+# djangoapp/perfil/serializers.py
+from __future__ import annotations
+
 from collections import OrderedDict
+from datetime import timedelta
 from typing import Any, Dict, cast
 from uuid import UUID
 
@@ -45,27 +49,31 @@ class PerfilSerializer(serializers.ModelSerializer):
                   )
 
 
-    def validate_data_nascimento(self, value):
+    def validate_data_nascimento(self, value) -> Any:
         """Valida a alteração da data de nascimento respeitando a regra dos 6 meses."""
         perfil_instance = self.context.get('perfil_instance')
         if perfil_instance and perfil_instance.data_nascimento == value:
             return value
 
         if perfil_instance and perfil_instance.ultima_atualizacao_data_nascimento:
-            periodo_minimo = perfil_instance.ultima_atualizacao_data_nascimento + timezone.timedelta(days=182.5)
+            periodo_minimo = perfil_instance.ultima_atualizacao_data_nascimento + timedelta(days=182.5)
             if timezone.now() < periodo_minimo:
                 raise serializers.ValidationError("A data de nascimento só pode ser alterada após 6 meses.")
 
         return value
 
-    def validate_telemovel(self, value):
+    def validate_telemovel(self, value: str) -> str:
         """Valida se o número de telemóvel já está em uso, apenas se for alterado."""
         perfil_instance = self.context.get('perfil_instance')
 
         if perfil_instance and perfil_instance.telemovel == value:
             return value  # Não validar se o número for o mesmo
 
-        if Perfil.objects.filter(telemovel=value).exclude(pk=self.instance.pk if self.instance else None).exists():
+        qs = Perfil.objects.filter(telemovel=value)
+        if self.instance is not None and getattr(self.instance, "pk", None) is not None:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
             raise serializers.ValidationError("Este número de telemóvel já está em uso.")
 
         if len(value) != 9:
@@ -76,7 +84,7 @@ class PerfilSerializer(serializers.ModelSerializer):
         
         return value
     
-    def validate(self, data):
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         """ Impõe a obrigatoriedade de estudante apenas na criação de um novo perfil. """
         request = self.context.get("request")  # Obtém o request, se existir
 
@@ -213,7 +221,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
                 self.last_name = last_name
                 self.password = password
                 self.code = code
-                self.code_expiration_time = (timezone.now() + timezone.timedelta(minutes=2)).timestamp()
+                self.code_expiration_time = (timezone.now() + timedelta(minutes=2)).timestamp()
                 self.perfil = perfil_data
 
         temp_user = TempUser(username, email, first_name, last_name, password, code, perfil_data)
@@ -345,7 +353,7 @@ class RequestResetPasswordSerializer(serializers.Serializer):
         reset_code = generate_reset_password_code()
         
         # Definir expiração para 15 minutos no futuro
-        expiration = timezone.now() + timezone.timedelta(minutes=2)
+        expiration = timezone.now() + timedelta(minutes=2)
 
         # Salvar código e expiração no perfil
         try:
