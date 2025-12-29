@@ -1,13 +1,16 @@
-'''Este módulo contém as views para o aplicativo perfil.'''
-
+'''Este módulo contém as views para o aplicativo perfil.
+djangoapp/perfil/views/views.py'''
+from __future__ import annotations
 
 from datetime import date, timedelta
 from decimal import Decimal
+from typing import Any, TypedDict, cast
 
+from django import forms
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AnonymousUser, User
 from django.db import models
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -36,6 +39,12 @@ from djangoapp.utils.model_validators import (
 )
 
 
+class BasePerfilContext(TypedDict, total=False):
+    active_setup: Any
+    userform: Any
+    perfilform: Any
+
+Context = dict[str, Any]
 class SignUpView(View):
     """Signup with email + password only (creates temp session and sends verification code)."""
 
@@ -63,8 +72,8 @@ class SignUpView(View):
         form = perfil_forms.RegisterForm(request.POST)
         if not form.is_valid():
             for errors in form.errors.values():
-                for err in errors:
-                    messages.error(request, err)
+                for error in errors:
+                    messages.error(request, str(error))
             return redirect("perfil:signup")
 
         email = form.cleaned_data["email"]
@@ -108,7 +117,7 @@ class BasePerfil(View):
                 usuario=self.request.user
             ).first()
 
-            self.context = {
+            self.context: Context = {
                 'active_setup': active_setup,
                 'userform': perfil_forms.UserForm(
                     data=self.request.POST or None,
@@ -131,8 +140,8 @@ class BasePerfil(View):
                 )
             }
 
-        self.userform = self.context['userform']
-        self.perfilform = self.context['perfilform']
+        self.userform = cast(forms.BaseForm, self.context['userform'])
+        self.perfilform = cast(forms.BaseForm, self.context['perfilform'])
 
         self.renderizar = render(
             self.request,
@@ -194,7 +203,7 @@ class Criar(BasePerfil):
                 for error in errors:
                     messages.error(
                         self.request,
-                        error
+                        str(error)
                     )
         messages.error(
             self.request,
@@ -341,13 +350,16 @@ class Atualizar(BasePerfil):
             updating=True,  # Passa que é uma atualização
         )
 
-        if self.context['userform'].is_valid() and self.context['perfilform'].is_valid():
+        userform = cast(forms.BaseForm, self.context["userform"])
+        perfilform = cast(forms.BaseForm, self.context["perfilform"])
 
-            username = self.context['userform'].cleaned_data.get('username')
-            email = self.context['userform'].cleaned_data.get('email')
-            first_name = self.context['userform'].cleaned_data.get(
-                'first_name')
-            last_name = self.context['userform'].cleaned_data.get('last_name')
+        if userform.is_valid() and perfilform.is_valid():
+
+
+            username = cast(str, userform.cleaned_data["username"])
+            email = cast(str, userform.cleaned_data["email"])
+            first_name = cast(str, userform.cleaned_data["first_name"])
+            last_name = cast(str, userform.cleaned_data["last_name"])
 
             # Usuários logados
             if self.request.user.is_authenticated:
@@ -366,7 +378,8 @@ class Atualizar(BasePerfil):
                 perfil.save()
 
             else:
-                perfil = self.perfilform.save(commit=False)
+                perfilform_mf = cast(forms.ModelForm, self.perfilform)
+                perfil = cast(perfil_models.Perfil, perfilform_mf.save(commit=False))
                 perfil.usuario = usuario
                 perfil.save()
 
@@ -395,8 +408,10 @@ class ChangePasswordView(BasePerfil):
         if self.request.user.is_authenticated:
             self.template_name = 'perfil/change_password.html' if self.request.user.is_authenticated else 'perfil/criar.html'
 
+        active_setup = cast(Any, self.context.get("active_setup"))
+        
         self.context = {
-            'active_setup': self.context['active_setup'],
+            'active_setup': active_setup,
             'form': perfil_forms.ChangePasswordForm(
                 data=self.request.POST or None,
             )
@@ -408,10 +423,12 @@ class ChangePasswordView(BasePerfil):
 
     @method_decorator(never_cache)
     def post(self, *args, **kwargs):
-        form = self.context['form']
+        form = cast(forms.BaseForm, self.context["form"])
         if form.is_valid():
             password = form.cleaned_data.get('password')
             user = self.request.user
+            if isinstance(user, AnonymousUser):
+                return redirect('perfil:criar')
             user.set_password(password)
             user.save()
             logout(self.request)
@@ -452,7 +469,7 @@ class Login(View):
                                       'username': username})
                 error_message = f'Verifique o seu email para ativar a conta!\nOu <a href="{resend_link}" style="text-decoration: underline;">clique aqui</a> para reenviar o email de confirmação!'
                 messages.error(
-                    self.request, mark_safe(error_message)
+                    self.request, mark_safe(str(error_message))
 
                 )
 
@@ -527,16 +544,20 @@ class Conta(BasePerfil):
             self.request.user)
         total_pontos_expirados = calcular_pontos_expirados(self.request.user)
 
-        ultima_presenca = perfil_models.Perfil.objects.filter(
-            usuario=self.request.user).values('ultima_actividade').first()
+        ultima_row = perfil_models.Perfil.objects.filter(
+            usuario=self.request.user
+        ).values("ultima_actividade").first()
 
-        if ultima_presenca and ultima_presenca['ultima_actividade']:
-            ultima_presenca = ultima_presenca['ultima_actividade'].date()
-            tempo_para_expiracao_pontos = ultima_presenca + timedelta(days=45)
-            dias_expiracao = (tempo_para_expiracao_pontos -
-                              timezone.now().date()).days
+        ultima_dt = None
+        if ultima_row:
+            ultima_dt = ultima_row.get("ultima_actividade")
+
+        if ultima_dt:
+            ultima_date = ultima_dt.date()
+            tempo_para_expiracao_pontos = ultima_date + timedelta(days=45)
+            dias_expiracao = (tempo_para_expiracao_pontos - timezone.now().date()).days
         else:
-            ultima_presenca = None
+            ultima_date = None
             tempo_para_expiracao_pontos = None
             dias_expiracao = None
 
@@ -549,7 +570,7 @@ class Conta(BasePerfil):
             'total_pontos_ganhos_decimal': total_pontos_ganhos_decimal,
             'total_ofertas_decimal': total_ofertas_decimal,
             'total_pontos_expirados': total_pontos_expirados,
-            'ultima_presenca': ultima_presenca,
+            'ultima_presenca': ultima_date if ultima_date else None,
             'data_expiracao': tempo_para_expiracao_pontos,
             'dias_expiracao': dias_expiracao,
         }
@@ -607,13 +628,17 @@ class CartaoCliente(View):
             .order_by('-id') \
             .first()
 
-        perfil = perfil_models.Perfil.objects.filter(
-            usuario=self.request.user).first()
+        user = self.request.user
+        if isinstance(user, AnonymousUser):
+            return redirect("perfil:criar")
+
+        perfil = perfil_models.Perfil.objects.filter(usuario=cast(User, user)).first()
+
 
         self.context = {
             'active_setup': active_setup,
             'perfil': perfil,
-        }
+                }
 
     def get(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
@@ -785,7 +810,7 @@ class ResetCodeView(View):
         if user and user.reset_password_code_expires:
             # Check if the code has expired
             expiration_time = user.reset_password_code_expires + \
-                timezone.timedelta(minutes=15)
+                timedelta(minutes=15)
             if timezone.now() > expiration_time:
                 messages.error(
                     request,
@@ -979,7 +1004,7 @@ class MovimentosCliente(BasePerfil):
         # Listar compras e ofertas
         movimentos = listar_compras_ofertas(user)
 
-        self.context = {
+        self.context:dict[str, Any] = {
             'active_setup': active_setup,
             # 'compras_fidelidade': compras_fidelidade,
             # 'ofertas_fidelidade': ofertas_fidelidade,

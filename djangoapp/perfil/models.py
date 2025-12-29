@@ -121,7 +121,7 @@ class Perfil(models.Model):
 
                 # Se há uma última atualização, verifica o período mínimo
                 if ultima_atualizacao:
-                    periodo_minimo = ultima_atualizacao + timezone.timedelta(days=182.5)  # 6 meses
+                    periodo_minimo = ultima_atualizacao + timedelta(days=182.5)  # 6 meses
                     if agora < periodo_minimo:
                         return
                 
@@ -130,18 +130,17 @@ class Perfil(models.Model):
 
         # Gera o número de cliente
         if not self.numero_cliente:
-            ultimo_numero_cliente = Perfil.objects.all().order_by(
-                'id').last()
-            if ultimo_numero_cliente is not None and \
-                    ultimo_numero_cliente.numero_cliente.startswith('CEW-'):
-                ultimo_numero_cliente = int(
-                    ultimo_numero_cliente.numero_cliente.split('-')[1])
-                novo_numero = ultimo_numero_cliente + 1
+            last_perfil = Perfil.objects.order_by("id").last()
 
-            else:
-                novo_numero = 1050  # número de cliente inicial
+            last_number: int | None = None
+            if last_perfil is not None and last_perfil.numero_cliente.startswith("CEW-"):
+                try:
+                    last_number = int(last_perfil.numero_cliente.split("-")[1])
+                except (IndexError, ValueError):
+                    last_number = None
 
-            self.numero_cliente = f'CEW-{novo_numero}'
+            novo_numero = (last_number + 1) if last_number is not None else 1050
+            self.numero_cliente = f"CEW-{novo_numero}"
 
         if self.estudante:
             # Aqui obtemos a instância de Fidelidade associada ao RespostaFidelidade
@@ -189,7 +188,7 @@ class Perfil(models.Model):
             if original.data_nascimento != self.data_nascimento:
                 agora = timezone.now()
                 if self.ultima_atualizacao_data_nascimento:
-                    periodo_minimo = self.ultima_atualizacao_data_nascimento + timezone.timedelta(days=182.5)
+                    periodo_minimo = self.ultima_atualizacao_data_nascimento + timedelta(days=182.5)
                     if agora < periodo_minimo:
                         error_messages['data_nascimento'] = (
                             'A data de nascimento só pode ser alterada passados 6 meses da última alteração.'

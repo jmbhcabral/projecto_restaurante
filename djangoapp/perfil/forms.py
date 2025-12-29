@@ -1,6 +1,8 @@
 # djangoapp/perfil/forms.py
 from __future__ import annotations
 
+from typing import Any
+
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
@@ -27,14 +29,14 @@ class RegisterForm(forms.Form):
         label="Confirmar palavra-passe",
     )
 
-    def clean_email(self):
-        email = (self.cleaned_data.get("email") or "").strip().lower()
+    def clean_email(self) -> str:
+        email = (self.data.get("email") or "").strip().lower()
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("Este email já existe.")
         return email
 
-    def clean(self):
-        cleaned = super().clean()
+    def clean(self) -> dict[str, Any]:
+        cleaned = super().clean() or {}
         p1 = cleaned.get("password1")
         p2 = cleaned.get("password2")
 
@@ -67,12 +69,12 @@ class OnboardingPerfilForm(forms.ModelForm):
         help_text="Opcional (se aplicável).",
     )
 
-    def clean(self):
-        cleaned = super().clean()
+    def clean(self) -> dict[str, Any]:
+        cleaned = super().clean() or {}
         telemovel = cleaned.get("telemovel")
         data_nascimento = cleaned.get("data_nascimento")
 
-        errors = {}
+        errors: dict[str, str] = {}
 
         if telemovel:
             if len(telemovel) != 9 or not telemovel.isdigit():
@@ -151,9 +153,9 @@ class PerfilForm(forms.ModelForm):
             else:
                 field.label_suffix = ''
 
-    def clean(self, *args, **kwargs):
-        cleaned = self.cleaned_data
-        validation_error_msgs = {}
+    def clean(self) -> dict[str, Any]:
+        cleaned = super().clean() or {}
+        validation_error_msgs: dict[str, str] = {}
 
         data_nascimento_data = cleaned.get('data_nascimento')
         telemovel_data = cleaned.get('telemovel')
@@ -182,6 +184,8 @@ class PerfilForm(forms.ModelForm):
                 validation_error_msgs['telemovel'] = error_msg_telemovel_existe
         if validation_error_msgs:
             raise (forms.ValidationError(validation_error_msgs))
+
+        return cleaned
 
 
 class UserForm(forms.ModelForm):
@@ -259,9 +263,9 @@ class UserForm(forms.ModelForm):
             else:
                 field.label_suffix = ''
 
-    def clean(self, *args, **kwargs):
-        cleaned = self.cleaned_data
-        validation_error_msgs = {}
+    def clean(self) -> dict[str, Any]:
+        cleaned = super().clean() or {}
+        validation_error_msgs: dict[str, str] = {}
 
         usuario_data = cleaned.get('username')
         email_data = cleaned.get('email')
@@ -322,12 +326,14 @@ class UserForm(forms.ModelForm):
             if password_data is not None and len(password_data) < 6:
                 validation_error_msgs['password'] = error_msg_password_short
 
-        if validation_error_msgs:
-            raise (forms.ValidationError(validation_error_msgs))
-
         if self.usuario and 'username' in self.changed_data:
             validation_error_msgs['username'] = 'O utilizador não pode \
             ser alterado.'
+
+        if validation_error_msgs:
+            raise (forms.ValidationError(validation_error_msgs))
+        return cleaned
+
 
 
 class ChangePasswordForm(forms.Form):
@@ -345,9 +351,9 @@ class ChangePasswordForm(forms.Form):
         help_text='Confirme Password.'
     )
 
-    def clean(self, *args, **kwargs):
-        cleaned_data = super().clean()
-        validation_error_msgs = {}
+    def clean(self) -> dict[str, Any]:
+        cleaned_data = super().clean() or {}
+        validation_error_msgs: dict[str, str] = {}
 
         password_data = cleaned_data.get('password')
         password2_data = cleaned_data.get('password2')
@@ -367,6 +373,8 @@ class ChangePasswordForm(forms.Form):
         if validation_error_msgs:
             raise (forms.ValidationError(validation_error_msgs))
 
+        return cleaned_data
+
 
 class RequestResetPasswordForm(forms.Form):
     email = forms.EmailField(
@@ -375,9 +383,9 @@ class RequestResetPasswordForm(forms.Form):
         help_text='Seu endereço de email.'
     )
 
-    def clean(self, *args, **kwargs):
-        cleaned_data = super().clean()
-        validation_error_msgs = {}
+    def clean(self) -> dict[str, Any]:
+        cleaned_data = super().clean() or {}
+        validation_error_msgs: dict[str, str] = {}
 
         email_data = cleaned_data.get('email')
 
@@ -390,6 +398,7 @@ class RequestResetPasswordForm(forms.Form):
 
         if validation_error_msgs:
             raise (forms.ValidationError(validation_error_msgs))
+        
         return cleaned_data
 
 
@@ -408,9 +417,9 @@ class ResetPasswordForm(forms.Form):
         help_text='Confirme Password.'
     )
 
-    def clean(self, *args, **kwargs):
-        cleaned_data = super().clean()
-        validation_error_msgs = {}
+    def clean(self) -> dict[str, Any]:
+        cleaned_data = super().clean() or {}
+        validation_error_msgs: dict[str, str] = {}
 
         password_data = cleaned_data.get('password')
         password2_data = cleaned_data.get('password2')
@@ -429,3 +438,5 @@ class ResetPasswordForm(forms.Form):
 
         if validation_error_msgs:
             raise (forms.ValidationError(validation_error_msgs))
+        
+        return cleaned_data
