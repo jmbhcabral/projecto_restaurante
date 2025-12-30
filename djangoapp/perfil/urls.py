@@ -77,6 +77,10 @@ urlpatterns: List[Union[URLPattern, URLResolver]] = [
 
     # New Auth flow
     path("signup/", views.SignUpView.as_view(), name="signup"),
+    path("signup/verify/", views.SignUpVerificationCodeView.as_view(), name="signup_verify"),
+    path("signup/resend/", views.SignUpResendCodeView.as_view(), name="signup_resend"),
+    path("login/", views.LoginView.as_view(), name="login_v2"),
+    path("perfil/onboarding/", views.OnboardingView.as_view(), name="onboarding"),
 ]
 
 

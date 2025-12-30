@@ -147,6 +147,7 @@ MESSAGE_TAGS = {
     constants.SUCCESS: 'alert-success',
     constants.WARNING: 'alert-warning',
 }
+
 # Sessão em dias: 60s * 60m * 24h * 1d * 3 meses
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30 * 3  
 
@@ -272,6 +273,12 @@ GCS_PUBLIC_BASE_URL = os.getenv(
     "change-me",
 )
 
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    "djangoapp.perfil.auth_backends.IdentifierBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 # Authentication configuration
 # AUTH_USER_MODEL = 'perfil.User'
 # LOGIN_URL = 'perfil:login'
@@ -282,28 +289,18 @@ GCS_PUBLIC_BASE_URL = os.getenv(
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS: list[dict[str, Any]] = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-        "OPTIONS": {
-            "message": "A palavra-passe não pode ser igual ao nome de utilizador.",
-        },
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",     
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
         "OPTIONS": {
             "min_length": 8,
-            "message": "A palavra-passe deve ter no mínimo 8 caracteres.",
         },
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-        "OPTIONS": {
-            "message": "A palavra-passe não pode ser uma palavra comum.",
-        },
     },
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-        "OPTIONS": {
-            "message": "A palavra-passe não pode ser uma palavra numérica.",
-        },
     },
 ]
