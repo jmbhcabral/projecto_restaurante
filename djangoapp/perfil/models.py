@@ -145,50 +145,58 @@ class Perfil(models.Model):
 
 
 class Morada(models.Model):
+    """Moradas do utilizador (Entrega / Faturação)."""
+
     class Meta:
         verbose_name = "Morada"
         verbose_name_plural = "Moradas"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["usuario", "purpose"],
+                name="uniq_address_per_user_purpose",
+            )
+        ]
 
-    usuario = models.OneToOneField(
+    class Purpose(models.TextChoices):
+        DELIVERY = "delivery", "Entrega"
+        BILLING = "billing", "Faturação"
+
+    usuario = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        verbose_name="Usuário",
+        related_name="moradas",
+        verbose_name="Utilizador",
     )
-    finalidade_morada = models.CharField(blank=False, choices=(
-        ('E', 'Entrega'),
-        ('F', 'Faturação')
-    )
-    )
-    morada = models.CharField(max_length=100, blank=True)
-    numero = models.CharField(
-        max_length=10,
-        blank=True,
-        verbose_name="Número",)
-    codigo_postal = models.CharField(
-        max_length=4,
-        blank=True,
-        verbose_name="Código Postal",)
-    ext_codigo_postal = models.CharField(
-        max_length=3,
-        blank=True,
-        verbose_name="Extensão Código Postal",)
 
-    def clean(self):
-        error_messages = {}
+    purpose = models.CharField(max_length=20, choices=Purpose.choices)
+
+    morada = models.CharField(max_length=120)
+    numero = models.CharField(max_length=10)
+    codigo_postal = models.CharField(max_length=4)
+    ext_codigo_postal = models.CharField(max_length=3)
+
+    is_active = models.BooleanField(default=True)
+
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def clean(self) -> None:
+        errors: dict[str, str] = {}
+
         if not self.morada:
-            error_messages['morada'] = 'Morada é obrigatória.'
+            errors["morada"] = "Morada é obrigatória."
         if not self.numero:
-            error_messages['numero'] = 'Número é obrigatório.'
+            errors["numero"] = "Número é obrigatório."
         if not self.codigo_postal:
-            error_messages['codigo_postal'] = 'Código Postal é obrigatório.'
+            errors["codigo_postal"] = "Código Postal é obrigatório."
         if not self.ext_codigo_postal:
-            error_messages['ext_codigo_postal'] = 'Extensão Código Postal é obrigatória.'
+            errors["ext_codigo_postal"] = "Extensão do Código Postal é obrigatória."
 
-        if error_messages:
-            raise ValidationError(error_messages)
+        if errors:
+            raise ValidationError(errors)
 
-    def __str__(self):
-        return self.finalidade_morada
+    def __str__(self) -> str:
+        return f"{self.usuario_id} - {self.purpose}"
 
 
 class PasswordResetToken(models.Model):
