@@ -23,10 +23,10 @@ class PerfilAdmin(admin.ModelAdmin):
 
 @admin.register(Morada)
 class MoradaAdmin(admin.ModelAdmin):
-    list_display = 'id', 'usuario', 'finalidade_morada', 'morada', \
+    list_display = 'id', 'usuario', 'purpose', 'morada', \
         'numero', 'codigo_postal', 'ext_codigo_postal'
     list_display_links = 'id', 'usuario'
-    search_fields = 'id', 'usuario', 'finalidade_morada', 'morada', \
+    search_fields = 'id', 'usuario', 'purpose', 'morada', \
         'numero', 'codigo_postal', 'ext_codigo_postal'
 
 @admin.register(PasswordResetToken)
