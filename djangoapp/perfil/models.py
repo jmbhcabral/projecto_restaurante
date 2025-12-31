@@ -4,11 +4,8 @@ from __future__ import annotations
 
 import uuid
 from datetime import timedelta
-from io import BytesIO
 
-import qrcode
-from django.contrib.auth import get_user_model
-from django.core.files import File
+from django.conf import settings
 from django.db import models
 from django.forms import ValidationError
 from django.utils import timezone
@@ -17,43 +14,41 @@ from django.utils.timezone import now
 from djangoapp.fidelidade.models import Fidelidade, RespostaFidelidade
 from djangoapp.utils.model_validators import validar_nif
 
-User = get_user_model()
+User = settings.AUTH_USER_MODEL
 
 class Perfil(models.Model):
-    ''' Model for the user profile. '''
+    """Perfil do utilizador (dados reais do negócio)."""
     class Meta:
-        ''' Meta class for the Perfil model. '''
+        """Meta class for the Perfil model."""
         verbose_name = "Perfil"
         verbose_name_plural = "Perfis"
+
+        indexes = [
+            models.Index(fields=["numero_cliente"]),
+            models.Index(fields=["telemovel"]),
+        ]
 
     usuario = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
-        null=False,
-        blank=False,
-        default=None,
+        related_name="perfil",
         verbose_name="Utilizador",
-        related_name='perfil',
     )
+
+    # Dados pessoais (não obrigatórios no registo)
     data_nascimento = models.DateField(null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
-    telemovel = models.CharField(
-        max_length=9,
-        blank=True,
-        verbose_name="Telemóvel",
-    )
+    telemovel = models.CharField(max_length=9, blank=True, verbose_name="Telemóvel")
     nif = models.CharField(max_length=9, blank=True)
 
-    qr_code = models.ImageField(
-        upload_to='assets/qrcodes/', blank=True, null=True)
-
+    # Negócio
     numero_cliente = models.CharField(
         max_length=10,
         unique=True,
         blank=True,
         verbose_name="Número Cliente",
+        db_index=True,
     )
+
     estudante = models.ForeignKey(
         RespostaFidelidade,
         on_delete=models.SET_NULL,
@@ -61,6 +56,7 @@ class Perfil(models.Model):
         blank=True,
         verbose_name="Estudante",
     )
+
     tipo_fidelidade = models.ForeignKey(
         Fidelidade,
         on_delete=models.SET_NULL,
@@ -68,6 +64,17 @@ class Perfil(models.Model):
         blank=True,
         verbose_name="Tipo Fidelidade",
     )
+
+    qr_code = models.ImageField(upload_to="assets/qrcodes/", blank=True, null=True)
+
+    # Onboarding (novo) — NÃO mexe no first_login do RN
+    onboarding_min_completed = models.BooleanField(default=False)
+    phone_verified = models.BooleanField(default=False)
+
+    # Capacidades (não-linear)
+    has_valid_nif = models.BooleanField(default=False)
+    has_delivery_address = models.BooleanField(default=False)
+    has_billing_address = models.BooleanField(default=False)
 
     ultima_atualizacao_data_nascimento = models.DateTimeField(
         null=True, blank=True)
@@ -84,6 +91,14 @@ class Perfil(models.Model):
         null=True,
         default=000000000
     )
+
+    reset_password_code_str = models.CharField(
+        verbose_name="Código de Reset de Password",
+        blank=True,
+        null=True,
+        max_length=6,
+    )
+
     reset_password_code_expires = models.DateTimeField(
         verbose_name="Expiração do Código de Reset de Password",
         blank=True,
@@ -108,95 +123,19 @@ class Perfil(models.Model):
         default=True,
     )
 
-    def save(self, *args, **kwargs):
-        # Atualiza a data da última atualização da data de nascimento
-        print('self.pk: ', self.pk)
-        if self.pk:
-            original = Perfil.objects.get(pk=self.pk)
-        
-            # Verifica se a data de nascimento foi alterada
-            if original.data_nascimento != self.data_nascimento:
-                agora = timezone.now()
-                ultima_atualizacao = self.ultima_atualizacao_data_nascimento
-
-                # Se há uma última atualização, verifica o período mínimo
-                if ultima_atualizacao:
-                    periodo_minimo = ultima_atualizacao + timedelta(days=182.5)  # 6 meses
-                    if agora < periodo_minimo:
-                        return
-                
-                # Atualiza a data da última alteração se a regra for cumprida
-                self.ultima_atualizacao_data_nascimento = agora
-
-        # Gera o número de cliente
-        if not self.numero_cliente:
-            last_perfil = Perfil.objects.order_by("id").last()
-
-            last_number: int | None = None
-            if last_perfil is not None and last_perfil.numero_cliente.startswith("CEW-"):
-                try:
-                    last_number = int(last_perfil.numero_cliente.split("-")[1])
-                except (IndexError, ValueError):
-                    last_number = None
-
-            novo_numero = (last_number + 1) if last_number is not None else 1050
-            self.numero_cliente = f"CEW-{novo_numero}"
-
-        if self.estudante:
-            # Aqui obtemos a instância de Fidelidade associada ao RespostaFidelidade
-            self.tipo_fidelidade = self.estudante.tipo_fidelidade
-        else:
-            self.tipo_fidelidade = None
-
-        # Crie um QRCode com base nas informações do perfil
-        numero_cliente_puro = ''.join(filter(str.isdigit, self.numero_cliente))
-
-        # Configuração do Qr Code
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
-
-        # Adicionando os dados JSON ao Qr Code
-        qr.add_data(numero_cliente_puro)
-        qr.make(fit=True)
-
-        # Crie uma imagem QRCode
-        img_qr = qr.make_image(fill_color="black", back_color="white")
-
-        # Salve a imagem QRCode no campo qr_code
-        img_io = BytesIO()
-        img_qr.save(img_io, 'PNG')
-        # Usando o número de cliente como nome do ficheiro
-        filename = f'qrcode_{self.numero_cliente}.png'
-        self.qr_code.save(
-            filename, File(img_io), save=False)
-
-        super().save(*args, **kwargs)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def clean(self):
         error_messages = {}
 
-        # Only require these fields after onboarding, not at registration time
-        # if not self.data_nascimento:
-        #     error_messages['data_nascimento'] = 'Data de Nascimento é obrigatória.'
-
-        if self.pk:
-            original = Perfil.objects.get(pk=self.pk)
-            if original.data_nascimento != self.data_nascimento:
-                agora = timezone.now()
-                if self.ultima_atualizacao_data_nascimento:
-                    periodo_minimo = self.ultima_atualizacao_data_nascimento + timedelta(days=182.5)
-                    if agora < periodo_minimo:
-                        error_messages['data_nascimento'] = (
-                            'A data de nascimento só pode ser alterada passados 6 meses da última alteração.'
-                        )
-                self.ultima_atualizacao_data_nascimento = agora
-
         if self.nif and not validar_nif(self.nif):
             error_messages['nif'] = 'NIF inválido.'
+
+        if self.telemovel:
+            t = self.telemovel.strip()
+            if len(t) != 9 or not t.isdigit():
+                error_messages['telemovel'] = "O telemóvel tem de ter 9 dígitos."
 
         if error_messages:
             raise ValidationError(error_messages)
