@@ -1,7 +1,7 @@
 # djangoapp/perfil/views/views_auth.py
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login
@@ -180,7 +180,7 @@ class SignUpResendCodeView(View):
         last_sent_at_raw = temp_user.get("last_sent_at")
         if last_sent_at_raw:
             try:
-                last_sent_at = timezone.datetime.fromisoformat(last_sent_at_raw)
+                last_sent_at = datetime.fromisoformat(last_sent_at_raw)
                 if timezone.is_naive(last_sent_at):
                     last_sent_at = timezone.make_aware(last_sent_at, timezone.get_current_timezone())
             except Exception:

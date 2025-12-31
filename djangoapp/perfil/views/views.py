@@ -134,7 +134,7 @@ class Criar(BasePerfil):
             }
 
             # Enviar email de confirmação
-            send_confirmation_email(self.request, email, username, code)
+            send_confirmation_email(self.request, email, code)
 
             messages.success(
                 self.request,
@@ -646,7 +646,7 @@ class ResendConfirmationEmail(View):
             )
             return redirect('perfil:criar')
 
-        send_confirmation_email(user, temp_user['username'], temp_user['email'], temp_user['code'])
+        send_confirmation_email(user, temp_user['email'], temp_user['code'])
         messages.success(
             request,
             'Email de confirmação reenviado com sucesso. Por favor, verifique seu email.'
