@@ -2,6 +2,7 @@
 djangoapp/perfil/views/views.py'''
 from __future__ import annotations
 
+import logging
 from datetime import date, timedelta
 from decimal import Decimal
 from typing import Any, TypedDict, cast
@@ -11,7 +12,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
-from django.db import models
+from django.db import models, transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -25,6 +26,7 @@ from djangoapp.fidelidade import models as fidelidade_models
 from djangoapp.perfil import forms as perfil_forms
 from djangoapp.perfil import models as perfil_models
 from djangoapp.perfil.forms import RequestResetPasswordForm, ResetPasswordForm
+from djangoapp.perfil.services import perfil_service
 from djangoapp.restau.models import ActiveSetup
 from djangoapp.utils.email_confirmation import (
     send_confirmation_email,
@@ -38,6 +40,7 @@ from djangoapp.utils.model_validators import (
     calcular_total_pontos_disponiveis,
 )
 
+logger = logging.getLogger(__name__)
 
 class BasePerfilContext(TypedDict, total=False):
     active_setup: Any
@@ -169,95 +172,103 @@ class Criar(BasePerfil):
 
 
 class VerificationCodeView(BasePerfil):
-    '''View for inserting the verification code.'''
+    """View for inserting the verification code (legacy flow)."""
 
-    template_name = 'perfil/user_verification_code.html'
+    template_name = "perfil/user_verification_code.html"
 
     def get(self, *args, **kwargs):
-        '''GET method.'''
+        """GET method."""
         if self.request.user.is_authenticated:
-            return redirect('perfil:conta')
+            return redirect("perfil:conta")
 
-        return render(
-            self.request,
-            self.template_name,
-            self.context
-        )
+        return render(self.request, self.template_name, self.context)
 
     def post(self, *args, **kwargs):
-        '''POST method.'''
+        """POST method."""
+        # 1) Read code inputs
+        code_1 = (self.request.POST.get("code_1") or "").strip()
+        code_2 = (self.request.POST.get("code_2") or "").strip()
+        code_3 = (self.request.POST.get("code_3") or "").strip()
+
+        # 2) Validate presence
+        if not all([code_1, code_2, code_3]):
+            messages.error(self.request, "Código incompleto! Preencha todos os campos.")
+            return render(self.request, self.template_name, self.context)
+
+        # 3) Validate numeric and build final code
         try:
-            # Get the code from the post request
-            code_1 = self.request.POST.get('code_1')
-            code_2 = self.request.POST.get('code_2')
-            code_3 = self.request.POST.get('code_3')
+            final_code = int(f"{code_1}{code_2}{code_3}")
+        except ValueError:
+            messages.error(self.request, "Código inválido! Insira apenas números.")
+            return render(self.request, self.template_name, self.context)
 
-            # Verificar se os códigos são válidos antes de concatenar
-            if not all([code_1, code_2, code_3]):
-                messages.error(self.request, 'Código incompleto! Preencha todos os campos.')
-                return render(self.request, self.template_name, self.context)
+        # 4) Get temp_user from session
+        temp_user = self.request.session.get("temp_user")
+        if not temp_user or "code" not in temp_user:
+            messages.error(self.request, "Utilizador não encontrado! Registe-se novamente.")
+            return redirect("perfil:criar")
 
-            # Criar o código final
-            try:
-                final_code = int(f'{code_1}{code_2}{code_3}')
-            except ValueError:
-                messages.error(self.request, 'Código inválido! Insira apenas números.')
-                return render(self.request, self.template_name, self.context)
+        # 5) Validate code
+        if str(temp_user["code"]) != str(final_code):
+            messages.error(self.request, "Código inválido! Por favor, insira o código correto.")
+            return render(self.request, self.template_name, self.context)
 
-            # Get the user from the session
-            temp_user = self.request.session.get('temp_user')
+        # 6) Prepare perfil_data and resolve estudante BEFORE creating anything
+        perfil_data = dict(temp_user.get("perfil_data", {}) or {})
+        estudante_id = perfil_data.pop("estudante", None)
 
-            # Check if the user exists in session
-            if not temp_user or 'code' not in temp_user:
-                messages.error(self.request, 'Utilizador não encontrado! Registe-se novamente.')
-                return redirect('perfil:criar')
+        estudante = None
+        if estudante_id:
+            estudante = fidelidade_models.RespostaFidelidade.objects.filter(id=estudante_id).first()
+            if not estudante:
+                messages.error(
+                    self.request,
+                    "Erro interno ao recuperar dados. Por favor, tente novamente."
+                )
+                return redirect("perfil:criar")
 
-            # Check if the code is valid
-            if str(temp_user['code']) != str(final_code):
-                messages.error(self.request, 'Código inválido! Por favor, insira o código correto.')
-                return render(self.request, self.template_name, self.context)
-
-            # Criar o usuário
-            user = User.objects.create_user(
-                username=temp_user['username'],
-                email=temp_user['email'],
-                password=temp_user['password'],
-                first_name=temp_user['first_name'],
-                last_name=temp_user['last_name'],
-            )
-
-            # Criar o perfil do usuário
-            perfil_data = temp_user.get('perfil_data', {})
-            
-            # Recuperar o objeto RespostaFidelidade apenas quando for criar o perfil
-            estudante_id = perfil_data.pop('estudante', None)  # Remove e guarda o ID
-            if estudante_id:
-                try:
-                    estudante = fidelidade_models.RespostaFidelidade.objects.get(id=estudante_id)
-                    perfil_models.Perfil.objects.create(
-                        usuario=user,
-                        estudante=estudante,  # Passa o objeto diretamente
-                        **perfil_data
-                    )
-                except fidelidade_models.RespostaFidelidade.DoesNotExist:
-                    messages.error(self.request, 'Erro ao recuperar dados de fidelidade.')
-                    return render(self.request, self.template_name, self.context)
-            else:
-                perfil_models.Perfil.objects.create(
-                    usuario=user,
-                    **perfil_data
+        # 7) Create user + profile atomically
+        try:
+            with transaction.atomic():
+                user = User.objects.create_user(
+                    username=temp_user["username"],
+                    email=temp_user["email"],
+                    password=temp_user["password"],
+                    first_name=temp_user.get("first_name", ""),
+                    last_name=temp_user.get("last_name", ""),
                 )
 
-            messages.success(self.request, 'Código verificado com sucesso! Já pode aceder à sua conta.')
-            
-            # Apagar o temp_user da sessão
-            self.request.session.pop('temp_user', None)
-            
-            return redirect('perfil:criar')
+                perfil = perfil_models.Perfil.objects.create(
+                    usuario=user,
+                    estudante=estudante,
+                    **perfil_data,
+                )
 
-        except Exception as e:
-            messages.error(self.request, f"Ocorreu um erro inesperado: {str(e)}")
-            return redirect('perfil:criar')
+                # Ensure business invariants (customer number, derived flags, etc.)
+                perfil_service.ensure_perfil_business_defaults(perfil)
+
+        except Exception:
+            # Log full stacktrace for debugging / production monitoring
+            logger.exception(
+                "Error creating user/profile during verification flow",
+                extra={
+                    "email": temp_user.get("email"),
+                    "username": temp_user.get("username"),
+                },
+            )
+            messages.error(
+                self.request,
+                "Ocorreu um erro inesperado. Por favor, tente novamente."
+            )
+            return redirect("perfil:criar")
+
+        # 8) Success: clear session and redirect
+        self.request.session.pop("temp_user", None)
+        messages.success(
+            self.request,
+            "Código verificado com sucesso! Já pode aceder à sua conta."
+        )
+        return redirect("perfil:criar")
 
 
 @method_decorator(login_required, name='dispatch')

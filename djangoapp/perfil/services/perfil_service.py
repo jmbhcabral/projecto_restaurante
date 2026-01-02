@@ -20,15 +20,13 @@ class CustomerNumberResult:
 
 def allocate_customer_number() -> CustomerNumberResult:
     """
-    Gera número de cliente via Postgres sequence (concurrency-safe).
+    Allocate customer number using a Postgres sequence (concurrency-safe).
     """
     with connection.cursor() as cursor:
-        cursor.execute(f"SELECT nextval('{SEQ_NAME}')")
+        cursor.execute("SELECT nextval(%s)", [SEQ_NAME])
         seq_value = int(cursor.fetchone()[0])
 
-    # Mantemos o teu formato CEW-XXXX
-    numero_cliente = f"CEW-{seq_value}"
-    return CustomerNumberResult(numero_cliente=numero_cliente, seq_value=seq_value)
+    return CustomerNumberResult(numero_cliente=f"CEW-{seq_value}", seq_value=seq_value)
 
 
 @transaction.atomic
