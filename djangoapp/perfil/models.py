@@ -144,6 +144,49 @@ class Perfil(models.Model):
         return f'{self.usuario.first_name} {self.usuario.last_name}'
 
 
+class VerificationCode(models.Model):
+    """
+    Stores verification codes for multiple purposes (signup, email change, etc.)
+    Code is stored as a digest (never store the raw code).
+    """
+
+    class Meta:
+        verbose_name = "Verification Code"
+        verbose_name_plural = "Verification Codes"
+        indexes = [
+            models.Index(fields=["email", "purpose"]),
+            models.Index(fields=["purpose", "expires_at"]),
+            models.Index(fields=["created_at"]),
+        ]
+
+    email = models.EmailField(db_index=True)
+    purpose = models.CharField(max_length=64, db_index=True)
+
+    # store only a digest (HMAC/sha256), never the raw code
+    code_digest = models.CharField(max_length=128)
+
+    expires_at = models.DateTimeField()
+    used_at = models.DateTimeField(blank=True, null=True)
+
+    # attempts/resends are useful for security + audit
+    attempts = models.PositiveSmallIntegerField(default=0)
+    resend_count = models.PositiveSmallIntegerField(default=0)
+
+    # Optional audit context (safe enough)
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    user_agent = models.TextField(blank=True, null=True)
+
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def is_used(self) -> bool:
+        return self.used_at is not None
+
+    @property
+    def is_expired(self) -> bool:
+        return timezone.now() > self.expires_at
+
 class Morada(models.Model):
     """Moradas do utilizador (Entrega / Faturação)."""
 
