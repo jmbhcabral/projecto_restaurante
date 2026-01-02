@@ -10,7 +10,13 @@
 		{% include "perfil/partials/_conta_menu.html" %}
 		<div class="conta-content-perfil">
 			<p>
-				Olá {{ user.first_name }}, bem-vindo à sua área de utilizador. Aqui,
+				Olá
+				{% if user.first_name %}
+					<strong>{{ user.first_name }}</strong>
+				{% else %}
+					<strong>{{ user.username }}</strong>
+				{% endif %},
+				bem-vindo à sua área de utilizador. Aqui,
 				pode atualizar os seus dados, explorar as suas vantagens exclusivas e
 				muito mais.
 			</p>

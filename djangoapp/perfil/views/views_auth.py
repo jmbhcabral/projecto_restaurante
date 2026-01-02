@@ -1,11 +1,13 @@
 # djangoapp/perfil/views/views_auth.py
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timedelta
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -13,12 +15,14 @@ from django.views import View
 
 from djangoapp.perfil.forms_auth import LoginForm, RegisterForm
 from djangoapp.perfil.models import Perfil
+from djangoapp.perfil.services import perfil_service
 from djangoapp.restau.models import ActiveSetup
 from djangoapp.utils.email_confirmation import send_confirmation_email
 from djangoapp.utils.generate_reset_password_code import generate_reset_password_code
 
 User = get_user_model()
 
+logger = logging.getLogger(__name__)
 
 class SignUpView(View):
     """
@@ -88,8 +92,8 @@ class SignUpVerificationCodeView(View):
             return redirect("perfil:signup")
 
         context = {
-        "email": temp_user.get("email", ""),
-        "resend_count": temp_user.get("resend_count", 0),
+            "email": temp_user.get("email", ""),
+            "resend_count": temp_user.get("resend_count", 0),
         }
         return render(request, self.template_name, context)
 
@@ -102,45 +106,76 @@ class SignUpVerificationCodeView(View):
             messages.error(request, "Sessão de registo expirada. Tente novamente.")
             return redirect("perfil:signup")
 
-        code_1 = request.POST.get("code_1")
-        code_2 = request.POST.get("code_2")
-        code_3 = request.POST.get("code_3")
+        # Keep template context stable on errors
+        context = {
+            "email": temp_user.get("email", ""),
+            "resend_count": temp_user.get("resend_count", 0),
+        }
 
+        # 1) Read code inputs
+        code_1 = (request.POST.get("code_1") or "").strip()
+        code_2 = (request.POST.get("code_2") or "").strip()
+        code_3 = (request.POST.get("code_3") or "").strip()
+
+        # 2) Validate presence
         if not all([code_1, code_2, code_3]):
             messages.error(request, "Código incompleto! Preencha todos os campos.")
-            return render(request, self.template_name, {})
+            return render(request, self.template_name, context)
 
+        # 3) Validate numeric and build final code
         try:
             final_code = int(f"{code_1}{code_2}{code_3}")
         except ValueError:
             messages.error(request, "Código inválido! Insira apenas números.")
-            return render(request, self.template_name, {})
+            return render(request, self.template_name, context)
 
+        # 4) Validate code
         if str(temp_user["code"]) != str(final_code):
             messages.error(request, "Código inválido! Por favor, insira o código correto.")
-            return render(request, self.template_name, {})
+            return render(request, self.template_name, context)
 
-        email = temp_user["email"]
-        username = temp_user["username"]
-        password = temp_user["password"]
+        # 5) Extract user data
+        email = temp_user.get("email", "").strip()
+        username = temp_user.get("username", "").strip()
+        password = temp_user.get("password", "")
 
+        if not email or not username or not password:
+            messages.error(request, "Sessão inválida. Tente novamente.")
+            request.session.pop("temp_user", None)
+            return redirect("perfil:signup")
+
+        # 6) Guard: email already exists
         if User.objects.filter(email__iexact=email).exists():
             messages.error(request, "Este email já existe. Faça login.")
             request.session.pop("temp_user", None)
             return redirect("perfil:signup")
 
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-        )
+        # 7) Create user + profile atomically
+        try:
+            with transaction.atomic():
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    password=password,
+                )
 
-        Perfil.objects.create(usuario=user)  # first_login=True default
+                perfil = Perfil.objects.create(usuario=user)
 
+                # Ensure business invariants (customer number, derived flags, etc.)
+                perfil_service.ensure_perfil_business_defaults(perfil)
+
+        except Exception:
+            logger.exception(
+                "Error creating user/profile during new signup verification flow",
+                extra={"email": email, "username": username},
+            )
+            messages.error(request, "Ocorreu um erro inesperado. Por favor, tente novamente.")
+            return redirect("perfil:signup")
+
+        # 8) Success
         request.session.pop("temp_user", None)
-
-        messages.success(request, "Conta criada com sucesso! Agora completa o onboarding.")
-        return redirect("perfil:signup")
+        messages.success(request, "Conta criada com sucesso! completa onboarding para ganhar pontos extra!")
+        return redirect("perfil:conta")
 
 class SignUpResendCodeView(View):
     """
