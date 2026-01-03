@@ -199,7 +199,7 @@ REST_FRAMEWORK: dict[str, Any] = {
         "auth_login": "10/min",   # login
     },
 }
-
+# TODO: change rotate and blacklist to true
 SIMPLE_JWT: dict[str, Any] = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=90),

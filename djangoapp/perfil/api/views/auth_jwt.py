@@ -2,6 +2,8 @@
 # djangoapp/perfil/api/views/auth_jwt.py
 from __future__ import annotations
 
+from typing import cast
+
 from django.contrib.auth.models import AbstractBaseUser
 from rest_framework import status
 from rest_framework.response import Response
@@ -29,7 +31,7 @@ class LoginJwtApiView(APIView):
 
         user: AbstractBaseUser = serializer.validated_data["user"]
 
-        refresh = RefreshToken.for_user(user)
+        refresh = cast(RefreshToken, RefreshToken.for_user(user))
         access = str(refresh.access_token)
 
         return Response(
