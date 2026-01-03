@@ -8,6 +8,18 @@ from django.urls.resolvers import URLPattern, URLResolver
 from rest_framework.routers import SimpleRouter
 
 from djangoapp.perfil import views
+from djangoapp.perfil.api.views import (
+    LoginApiView,
+    LogoutApiView,
+    SignupResendApiView,
+    SignupStartApiView,
+    SignupVerifyApiView,
+)
+from djangoapp.perfil.api.views.password_reset import (
+    PasswordResetResendApiView,
+    PasswordResetStartApiView,
+    PasswordResetVerifyApiView,
+)
 from djangoapp.perfil.views.admin_views import NotificationBroadcastAdminView
 from djangoapp.perfil.views.perfil_api import (
     CancelRegistrationApiView,
@@ -83,11 +95,14 @@ urlpatterns: List[Union[URLPattern, URLResolver]] = [
     path("perfil/onboarding/", views.OnboardingView.as_view(), name="onboarding"),
 
         # New Auth API
-    path("api/auth/signup/start/", views.SignupStartApiView.as_view(), name="api_signup_start"),
-    path("api/auth/signup/verify/", views.SignupVerifyApiView.as_view(), name="api_signup_verify"),
-    path("api/auth/signup/resend/", views.SignupResendApiView.as_view(), name="api_signup_resend"),
-    path("api/auth/login/", views.LoginApiView.as_view(), name="api_login"),
-    path("api/auth/logout/", views.LogoutApiView.as_view(), name="api_logout"),
+    path("api/auth/signup/start/", SignupStartApiView.as_view(), name="api_signup_start"),
+    path("api/auth/signup/verify/", SignupVerifyApiView.as_view(), name="api_signup_verify"),
+    path("api/auth/signup/resend/", SignupResendApiView.as_view(), name="api_signup_resend"),
+    path("api/auth/login/", LoginApiView.as_view(), name="api_login"),
+    path("api/auth/logout/", LogoutApiView.as_view(), name="api_logout"),
+    path("api/auth/password/reset/start/", PasswordResetStartApiView.as_view(), name="api_password_reset_start"),
+    path("api/auth/password/reset/verify/", PasswordResetVerifyApiView.as_view(), name="api_password_reset_verify"),
+    path("api/auth/password/reset/resend/", PasswordResetResendApiView.as_view(), name="api_password_reset_resend"),
 ]
 
 

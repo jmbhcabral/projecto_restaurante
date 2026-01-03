@@ -5,6 +5,7 @@ from __future__ import annotations
 from django.contrib.auth import login, logout
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from djangoapp.perfil.api.serializers.auth import (
@@ -22,6 +23,9 @@ class SignupStartApiView(APIView):
     """
     authentication_classes = []
     permission_classes = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth_send"
+
 
     def post(self, request):
         serializer = SignupStartSerializer(data=request.data, context={"request": request})
@@ -46,6 +50,8 @@ class SignupVerifyApiView(APIView):
     """
     authentication_classes = []
     permission_classes = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth_verify"
 
     def post(self, request):
         serializer = SignupVerifySerializer(data=request.data, context={"request": request})
@@ -72,6 +78,8 @@ class SignupResendApiView(APIView):
     """
     authentication_classes = []
     permission_classes = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth_send"
 
     def post(self, request):
         serializer = SignupResendSerializer(data=request.data, context={"request": request})
@@ -96,6 +104,8 @@ class LoginApiView(APIView):
     """
     authentication_classes = []
     permission_classes = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth_login"
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data, context={"request": request})

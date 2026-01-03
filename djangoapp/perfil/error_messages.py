@@ -15,6 +15,9 @@ ERROR_MESSAGES_PT: Final[Mapping[str, str]] = {
     ErrorCode.CODE_MAX_ATTEMPTS: "Atingiste o limite de tentativas. Pede um novo código.",
     ErrorCode.CODE_MAX_RESENDS: "Atingiste o limite de reenvios. Tenta mais tarde.",
 
+    # Rate limiting (domain)
+    ErrorCode.RATE_LIMITED: "Demasiadas tentativas. Tenta novamente mais tarde.",
+
     # Auth
     ErrorCode.AUTH_USER_EXISTS: "Já existe uma conta com este email.",
     ErrorCode.AUTH_USER_NOT_FOUND: "Conta não encontrada.",

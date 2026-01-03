@@ -17,6 +17,9 @@ class ErrorCode:
     CODE_MAX_ATTEMPTS: Final = "CODE_MAX_ATTEMPTS"
     CODE_MAX_RESENDS: Final = "CODE_MAX_RESENDS"
 
+    # Rate limiting (domain)
+    RATE_LIMITED: Final = "RATE_LIMITED"
+    
     # Auth
     AUTH_USER_EXISTS: Final = "AUTH_USER_EXISTS"
     AUTH_USER_NOT_FOUND: Final = "AUTH_USER_NOT_FOUND"

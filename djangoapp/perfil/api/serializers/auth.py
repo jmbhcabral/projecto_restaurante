@@ -60,7 +60,7 @@ class LoginSerializer(serializers.Serializer):
                 http_status=403,
             )
 
-        # English comment: keep the type stable for callers
+        # keep the type stable for callers
         attrs["user"] = cast(AbstractBaseUser, user)
         return attrs
 
@@ -75,14 +75,14 @@ class SignupStartSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True, trim_whitespace=False)
 
     def validate_email(self, value: str) -> str:
-        # English comment: normalize once at the boundary
+        # normalize once at the boundary
         return value.strip().lower()
 
     def validate_password(self, value: str) -> str:
         try:
             django_validate_password(value)
         except DjangoValidationError as e:
-            # English comment: keep UX simple: return the first validator message
+            # keep UX simple: return the first validator message
             raise serializers.ValidationError(e.messages[0])
         return value
 

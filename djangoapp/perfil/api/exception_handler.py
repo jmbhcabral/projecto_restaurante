@@ -41,7 +41,7 @@ DRF_CODE_MAP: dict[type[Exception], str] = {
 
 
 def _error_response(*, code: str, message: str, http_status: int, field: str | None = None) -> Response:
-    # English comment: consistent error shape + optional field for UI
+    # consistent error shape + optional field for UI
     payload: dict[str, Any] = {"code": code, "message": message}
     if field:
         payload["field"] = field
@@ -50,7 +50,7 @@ def _error_response(*, code: str, message: str, http_status: int, field: str | N
 
 def _extract_validation_error(detail: Any) -> tuple[str, str | None]:
     """
-    English comment: Returns (message, field).
+    Returns (message, field).
     For field-level errors, returns the first field and its first error message.
     """
     if isinstance(detail, dict) and detail:

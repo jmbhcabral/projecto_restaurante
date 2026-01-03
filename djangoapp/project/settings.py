@@ -170,16 +170,33 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK: dict[str, Any] = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
+    "DEFAULT_RENDERER_CLASSES": (
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
     ),
-        "EXCEPTION_HANDLER": "djangoapp.perfil.api.exception_handler.custom_exception_handler",
+    "EXCEPTION_HANDLER": "djangoapp.perfil.api.exception_handler.custom_exception_handler",
+
+    # Throttling (enterprise baseline)
+    "DEFAULT_THROTTLE_CLASSES": (
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
+    ),
+    "DEFAULT_THROTTLE_RATES": {
+        # global baseline (applies everywhere)
+        "anon": "60/min",
+        "user": "300/min",
+
+        # auth scopes (applies only where throttle_scope is set)
+        "auth_send": "6/min",     # signup/password reset start + resend
+        "auth_verify": "12/min",  # verify code endpoints
+        "auth_login": "10/min",   # login
+    },
 }
 
 SIMPLE_JWT: dict[str, Any] = {

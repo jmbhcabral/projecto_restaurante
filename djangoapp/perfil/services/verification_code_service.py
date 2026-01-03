@@ -18,15 +18,20 @@ from djangoapp.perfil.services.codes import (
     safe_compare_digest,
 )
 
+WINDOW_MINUTES = 60
+
+# total sends within window (create + resend) per email+purpose
+MAX_SENDS_PER_WINDOW = 6
+
+# per-IP throttle within window (create + resend)
+MAX_SENDS_PER_IP_WINDOW = 30
+
 DEFAULT_TTL_MINUTES = 10
 DEFAULT_CODE_LENGTH = 6
 MAX_ATTEMPTS = 5
-MAX_RESENDS = 5
-
-
 @dataclass(frozen=True)
 class CreatedCode:
-    # English comment: raw_code is returned only to be sent via email/SMS
+    # raw_code is returned only to be sent via email/SMS
     raw_code: str
     expires_at: datetime
     resend_count: int
@@ -52,18 +57,56 @@ def _get_user_agent(request) -> Optional[str]:
 
 
 def _get_last_resend_count(*, email: str, purpose: str) -> int:
+    cutoff = _now() - timedelta(minutes=WINDOW_MINUTES)
     last = (
         VerificationCode.objects
-        .filter(email=email, purpose=purpose)
+        .filter(email=email, purpose=purpose, created_at__gte=cutoff)
         .order_by("-created_at")
         .first()
     )
     return last.resend_count if last else 0
 
+def _count_sends_in_window(*, email: str, purpose: str) -> int:
+    cutoff = _now() - timedelta(minutes=WINDOW_MINUTES)
+    return VerificationCode.objects.filter(
+        email=email,
+        purpose=purpose,
+        created_at__gte=cutoff,
+    ).count()
+
+
+def _count_sends_by_ip_in_window(*, ip: Optional[str], purpose: str) -> int:
+    if not ip:
+        return 0
+    cutoff = _now() - timedelta(minutes=WINDOW_MINUTES)
+    return VerificationCode.objects.filter(
+        ip_address=ip,
+        purpose=purpose,
+        created_at__gte=cutoff,
+    ).count()
+    
+def _enforce_rate_limits(*, email: str, purpose: str, request) -> None:
+    email_norm = email.strip().lower()
+    ip = _get_client_ip(request)
+
+    if _count_sends_in_window(email=email_norm, purpose=purpose) >= MAX_SENDS_PER_WINDOW:
+        raise DomainError(
+            code=ErrorCode.RATE_LIMITED,
+            message=get_error_message(ErrorCode.RATE_LIMITED),
+            http_status=429,
+        )
+
+    if _count_sends_by_ip_in_window(ip=ip, purpose=purpose) >= MAX_SENDS_PER_IP_WINDOW:
+        # IP-based throttle uses same error code to keep contract stable.
+        raise DomainError(
+            code=ErrorCode.CODE_MAX_RESENDS,
+            message=get_error_message(ErrorCode.CODE_MAX_RESENDS),
+            http_status=429,
+        )
 
 @transaction.atomic
 def invalidate_open_codes(*, email: str, purpose: str) -> int:
-    # English comment: marks any open code as used so only the newest can be valid
+    # marks any open code as used so only the newest can be valid
     email_norm = email.strip().lower()
     now = _now()
     qs = VerificationCode.objects.filter(email=email_norm, purpose=purpose, used_at__isnull=True)
@@ -81,13 +124,7 @@ def create_code(
 ) -> CreatedCode:
     email_norm = email.strip().lower()
 
-    last_resends = _get_last_resend_count(email=email_norm, purpose=purpose)
-    if last_resends >= MAX_RESENDS:
-        raise DomainError(
-            code=ErrorCode.CODE_MAX_RESENDS,
-            message=get_error_message(ErrorCode.CODE_MAX_RESENDS),
-            http_status=429,
-        )
+    _enforce_rate_limits(email=email_norm, purpose=purpose, request=request)
 
     invalidate_open_codes(email=email_norm, purpose=purpose)
 
@@ -121,13 +158,9 @@ def resend_code(
 ) -> CreatedCode:
     email_norm = email.strip().lower()
 
+    _enforce_rate_limits(email=email_norm, purpose=purpose, request=request)
+
     last_resends = _get_last_resend_count(email=email_norm, purpose=purpose)
-    if last_resends >= MAX_RESENDS:
-        raise DomainError(
-            code=ErrorCode.CODE_MAX_RESENDS,
-            message=get_error_message(ErrorCode.CODE_MAX_RESENDS),
-            http_status=429,
-        )
 
     invalidate_open_codes(email=email_norm, purpose=purpose)
 
@@ -198,7 +231,7 @@ def verify_code(
 
     received = make_code_digest(email=email_norm, purpose=purpose, code=code_norm)
 
-    # English comment: always increment attempts to keep behavior consistent
+    # always increment attempts to keep behavior consistent
     latest.attempts += 1
     latest.updated_at = _now()
 
