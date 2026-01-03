@@ -157,6 +157,10 @@ class VerificationCode(models.Model):
             models.Index(fields=["email", "purpose"]),
             models.Index(fields=["purpose", "expires_at"]),
             models.Index(fields=["created_at"]),
+
+            # cleanup speed (expired + used)
+            models.Index(fields=["expires_at"]),
+            models.Index(fields=["used_at"]),
         ]
 
     email = models.EmailField(db_index=True)
