@@ -110,8 +110,6 @@ def start_signup(*, request, email: str, password: str) -> SignupStartResult:
 def verify_signup(*, email: str, code: str) -> SignupVerifyResult:
     email_norm = _normalize_email(email)
 
-    verify_code(email=email_norm, purpose=PURPOSE_SIGNUP, code=code, consume=True)
-
     user = User.objects.filter(email__iexact=email_norm).first()
     if not user:
         raise DomainError(
@@ -119,6 +117,16 @@ def verify_signup(*, email: str, code: str) -> SignupVerifyResult:
             message=get_error_message(ErrorCode.AUTH_USER_NOT_FOUND),
             http_status=404,
         )
+
+    if getattr(user, "is_active", False):
+        raise DomainError(
+            code=ErrorCode.AUTH_ALREADY_ACTIVE,
+            message=get_error_message(ErrorCode.AUTH_ALREADY_ACTIVE),
+            http_status=400,
+        )
+
+    # Validate + consume the code only for inactive users
+    verify_code(email=email_norm, purpose=PURPOSE_SIGNUP, code=code, consume=True)
 
     user.is_active = True
     user.save(update_fields=["is_active"])

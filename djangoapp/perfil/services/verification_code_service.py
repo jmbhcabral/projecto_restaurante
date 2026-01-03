@@ -29,6 +29,9 @@ MAX_SENDS_PER_IP_WINDOW = 30
 DEFAULT_TTL_MINUTES = 10
 DEFAULT_CODE_LENGTH = 6
 MAX_ATTEMPTS = 5
+
+# minimum seconds between sends
+MIN_SECONDS_BETWEEN_SENDS = 15  # good DX + good security
 @dataclass(frozen=True)
 class CreatedCode:
     # raw_code is returned only to be sent via email/SMS
@@ -104,6 +107,16 @@ def _enforce_rate_limits(*, email: str, purpose: str, request) -> None:
             http_status=429,
         )
 
+def _has_recent_open_code(*, email: str, purpose: str) -> bool:
+    cutoff = _now() - timedelta(seconds=MIN_SECONDS_BETWEEN_SENDS)
+    return VerificationCode.objects.filter(
+        email=email,
+        purpose=purpose,
+        used_at__isnull=True,
+        created_at__gte=cutoff,
+    ).exists()
+
+
 @transaction.atomic
 def invalidate_open_codes(*, email: str, purpose: str) -> int:
     # marks any open code as used so only the newest can be valid
@@ -125,6 +138,14 @@ def create_code(
     email_norm = email.strip().lower()
 
     _enforce_rate_limits(email=email_norm, purpose=purpose, request=request)
+
+    if _has_recent_open_code(email=email_norm, purpose=purpose):
+        # treat as idempotent send (avoid double click / retries)
+        raise DomainError(
+            code=ErrorCode.RATE_LIMITED,
+            message=get_error_message(ErrorCode.RATE_LIMITED),
+            http_status=429,
+        )
 
     invalidate_open_codes(email=email_norm, purpose=purpose)
 
@@ -160,6 +181,14 @@ def resend_code(
 
     _enforce_rate_limits(email=email_norm, purpose=purpose, request=request)
 
+    if _has_recent_open_code(email=email_norm, purpose=purpose):
+        # treat as idempotent send (avoid double click / retries)
+        raise DomainError(
+            code=ErrorCode.RATE_LIMITED,
+            message=get_error_message(ErrorCode.RATE_LIMITED),
+            http_status=429,
+        )
+
     last_resends = _get_last_resend_count(email=email_norm, purpose=purpose)
 
     invalidate_open_codes(email=email_norm, purpose=purpose)
@@ -194,35 +223,34 @@ def verify_code(
     email_norm = email.strip().lower()
     code_norm = code.strip()
 
-    latest = (
-        VerificationCode.objects
-        .filter(email=email_norm, purpose=purpose)
-        .order_by("-created_at")
-        .first()
-    )
+    latest_open = VerificationCode.objects.filter(
+        email=email_norm,
+        purpose=purpose,
+        used_at__isnull=True,
+    ).order_by("-created_at").first()
 
-    if not latest:
+    if not latest_open:
         raise DomainError(
             code=ErrorCode.CODE_NOT_FOUND,
             message=get_error_message(ErrorCode.CODE_NOT_FOUND),
             http_status=400,
         )
 
-    if latest.used_at is not None:
+    if latest_open.used_at is not None:
         raise DomainError(
             code=ErrorCode.CODE_INVALIDATED,
             message=get_error_message(ErrorCode.CODE_INVALIDATED),
             http_status=400,
         )
 
-    if latest.expires_at and _now() > latest.expires_at:
+    if latest_open.expires_at and _now() > latest_open.expires_at:
         raise DomainError(
             code=ErrorCode.CODE_EXPIRED,
             message=get_error_message(ErrorCode.CODE_EXPIRED),
             http_status=400,
         )
 
-    if latest.attempts >= MAX_ATTEMPTS:
+    if latest_open.attempts >= MAX_ATTEMPTS:
         raise DomainError(
             code=ErrorCode.CODE_MAX_ATTEMPTS,
             message=get_error_message(ErrorCode.CODE_MAX_ATTEMPTS),
@@ -232,11 +260,11 @@ def verify_code(
     received = make_code_digest(email=email_norm, purpose=purpose, code=code_norm)
 
     # always increment attempts to keep behavior consistent
-    latest.attempts += 1
-    latest.updated_at = _now()
+    latest_open.attempts += 1
+    latest_open.updated_at = _now()
 
-    if not safe_compare_digest(latest.code_digest, received):
-        latest.save(update_fields=["attempts", "updated_at"])
+    if not safe_compare_digest(latest_open.code_digest, received):
+        latest_open.save(update_fields=["attempts", "updated_at"])
         raise DomainError(
             code=ErrorCode.CODE_INCORRECT,
             message=get_error_message(ErrorCode.CODE_INCORRECT),
@@ -244,10 +272,10 @@ def verify_code(
         )
 
     if consume:
-        latest.used_at = _now()
-        latest.updated_at = _now()
-        latest.save(update_fields=["attempts", "used_at", "updated_at"])
+        latest_open.used_at = _now()
+        latest_open.updated_at = _now()
+        latest_open.save(update_fields=["attempts", "used_at", "updated_at"])
     else:
-        latest.save(update_fields=["attempts", "updated_at"])
+        latest_open.save(update_fields=["attempts", "updated_at"])
 
     return True

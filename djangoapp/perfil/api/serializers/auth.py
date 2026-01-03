@@ -117,7 +117,7 @@ class SignupVerifySerializer(serializers.Serializer):
         return value.strip().lower()
 
     def validate_code(self, value: str) -> str:
-        code = value.strip()
+        code = value.replace(" ", "").strip()
         if len(code) != 6 or not code.isdigit():
             raise serializers.ValidationError("Código inválido.")
         return code

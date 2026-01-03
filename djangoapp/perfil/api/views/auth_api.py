@@ -58,10 +58,6 @@ class SignupVerifyApiView(APIView):
         serializer.is_valid(raise_exception=True)
         result = serializer.save()
 
-        user = getattr(result, "user", None)
-        if user is not None:
-            login(request, user)
-
         return Response(
             {
                 "detail": "Conta verificada com sucesso.",
