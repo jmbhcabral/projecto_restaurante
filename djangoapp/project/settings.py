@@ -179,6 +179,7 @@ REST_FRAMEWORK: dict[str, Any] = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
+        "EXCEPTION_HANDLER": "djangoapp.perfil.api.exception_handler.custom_exception_handler",
 }
 
 SIMPLE_JWT: dict[str, Any] = {

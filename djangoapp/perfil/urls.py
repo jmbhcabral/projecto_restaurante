@@ -81,6 +81,13 @@ urlpatterns: List[Union[URLPattern, URLResolver]] = [
     path("signup/resend/", views.SignUpResendCodeView.as_view(), name="signup_resend"),
     path("login/", views.LoginView.as_view(), name="login_v2"),
     path("perfil/onboarding/", views.OnboardingView.as_view(), name="onboarding"),
+
+        # New Auth API
+    path("api/auth/signup/start/", views.SignupStartApiView.as_view(), name="api_signup_start"),
+    path("api/auth/signup/verify/", views.SignupVerifyApiView.as_view(), name="api_signup_verify"),
+    path("api/auth/signup/resend/", views.SignupResendApiView.as_view(), name="api_signup_resend"),
+    path("api/auth/login/", views.LoginApiView.as_view(), name="api_login"),
+    path("api/auth/logout/", views.LogoutApiView.as_view(), name="api_logout"),
 ]
 
 
