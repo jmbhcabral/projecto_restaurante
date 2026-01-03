@@ -282,6 +282,11 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'djangoapp.fidelidade.tasks.enviar_avisos_pontos_a_expirar_task',
         'schedule': crontab(hour=10, minute=5),  # todos os dias às 10:05
     },
+    "cleanup_verification_codes_daily": {
+        "task": "perfil.cleanup_verification_codes",
+        "schedule": crontab(hour=3, minute=0),  # 03:00 todos os dias
+        "args": (30,),
+    },
 }
 
 # Google Cloud Storage configuration
