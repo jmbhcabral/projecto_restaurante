@@ -6,10 +6,12 @@ from typing import List, Union
 from django.urls import path
 from django.urls.resolvers import URLPattern, URLResolver
 from rest_framework.routers import SimpleRouter
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from djangoapp.perfil import views
 from djangoapp.perfil.api.views import (
     LoginApiView,
+    LoginJwtApiView,
     LogoutApiView,
     SignupResendApiView,
     SignupStartApiView,
@@ -103,6 +105,10 @@ urlpatterns: List[Union[URLPattern, URLResolver]] = [
     path("api/auth/password/reset/start/", PasswordResetStartApiView.as_view(), name="api_password_reset_start"),
     path("api/auth/password/reset/verify/", PasswordResetVerifyApiView.as_view(), name="api_password_reset_verify"),
     path("api/auth/password/reset/resend/", PasswordResetResendApiView.as_view(), name="api_password_reset_resend"),
+
+    # JWT API
+    path("api/auth/login/jwt/", LoginJwtApiView.as_view(), name="api_login_jwt"),
+    path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="api_token_refresh"),
 ]
 
 

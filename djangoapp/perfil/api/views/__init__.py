@@ -7,6 +7,7 @@ from djangoapp.perfil.api.views.auth_api import (
     SignupStartApiView,
     SignupVerifyApiView,
 )
+from djangoapp.perfil.api.views.auth_jwt import LoginJwtApiView
 
 __all__ = [
     "LoginApiView",
@@ -14,4 +15,5 @@ __all__ = [
     "SignupResendApiView",
     "SignupStartApiView",
     "SignupVerifyApiView",
+    "LoginJwtApiView",
 ]

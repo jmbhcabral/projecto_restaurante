@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 'restau.apps.RestauConfig',
     'rest_framework_simplejwt',
+    "rest_framework_simplejwt.token_blacklist",
     'rest_framework',
     "djangoapp.perfil.apps.PerfilConfig",
     'djangoapp.restau',
