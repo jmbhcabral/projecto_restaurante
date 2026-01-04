@@ -283,7 +283,7 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(hour=10, minute=5),  # todos os dias às 10:05
     },
     "cleanup_verification_codes_daily": {
-        "task": "perfil.cleanup_verification_codes",
+        "task": "djangoapp.perfil.tasks.cleanup_verification_codes",
         "schedule": crontab(hour=3, minute=0),  # 03:00 todos os dias
         "args": (30,),
     },

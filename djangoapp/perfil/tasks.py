@@ -6,7 +6,7 @@ from celery import shared_task
 from django.core.management import call_command
 
 
-@shared_task(bind=True, name="perfil.cleanup_verification_codes")
+@shared_task(bind=True, name="djangoapp.perfil.tasks.cleanup_verification_codes")
 def cleanup_verification_codes_task(self, days: int = 30) -> dict[str, int]:
     """
     Runs the management command that deletes old verification codes.

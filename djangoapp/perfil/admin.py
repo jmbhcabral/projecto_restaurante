@@ -7,6 +7,7 @@ from djangoapp.perfil.models import (
     PasswordResetToken,
     Perfil,
     PushNotificationToken,
+    VerificationCode,
 )
 
 
@@ -59,3 +60,10 @@ class NotificationAdmin(admin.ModelAdmin):
         return super().changelist_view(request, extra_context=extra_context)
 
 
+@admin.register(VerificationCode)
+class VerificationCodeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'email', 'purpose', 'code_digest', 'expires_at', 'used_at', 'attempts', 'resend_count')
+    list_display_links = ('id', 'email', 'purpose')
+    search_fields = ('email', 'purpose', 'code_digest')
+    list_filter = ('expires_at', 'used_at')
+    date_hierarchy = 'created_at'
