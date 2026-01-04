@@ -52,8 +52,10 @@ class PasswordResetVerifySerializer(serializers.Serializer):
         return value.strip().lower()
 
     def validate_code(self, value: str) -> str:
-        # normalize code input.
-        return value.strip()
+        code = value.replace(" ", "").strip()
+        if len(code) != 6 or not code.isdigit():
+            raise serializers.ValidationError("Código inválido.")
+        return code
 
     def save(self, **kwargs: Any) -> PasswordResetVerifyResult:
         return verify_password_reset(
