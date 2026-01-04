@@ -21,16 +21,18 @@ from rest_framework.exceptions import (
 )
 from rest_framework.response import Response
 from rest_framework.views import exception_handler as drf_exception_handler
+from rest_framework_simplejwt.exceptions import InvalidToken
 
 from djangoapp.perfil.errors import CommonErrorCode, DomainError
 
 logger = logging.getLogger(__name__)
 
 
-# English comment: map DRF exceptions to stable error codes
+# Map DRF exceptions to stable error codes
 DRF_CODE_MAP: dict[type[Exception], str] = {
     NotAuthenticated: CommonErrorCode.AUTH_NOT_AUTHENTICATED,
     AuthenticationFailed: CommonErrorCode.AUTH_FAILED,
+    InvalidToken: CommonErrorCode.AUTH_FAILED,
     PermissionDenied: CommonErrorCode.AUTH_FORBIDDEN,
     Throttled: CommonErrorCode.RATE_LIMITED,
     NotFound: CommonErrorCode.NOT_FOUND,
@@ -38,6 +40,27 @@ DRF_CODE_MAP: dict[type[Exception], str] = {
     ParseError: CommonErrorCode.BAD_REQUEST,
     UnsupportedMediaType: CommonErrorCode.UNSUPPORTED_MEDIA_TYPE,
 }
+
+def _extract_api_detail_message(detail: Any) -> str:
+    """
+    Normalize "detail" from DRF/SimpleJWT exceptions to a readable message.
+    """
+    if isinstance(detail, str):
+        return detail
+
+    if isinstance(detail, list) and detail:
+        return str(detail[0])
+
+    if isinstance(detail, dict):
+        # Most common case in SimpleJWT: {"detail": "...", "code": "..."}
+        if "detail" in detail:
+            return str(detail["detail"])
+        # fallback: try to extract the first value
+        first_key = next(iter(detail.keys()), None)
+        if first_key is not None:
+            return str(detail[first_key])
+
+    return "Erro."
 
 
 def _error_response(*, code: str, message: str, http_status: int, field: str | None = None) -> Response:
@@ -108,8 +131,13 @@ def custom_exception_handler(exc: Exception, context: dict[str, Any]) -> Respons
     for exc_type, mapped_code in DRF_CODE_MAP.items():
         if isinstance(exc, exc_type):
             detail = getattr(exc, "detail", None)
-            message = str(detail) if detail else "Erro."
+            message = _extract_api_detail_message(detail) if detail else "Erro."
             http_status = getattr(exc, "status_code", status.HTTP_400_BAD_REQUEST)
+
+            # Optional: “enterprise UX” for tokens (do not reveal details)
+            if isinstance(exc, InvalidToken):
+                message = "Token inválido ou expirado."
+
             return _error_response(code=mapped_code, message=message, http_status=http_status)
 
     # 5) Let DRF handle other APIExceptions, then normalize its response

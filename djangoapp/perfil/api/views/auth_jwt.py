@@ -9,9 +9,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 from djangoapp.perfil.api.serializers.auth import LoginSerializer
+from djangoapp.perfil.api.serializers.auth_jwt import LogoutJwtSerializer
+from djangoapp.perfil.errors import CommonErrorCode, DomainError
 
 
 class LoginJwtApiView(APIView):
@@ -42,3 +44,33 @@ class LoginJwtApiView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+class LogoutJwtApiView(APIView):
+    """
+    POST /api/auth/logout/jwt/
+    Body: { "refresh": "..." }
+    """
+    authentication_classes = []
+    permission_classes = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth_logout"  
+
+    def post(self, request):
+        serializer = LogoutJwtSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        refresh_str = serializer.validated_data["refresh"]
+
+        try:
+            token = RefreshToken(refresh_str)
+            token.blacklist()
+        except TokenError:
+            # do not reveal details (invalid/expired/etc.)
+            raise DomainError(
+                code=CommonErrorCode.BAD_REQUEST,
+                message="Pedido inválido.",
+                http_status=400,
+            )
+
+        return Response({"detail": "Logout efetuado com sucesso."}, status=status.HTTP_200_OK)

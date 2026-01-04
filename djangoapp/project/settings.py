@@ -197,16 +197,27 @@ REST_FRAMEWORK: dict[str, Any] = {
         "auth_send": "6/min",     # signup/password reset start + resend
         "auth_verify": "12/min",  # verify code endpoints
         "auth_login": "10/min",   # login
+        "auth_logout": "30/min",  # logout
+
     },
 }
-# TODO: change rotate and blacklist to true
 SIMPLE_JWT: dict[str, Any] = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=90),
-    "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": False,
-    "SIGNING_KEY": os.getenv('SECRET_KEY_JWT', 'change-me'),
+    # Segurança / UX balance (híbrido)
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+
+    # Hardening
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+
+    # Assinatura
+    "SIGNING_KEY": os.getenv("SECRET_KEY_JWT", SECRET_KEY),
+
+    # Header
     "AUTH_HEADER_TYPES": ("Bearer",),
+
+    # Opcional mas recomendado (auditoria / compatibilidade)
+    "UPDATE_LAST_LOGIN": True,
 }
 
 LOGGING: dict[str, Any] = {
