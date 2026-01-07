@@ -18,11 +18,15 @@ class MeApiView(APIView):
 
     def get(self, request):
         user = request.user
+        is_group_admin = user.groups.filter(name="acesso_restrito").exists()
         return Response(
             {
                 "id": user.id,
                 "email": getattr(user, "email", None),
                 "username": getattr(user, "username", None),
+                "first_name": getattr(user, "first_name", None),
+                "last_name": getattr(user, "last_name", None),
                 "is_active": getattr(user, "is_active", None),
+                "is_group_admin": is_group_admin,
             }
         )

@@ -110,7 +110,7 @@ urlpatterns: List[Union[URLPattern, URLResolver]] = [
 
     # JWT API
     path("api/auth/login/jwt/", LoginJwtApiView.as_view(), name="api_login_jwt"),
-    path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="api_token_refresh"),
+    path("api/auth/token/refresh/jwt/", TokenRefreshView.as_view(), name="api_token_refresh_jwt"),
     path("api/auth/logout/jwt/", LogoutJwtApiView.as_view(), name="api_logout_jwt"),
     path("api/auth/me/", MeApiView.as_view(), name="api_me"),
 ]
