@@ -24,6 +24,10 @@ ERROR_MESSAGES_PT: Final[Mapping[str, str]] = {
     ErrorCode.AUTH_ALREADY_ACTIVE: "Esta conta já está ativa. Faz login.",
     ErrorCode.AUTH_DISABLED: "Conta desativada.",
     ErrorCode.AUTH_INVALID_CREDENTIALS: "Credenciais inválidas.",
+    
+    # Signup flow (temp_user)
+    ErrorCode.AUTH_SIGNUP_NOT_STARTED: "O registo ainda não foi iniciado. Faz o registo novamente.",
+    ErrorCode.AUTH_SIGNUP_SESSION_EXPIRED: "A sessão de registo expirou. Faz o registo novamente.",
 }
 
 def get_error_message(code: str) -> str:

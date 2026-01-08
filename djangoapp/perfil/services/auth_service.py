@@ -118,12 +118,19 @@ def verify_signup(*, email: str, code: str) -> SignupVerifyResult:
     # Phase B (atomic): apply state changes
     with transaction.atomic():
         pending = PendingSignup.objects.select_for_update().filter(email=email_norm).first()
-        if not pending or pending.is_used:
-            # TODO: Add a new code to the error_messages.py
+
+        if not pending:
             raise DomainError(
-                code=ErrorCode.AUTH_USER_NOT_FOUND,
-                message="Sessão de registo expirada. Faz signup novamente.",
+                code=ErrorCode.AUTH_SIGNUP_NOT_STARTED,
+                message=get_error_message(ErrorCode.AUTH_SIGNUP_NOT_STARTED),
                 http_status=404,
+            )
+
+        if pending.is_used:
+            raise DomainError(
+                code=ErrorCode.AUTH_SIGNUP_SESSION_EXPIRED,
+                message=get_error_message(ErrorCode.AUTH_SIGNUP_SESSION_EXPIRED),
+                http_status=400,
             )
 
         user = User.objects.filter(email__iexact=email_norm).first()
@@ -164,11 +171,10 @@ def resend_signup_code(*, request, email: str) -> SignupStartResult:
     with transaction.atomic():
         pending = PendingSignup.objects.select_for_update().filter(email=email_norm).first()
         if not pending or pending.is_used:
-            # TODO: Add a new code to the error_messages.py
             raise DomainError(
-                code=ErrorCode.AUTH_USER_NOT_FOUND,
-                message="Sessão de registo expirada. Faz signup novamente.",
-                http_status=404,
+                code=ErrorCode.AUTH_SIGNUP_SESSION_EXPIRED,
+                message=get_error_message(ErrorCode.AUTH_SIGNUP_SESSION_EXPIRED),
+                http_status=400,
             )
 
         created: CreatedCode = resend_code(

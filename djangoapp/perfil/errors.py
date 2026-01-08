@@ -27,6 +27,9 @@ class ErrorCode:
     AUTH_DISABLED: Final = "AUTH_DISABLED"
     AUTH_INVALID_CREDENTIALS: Final = "AUTH_INVALID_CREDENTIALS"
 
+    # Signup flow (temp_user)
+    AUTH_SIGNUP_NOT_STARTED: Final = "AUTH_SIGNUP_NOT_STARTED"
+    AUTH_SIGNUP_SESSION_EXPIRED: Final = "AUTH_SIGNUP_SESSION_EXPIRED"
 
 class CommonErrorCode:
     """Cross-cutting / infrastructure error codes."""
