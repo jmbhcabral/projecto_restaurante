@@ -6,6 +6,7 @@ import uuid
 from datetime import timedelta
 
 from django.conf import settings
+from django.contrib.auth.hashers import make_password
 from django.db import models
 from django.forms import ValidationError
 from django.utils import timezone
@@ -142,6 +143,45 @@ class Perfil(models.Model):
 
     def __str__(self):
         return f'{self.usuario.first_name} {self.usuario.last_name}'
+
+
+class PendingSignup(models.Model):
+    """
+    Temporary signup payload until code verification.
+    Stores password as a Django-compatible hash (never plaintext).
+    """
+
+    class Meta:
+        verbose_name = "Pending Signup"
+        verbose_name_plural = "Pending Signups"
+        indexes = [
+            models.Index(fields=["email"]),
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["used_at"]),
+        ]
+
+    email = models.EmailField(unique=True, db_index=True)
+    password_hash = models.CharField(max_length=255)
+
+    used_at = models.DateTimeField(blank=True, null=True)
+
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    user_agent = models.TextField(blank=True, null=True)
+
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def is_used(self) -> bool:
+        return self.used_at is not None
+
+    def set_temp_password(self, raw_password: str) -> None:
+        # English comment: store as Django password hash; can later be assigned to User.password directly.
+        self.password_hash = make_password(raw_password)
+
+    def mark_used(self) -> None:
+        self.used_at = timezone.now()
+        self.save(update_fields=["used_at"])
 
 
 class VerificationCode(models.Model):

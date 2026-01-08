@@ -212,7 +212,6 @@ def resend_code(
     return CreatedCode(raw_code=raw_code, expires_at=expires_at, resend_count=vc_resend_count)
 
 
-@transaction.atomic
 def verify_code(
     *,
     email: str,
@@ -223,59 +222,66 @@ def verify_code(
     email_norm = email.strip().lower()
     code_norm = code.strip()
 
-    latest_open = VerificationCode.objects.filter(
-        email=email_norm,
-        purpose=purpose,
-        used_at__isnull=True,
-    ).order_by("-created_at").first()
+    error: DomainError | None = None
 
-    if not latest_open:
-        raise DomainError(
-            code=ErrorCode.CODE_NOT_FOUND,
-            message=get_error_message(ErrorCode.CODE_NOT_FOUND),
-            http_status=400,
+    with transaction.atomic():
+        # English comment: lock latest open code row to prevent race conditions.
+        latest_open = (
+            VerificationCode.objects
+            .select_for_update()
+            .filter(email=email_norm, purpose=purpose, used_at__isnull=True)
+            .order_by("-created_at")
+            .first()
         )
 
-    if latest_open.used_at is not None:
-        raise DomainError(
-            code=ErrorCode.CODE_INVALIDATED,
-            message=get_error_message(ErrorCode.CODE_INVALIDATED),
-            http_status=400,
-        )
+        if not latest_open:
+            error = DomainError(
+                code=ErrorCode.CODE_NOT_FOUND,
+                message=get_error_message(ErrorCode.CODE_NOT_FOUND),
+                http_status=400,
+            )
+        elif latest_open.used_at is not None:
+            error = DomainError(
+                code=ErrorCode.CODE_INVALIDATED,
+                message=get_error_message(ErrorCode.CODE_INVALIDATED),
+                http_status=400,
+            )
+        elif latest_open.expires_at and _now() > latest_open.expires_at:
+            error = DomainError(
+                code=ErrorCode.CODE_EXPIRED,
+                message=get_error_message(ErrorCode.CODE_EXPIRED),
+                http_status=400,
+            )
+        elif latest_open.attempts >= MAX_ATTEMPTS:
+            error = DomainError(
+                code=ErrorCode.CODE_MAX_ATTEMPTS,
+                message=get_error_message(ErrorCode.CODE_MAX_ATTEMPTS),
+                http_status=429,
+            )
+        else:
+            received = make_code_digest(email=email_norm, purpose=purpose, code=code_norm)
 
-    if latest_open.expires_at and _now() > latest_open.expires_at:
-        raise DomainError(
-            code=ErrorCode.CODE_EXPIRED,
-            message=get_error_message(ErrorCode.CODE_EXPIRED),
-            http_status=400,
-        )
+            # always increment attempts to keep behavior consistent
+            latest_open.attempts += 1
+            latest_open.updated_at = _now()
 
-    if latest_open.attempts >= MAX_ATTEMPTS:
-        raise DomainError(
-            code=ErrorCode.CODE_MAX_ATTEMPTS,
-            message=get_error_message(ErrorCode.CODE_MAX_ATTEMPTS),
-            http_status=429,
-        )
+            if not safe_compare_digest(latest_open.code_digest, received):
+                latest_open.save(update_fields=["attempts", "updated_at"])
+                error = DomainError(
+                    code=ErrorCode.CODE_INCORRECT,
+                    message=get_error_message(ErrorCode.CODE_INCORRECT),
+                    http_status=400,
+                )
+            else:
+                if consume:
+                    latest_open.used_at = _now()
+                    latest_open.updated_at = _now()
+                    latest_open.save(update_fields=["attempts", "used_at", "updated_at"])
+                else:
+                    latest_open.save(update_fields=["attempts", "updated_at"])
 
-    received = make_code_digest(email=email_norm, purpose=purpose, code=code_norm)
-
-    # always increment attempts to keep behavior consistent
-    latest_open.attempts += 1
-    latest_open.updated_at = _now()
-
-    if not safe_compare_digest(latest_open.code_digest, received):
-        latest_open.save(update_fields=["attempts", "updated_at"])
-        raise DomainError(
-            code=ErrorCode.CODE_INCORRECT,
-            message=get_error_message(ErrorCode.CODE_INCORRECT),
-            http_status=400,
-        )
-
-    if consume:
-        latest_open.used_at = _now()
-        latest_open.updated_at = _now()
-        latest_open.save(update_fields=["attempts", "used_at", "updated_at"])
-    else:
-        latest_open.save(update_fields=["attempts", "updated_at"])
+    # English comment: raise AFTER atomic block so attempts update is committed even on wrong codes.
+    if error is not None:
+        raise error
 
     return True

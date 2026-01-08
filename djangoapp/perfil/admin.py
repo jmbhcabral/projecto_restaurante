@@ -5,6 +5,7 @@ from djangoapp.perfil.models import (
     Morada,
     Notification,
     PasswordResetToken,
+    PendingSignup,
     Perfil,
     PushNotificationToken,
     VerificationCode,
@@ -66,4 +67,12 @@ class VerificationCodeAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'email', 'purpose')
     search_fields = ('email', 'purpose', 'code_digest')
     list_filter = ('expires_at', 'used_at')
+    date_hierarchy = 'created_at'
+
+@admin.register(PendingSignup)
+class PendingSignupAdmin(admin.ModelAdmin):
+    list_display = ('id', 'email', 'password_hash', 'used_at', 'ip_address', 'user_agent', 'created_at', 'updated_at')
+    list_display_links = ('id', 'email')
+    search_fields = ('email', 'password_hash', 'ip_address', 'user_agent')
+    list_filter = ('created_at', 'updated_at')
     date_hierarchy = 'created_at'
