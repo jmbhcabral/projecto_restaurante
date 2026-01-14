@@ -9,6 +9,10 @@ from djangoapp.perfil.api.views.auth_api import (
 )
 from djangoapp.perfil.api.views.auth_jwt import LoginJwtApiView, LogoutJwtApiView
 from djangoapp.perfil.api.views.me import MeApiView
+from djangoapp.perfil.api.views.onboarding_optional import (
+    OnboardingOptionalCompleteApiView,
+)
+from djangoapp.perfil.api.views.ping import PingApiView
 
 __all__ = [
     "LoginApiView",
@@ -19,4 +23,6 @@ __all__ = [
     "LoginJwtApiView",
     "LogoutJwtApiView",
     "MeApiView",
+    "PingApiView",
+    "OnboardingOptionalCompleteApiView",
 ]

@@ -69,8 +69,11 @@ class Perfil(models.Model):
     qr_code = models.ImageField(upload_to="assets/qrcodes/", blank=True, null=True)
 
     # Onboarding (novo) — NÃO mexe no first_login do RN
-    onboarding_min_completed = models.BooleanField(default=False)
+    onboarding_optional_completed = models.BooleanField(default=False)
     phone_verified = models.BooleanField(default=False)
+    onboarding_required_completed = models.BooleanField(default=False)
+
+    terms_accepted_at = models.DateTimeField(null=True, blank=True)
 
     # Capacidades (não-linear)
     has_valid_nif = models.BooleanField(default=False)

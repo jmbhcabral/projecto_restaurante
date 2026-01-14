@@ -1,58 +1,73 @@
+# djangoapp/perfil/api/serializers/onboarding.py
 from __future__ import annotations
 
 from typing import Any
 
+from django.utils import timezone
 from rest_framework import serializers
 
+from djangoapp.fidelidade.models import RespostaFidelidade
+from djangoapp.perfil.constants import QUESTION_CODE_STUDENT
 from djangoapp.perfil.models import Perfil
-from djangoapp.utils.model_validators import validar_nif
 
 
-class OnboardingMinSerializer(serializers.Serializer):
-    # Minimal onboarding fields (adapt to your UI)
-    telemovel = serializers.CharField(required=False, allow_blank=True, max_length=9)
-    nif = serializers.CharField(required=False, allow_blank=True, max_length=9)
+class OnboardingRequiredSerializer(serializers.Serializer):
+    estudante = serializers.PrimaryKeyRelatedField(
+        queryset=RespostaFidelidade.objects.filter(
+            resposta__pergunta__code=QUESTION_CODE_STUDENT
+        ),
+        required=True,
+    )
+
     accept_terms = serializers.BooleanField(required=True)
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         if attrs.get("accept_terms") is not True:
             raise serializers.ValidationError({"accept_terms": "Tens de aceitar os termos."})
 
-        # Validate phone if provided
-        telemovel = (attrs.get("telemovel") or "").strip()
-        if telemovel:
-            if len(telemovel) != 9 or not telemovel.isdigit():
-                raise serializers.ValidationError({"telemovel": "O telemóvel tem de ter 9 dígitos."})
-
-        # Validate nif if provided
-        nif = (attrs.get("nif") or "").strip()
-        if nif:
-            if len(nif) != 9 or not nif.isdigit():
-                raise serializers.ValidationError({"nif": "O NIF tem de ter 9 dígitos."})
-            if not validar_nif(nif):
-                raise serializers.ValidationError({"nif": "NIF inválido."})
-
         return attrs
 
     def save(self, **kwargs: Any) -> Perfil:
-        # English comment: DRF's BaseSerializer.save signature is save(**kwargs)
-        perfil = kwargs.get("perfil")
+        perfil: Perfil | None = self.context.get("perfil")
         if perfil is None or not isinstance(perfil, Perfil):
-            raise TypeError("Missing required kwarg: perfil")
+            raise TypeError("Missing required context: perfil")
 
-        data: dict[str, Any] = self.validated_data
+        resposta_fidelidade: RespostaFidelidade = self.validated_data["estudante"]
 
-        # Update fields
-        if "telemovel" in data:
-            perfil.telemovel = (data.get("telemovel") or "").strip()
-        if "nif" in data:
-            perfil.nif = (data.get("nif") or "").strip()
+        # 1) Store the answer
+        perfil.estudante = resposta_fidelidade
 
-        # Set derived flags
-        perfil.has_valid_nif = bool(perfil.nif and validar_nif(perfil.nif))
+        # 2) Assign loyalty type derived from the answer
+        perfil.tipo_fidelidade = resposta_fidelidade.tipo_fidelidade
 
-        # Mark onboarding minimal as completed
-        perfil.onboarding_min_completed = True
+        # 3) Mark onboarding as completed (blocking)
+        perfil.onboarding_required_completed = True
 
-        perfil.save()
+        # 4) Store terms acceptance timestamp
+        if perfil.terms_accepted_at is None:
+            perfil.terms_accepted_at = timezone.now()
+
+        perfil.save(
+            update_fields=[
+                "estudante",
+                "tipo_fidelidade",
+                "onboarding_required_completed",
+                "terms_accepted_at",
+            ]
+        )
         return perfil
+
+
+class StudentOptionSerializer(serializers.ModelSerializer):
+    label = serializers.CharField(source="resposta.resposta")
+    value = serializers.CharField(source="resposta.value")
+    tipo_fidelidade = serializers.IntegerField(source="tipo_fidelidade_id")
+
+    class Meta:
+        model = RespostaFidelidade
+        fields = [
+            "id",
+            "label",
+            "value",
+            "tipo_fidelidade",
+        ]

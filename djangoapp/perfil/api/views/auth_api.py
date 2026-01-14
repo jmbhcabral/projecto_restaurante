@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from django.contrib.auth import login, logout
 from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
@@ -21,8 +22,7 @@ class SignupStartApiView(APIView):
     POST /api/auth/signup/start/
     Body: { "email": "...", "password": "..." }
     """
-    authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "auth_send"
 
@@ -48,8 +48,7 @@ class SignupVerifyApiView(APIView):
     POST /api/auth/signup/verify/
     Body: { "email": "...", "code": "123456" }
     """
-    authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "auth_verify"
 
@@ -72,8 +71,7 @@ class SignupResendApiView(APIView):
     POST /api/auth/signup/resend/
     Body: { "email": "..." }
     """
-    authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "auth_send"
 
@@ -98,8 +96,7 @@ class LoginApiView(APIView):
     POST /api/auth/login/
     Body: { "identifier": "...", "password": "..." }
     """
-    authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "auth_login"
 
@@ -118,6 +115,7 @@ class LogoutApiView(APIView):
     POST /api/auth/logout/
     Session-based logout.
     """
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         logout(request)
         return Response({"detail": "Logout efetuado com sucesso."}, status=status.HTTP_200_OK)

@@ -203,6 +203,13 @@ class MovimentoPontos(models.Model):
         related_name="movimentos_pontos",
     )
 
+    code = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="Código lógico do evento (ex: PROFILE_COMPLETED_BONUS)",
+    )
+
     criado_em = models.DateTimeField(
         default=timezone.now,
     )
@@ -216,6 +223,13 @@ class MovimentoPontos(models.Model):
             models.Index(fields=["tipo"]),
         ]
 
+        constraints = [
+        models.UniqueConstraint(
+            fields=["utilizador", "fidelidade", "code"],
+            name="uniq_user_fidelity_event_code",
+        )
+    ]
+
     def __str__(self):
         return f"{self.utilizador} - {self.tipo} - {self.pontos}"
 
@@ -225,6 +239,7 @@ class Perguntas(models.Model):
         verbose_name = 'Pergunta'
         verbose_name_plural = 'Perguntas'
 
+    code = models.SlugField(max_length=50, unique=True, help_text='Código único para a pergunta')
     pergunta = models.CharField(max_length=200, verbose_name='Pergunta')
 
     def __str__(self):
@@ -243,6 +258,8 @@ class Respostas(models.Model):
     )
 
     resposta = models.CharField(max_length=200, verbose_name='Resposta')
+
+    value = models.SlugField(max_length=50, help_text='Código único para a resposta')
 
     def __str__(self):
         return self.resposta
