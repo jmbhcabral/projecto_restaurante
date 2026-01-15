@@ -1,6 +1,7 @@
 # djangoapp/perfil/api/views/profile_me.py
 from __future__ import annotations
 
+from django.db import transaction
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -56,45 +57,46 @@ class ProfileMeApiView(APIView):
         return Response(perfil, status=status.HTTP_200_OK)
 
     def patch(self, request):
-        user = request.user
+        with transaction.atomic():
+            user = request.user
 
-        perfil = Perfil.objects.filter(usuario=user).first()
-        if not perfil:
-            return Response({}, status=status.HTTP_404_NOT_FOUND)
+            perfil = Perfil.objects.filter(usuario=user).first()
+            if not perfil:
+                return Response({}, status=status.HTTP_404_NOT_FOUND)
 
-        # -------------------------
-        # Update User fields
-        # -------------------------
-        user_editable_fields = {"first_name", "last_name"}
-        user_updated_fields = set()
+            # -------------------------
+            # Update User fields
+            # -------------------------
+            user_editable_fields = {"first_name", "last_name"}
+            user_updated_fields = set()
 
-        for field in user_editable_fields:
-            if field in request.data:
-                setattr(user, field, request.data[field])
-                user_updated_fields.add(field)
+            for field in user_editable_fields:
+                if field in request.data:
+                    setattr(user, field, request.data[field])
+                    user_updated_fields.add(field)
 
-        if user_updated_fields:
-            user.full_clean()  # validates User model
-            user.save(update_fields=user_updated_fields)
+            if user_updated_fields:
+                user.full_clean()  # validates User model
+                user.save(update_fields=list(user_updated_fields))
 
-        # -------------------------
-        # Update Perfil fields
-        # -------------------------
-        perfil_editable_fields = {
-            "data_nascimento",
-            "telemovel",
-            "notificacoes_email",
-            "notificacoes_telemovel",
-        }
-        perfil_updated_fields = set()
+            # -------------------------
+            # Update Perfil fields
+            # -------------------------
+            perfil_editable_fields = {
+                "data_nascimento",
+                "telemovel",
+                "notificacoes_email",
+                "notificacoes_telemovel",
+            }
+            perfil_updated_fields = set()
 
-        for field in perfil_editable_fields:
-            if field in request.data:
-                setattr(perfil, field, request.data[field])
-                perfil_updated_fields.add(field)
+            for field in perfil_editable_fields:
+                if field in request.data:
+                    setattr(perfil, field, request.data[field])
+                    perfil_updated_fields.add(field)
 
-        if perfil_updated_fields:
-            perfil.full_clean()  # runs model validations
-            perfil.save(update_fields=perfil_updated_fields)
+            if perfil_updated_fields:
+                perfil.full_clean()  # runs model validations
+                perfil.save(update_fields=list(perfil_updated_fields))
 
         return Response({"status": "updated"}, status=status.HTTP_200_OK)
