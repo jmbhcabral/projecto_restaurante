@@ -102,8 +102,8 @@ def _enforce_rate_limits(*, email: str, purpose: str, request) -> None:
     if _count_sends_by_ip_in_window(ip=ip, purpose=purpose) >= MAX_SENDS_PER_IP_WINDOW:
         # IP-based throttle uses same error code to keep contract stable.
         raise DomainError(
-            code=ErrorCode.CODE_MAX_RESENDS,
-            message=get_error_message(ErrorCode.CODE_MAX_RESENDS),
+            code=ErrorCode.RATE_LIMITED ,
+            message=get_error_message(ErrorCode.RATE_LIMITED),
             http_status=429,
         )
 

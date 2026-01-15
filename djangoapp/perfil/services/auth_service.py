@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser
-from django.db import transaction
+from django.db import IntegrityError, transaction
+from django.utils import timezone
 
 from djangoapp.perfil.error_messages import get_error_message
 from djangoapp.perfil.errors import DomainError, ErrorCode
@@ -17,6 +18,7 @@ from djangoapp.perfil.services.email_service import (
     send_signup_code_email,
     send_signup_verified_email,
 )
+from djangoapp.perfil.services.perfil_service import ensure_perfil_business_defaults
 from djangoapp.perfil.services.verification_code_service import (
     CreatedCode,
     create_code,
@@ -28,6 +30,8 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 PURPOSE_SIGNUP = "signup"
+
+GENERIC_TTL_MIN = 10
 
 # TODO: create a management command to clean up PendingSignup with more than X days and used_at is null
 @dataclass(frozen=True)
@@ -68,23 +72,28 @@ def _safe_send_signup_verified_email(*, email: str) -> None:
 
 
 
+def _generic_signup_start_result(email_norm: str) -> SignupStartResult:
+    # English comment: do not reveal whether account exists; return generic metadata
+    return SignupStartResult(
+        email=email_norm,
+        expires_at=timezone.now() + timedelta(minutes=GENERIC_TTL_MIN),
+        resend_count=0,
+    )
+
 def start_signup(*, request, email: str, password: str) -> SignupStartResult:
     email_norm = _normalize_email(email)
 
     with transaction.atomic():
         existing = User.objects.select_for_update().filter(email__iexact=email_norm).first()
         if existing and getattr(existing, "is_active", False):
-            raise DomainError(
-                code=ErrorCode.AUTH_USER_EXISTS,
-                message=get_error_message(ErrorCode.AUTH_USER_EXISTS),
-                http_status=400,
-            )
+            # ✅ no-op to prevent email enumeration
+            logger.info("signup_start: active user exists", extra={"email": email_norm})
+            return _generic_signup_start_result(email_norm)
 
         pending = PendingSignup.objects.select_for_update().filter(email=email_norm).first()
         if pending is None:
             pending = PendingSignup(email=email_norm)
         else:
-            # English comment: PendingSignup is not source of truth; allow restarting signup anytime.
             if pending.is_used:
                 pending.used_at = None
 
@@ -99,7 +108,6 @@ def start_signup(*, request, email: str, password: str) -> SignupStartResult:
             purpose=PURPOSE_SIGNUP,
         )
 
-    # English comment: external IO outside transaction
     _safe_send_signup_code_email(email=email_norm, code=created.raw_code)
 
     return SignupStartResult(
@@ -111,11 +119,10 @@ def start_signup(*, request, email: str, password: str) -> SignupStartResult:
 def verify_signup(*, email: str, code: str) -> SignupVerifyResult:
     email_norm = _normalize_email(email)
 
-    # Phase A (no outer transaction): validate + consume code
-    # English comment: This must run outside outer atomic so attempts are persisted on failures.
+    # Phase A: verify + consume code outside outer atomic
     verify_code(email=email_norm, purpose=PURPOSE_SIGNUP, code=code, consume=True)
 
-    # Phase B (atomic): apply state changes
+    # Phase B: atomic state changes
     with transaction.atomic():
         pending = PendingSignup.objects.select_for_update().filter(email=email_norm).first()
 
@@ -133,25 +140,41 @@ def verify_signup(*, email: str, code: str) -> SignupVerifyResult:
                 http_status=400,
             )
 
-        user = User.objects.filter(email__iexact=email_norm).first()
+        # lock user row to avoid concurrent activation/create races
+        user = User.objects.select_for_update().filter(email__iexact=email_norm).first()
 
-        if user is None:
-            user = User(username=email_norm, email=email_norm, is_active=True)
-            user.password = pending.password_hash
-            user.save()
-            _ensure_profile(user)
-        else:
-            if getattr(user, "is_active", False):
-                raise DomainError(
-                    code=ErrorCode.AUTH_ALREADY_ACTIVE,
-                    message=get_error_message(ErrorCode.AUTH_ALREADY_ACTIVE),
-                    http_status=400,
-                )
+        try:
+            if user is None:
+                user = User(username=email_norm, email=email_norm, is_active=True)
+                user.password = pending.password_hash
+                user.full_clean()  # validates User model
+                user.save()
 
-            user.is_active = True
-            user.password = pending.password_hash
-            user.save(update_fields=["is_active", "password"])
-            _ensure_profile(user)
+                perfil = _ensure_profile(user)
+                ensure_perfil_business_defaults(perfil)
+            else:
+                if getattr(user, "is_active", False):
+                    raise DomainError(
+                        code=ErrorCode.AUTH_ALREADY_ACTIVE,
+                        message=get_error_message(ErrorCode.AUTH_ALREADY_ACTIVE),
+                        http_status=400,
+                    )
+
+                user.is_active = True
+                user.password = pending.password_hash
+                user.full_clean()
+                user.save(update_fields=["is_active", "password"])
+
+                perfil = _ensure_profile(user)
+                ensure_perfil_business_defaults(perfil)
+
+        except IntegrityError:
+            # English comment: handle uniqueness conflicts (username/email) gracefully
+            raise DomainError(
+                code=ErrorCode.AUTH_USER_EXISTS,
+                message=get_error_message(ErrorCode.AUTH_USER_EXISTS),
+                http_status=400,
+            )
 
         pending.mark_used()
 
@@ -162,11 +185,8 @@ def resend_signup_code(*, request, email: str) -> SignupStartResult:
     email_norm = _normalize_email(email)
 
     if User.objects.filter(email__iexact=email_norm, is_active=True).exists():
-        raise DomainError(
-            code=ErrorCode.AUTH_ALREADY_ACTIVE,
-            message=get_error_message(ErrorCode.AUTH_ALREADY_ACTIVE),
-            http_status=400,
-        )
+        logger.info("signup_resend: active user exists", extra={"email": email_norm})
+        return _generic_signup_start_result(email_norm)
 
     with transaction.atomic():
         pending = PendingSignup.objects.select_for_update().filter(email=email_norm).first()

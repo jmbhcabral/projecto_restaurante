@@ -14,6 +14,8 @@ from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from djangoapp.perfil.api.serializers.auth import LoginSerializer
 from djangoapp.perfil.api.serializers.auth_jwt import LogoutJwtSerializer
 from djangoapp.perfil.errors import CommonErrorCode, DomainError
+from djangoapp.perfil.models import Perfil
+from djangoapp.perfil.services.perfil_service import ensure_perfil_business_defaults
 
 
 class LoginJwtApiView(APIView):
@@ -32,6 +34,11 @@ class LoginJwtApiView(APIView):
         serializer.is_valid(raise_exception=True)
 
         user: AbstractBaseUser = serializer.validated_data["user"]
+
+        # English comment: keep Perfil invariants consistent at login time
+        perfil = Perfil.objects.filter(usuario=user).first()
+        if perfil:
+            ensure_perfil_business_defaults(perfil)
 
         refresh = cast(RefreshToken, RefreshToken.for_user(user))
         access = str(refresh.access_token)
