@@ -8,6 +8,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.db import models
+from django.db.models import Q
 from django.forms import ValidationError
 from django.utils import timezone
 
@@ -26,6 +27,15 @@ class Perfil(models.Model):
         indexes = [
             models.Index(fields=["numero_cliente"]),
             models.Index(fields=["telemovel"]),
+        ]
+
+        constraints = [
+            # English comment: unique phone only when not empty
+            models.UniqueConstraint(
+                fields=["telemovel"],
+                condition=~Q(telemovel=""),
+                name="uniq_perfil_telemovel_non_empty",
+            )
         ]
 
     usuario = models.OneToOneField(
