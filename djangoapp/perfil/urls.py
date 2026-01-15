@@ -6,8 +6,36 @@ from typing import List, Union
 from django.urls import path
 from django.urls.resolvers import URLPattern, URLResolver
 from rest_framework.routers import SimpleRouter
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from djangoapp.perfil import views
+from djangoapp.perfil.api.views import (
+    LoginApiView,
+    LoginJwtApiView,
+    LogoutApiView,
+    LogoutJwtApiView,
+    MeApiView,
+    PingApiView,
+    SignupResendApiView,
+    SignupStartApiView,
+    SignupVerifyApiView,
+)
+from djangoapp.perfil.api.views.onboarding_optional import (
+    OnboardingOptionalCompleteApiView,
+)
+from djangoapp.perfil.api.views.onboarding_optional_progress import (
+    OnboardingOptionalProgressApiView,
+)
+from djangoapp.perfil.api.views.onboarding_views import (
+    OnboardingCompleteApiView,
+    OnboardingStudentOptionsApiView,
+)
+from djangoapp.perfil.api.views.password_reset import (
+    PasswordResetResendApiView,
+    PasswordResetStartApiView,
+    PasswordResetVerifyApiView,
+)
+from djangoapp.perfil.api.views.profile_me import ProfileMeApiView
 from djangoapp.perfil.views.admin_views import NotificationBroadcastAdminView
 from djangoapp.perfil.views.perfil_api import (
     CancelRegistrationApiView,
@@ -76,7 +104,52 @@ urlpatterns: List[Union[URLPattern, URLResolver]] = [
     path('admin/perfil/notification-broadcast/', NotificationBroadcastAdminView.as_view(), name='notification_broadcast_admin'),
 
     # New Auth flow
-    path("signup/", views.SignUpView.as_view(), name="signup"),
+    # path("signup/", views.SignUpView.as_view(), name="signup"),
+    # path("signup/verify/", views.SignUpVerificationCodeView.as_view(), name="signup_verify"),
+    # path("signup/resend/", views.SignUpResendCodeView.as_view(), name="signup_resend"),
+    # path("login/", views.LoginView.as_view(), name="login_v2"),
+    # path("perfil/onboarding/", views.OnboardingView.as_view(), name="onboarding"),
+
+        # New Auth API
+    path("api/auth/signup/start/", SignupStartApiView.as_view(), name="api_signup_start"),
+    path("api/auth/signup/verify/", SignupVerifyApiView.as_view(), name="api_signup_verify"),
+    path("api/auth/signup/resend/", SignupResendApiView.as_view(), name="api_signup_resend"),
+    path("api/auth/login/", LoginApiView.as_view(), name="api_login"),
+    path("api/auth/logout/", LogoutApiView.as_view(), name="api_logout"),
+    path("api/auth/password/reset/start/", PasswordResetStartApiView.as_view(), name="api_password_reset_start"),
+    path("api/auth/password/reset/verify/", PasswordResetVerifyApiView.as_view(), name="api_password_reset_verify"),
+    path("api/auth/password/reset/resend/", PasswordResetResendApiView.as_view(), name="api_password_reset_resend"),
+
+    # JWT API
+    path("api/auth/login/jwt/", LoginJwtApiView.as_view(), name="api_login_jwt"),
+    path("api/auth/token/refresh/jwt/", TokenRefreshView.as_view(), name="api_token_refresh_jwt"),
+    path("api/auth/logout/jwt/", LogoutJwtApiView.as_view(), name="api_logout_jwt"),
+    path("api/auth/me/", MeApiView.as_view(), name="api_me"),
+
+    # Onboarding API
+    path(
+        "api/onboarding/student-options/",
+        OnboardingStudentOptionsApiView.as_view(),
+        name="api_onboarding_student_options",
+    ),
+    path("api/onboarding/complete/", OnboardingCompleteApiView.as_view(), name="api_onboarding_complete"),
+
+    path(
+        "api/onboarding/optional/complete/",
+        OnboardingOptionalCompleteApiView.as_view(),
+        name="api_onboarding_optional_complete",
+    ),
+    path(
+        "api/onboarding/optional/",
+        OnboardingOptionalProgressApiView.as_view(),
+        name="api_onboarding_optional",
+    ),
+
+    # Profile API
+     path("api/profile/me/", ProfileMeApiView.as_view(), name="api_profile_me"),
+
+    # Ping API
+    path("api/ping/", PingApiView.as_view(), name="api_ping"),
 ]
 
 

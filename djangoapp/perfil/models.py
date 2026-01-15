@@ -4,56 +4,51 @@ from __future__ import annotations
 
 import uuid
 from datetime import timedelta
-from io import BytesIO
 
-import qrcode
-from django.contrib.auth import get_user_model
-from django.core.files import File
+from django.conf import settings
+from django.contrib.auth.hashers import make_password
 from django.db import models
 from django.forms import ValidationError
 from django.utils import timezone
-from django.utils.timezone import now
 
 from djangoapp.fidelidade.models import Fidelidade, RespostaFidelidade
 from djangoapp.utils.model_validators import validar_nif
 
-User = get_user_model()
+User = settings.AUTH_USER_MODEL
 
 class Perfil(models.Model):
-    ''' Model for the user profile. '''
+    """Perfil do utilizador (dados reais do negócio)."""
     class Meta:
-        ''' Meta class for the Perfil model. '''
+        """Meta class for the Perfil model."""
         verbose_name = "Perfil"
         verbose_name_plural = "Perfis"
+
+        indexes = [
+            models.Index(fields=["numero_cliente"]),
+            models.Index(fields=["telemovel"]),
+        ]
 
     usuario = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
-        null=False,
-        blank=False,
-        default=None,
+        related_name="perfil",
         verbose_name="Utilizador",
-        related_name='perfil',
     )
+
+    # Dados pessoais (não obrigatórios no registo)
     data_nascimento = models.DateField(null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
-    telemovel = models.CharField(
-        max_length=9,
-        blank=True,
-        verbose_name="Telemóvel",
-    )
+    telemovel = models.CharField(max_length=9, blank=True, verbose_name="Telemóvel")
     nif = models.CharField(max_length=9, blank=True)
 
-    qr_code = models.ImageField(
-        upload_to='assets/qrcodes/', blank=True, null=True)
-
+    # Negócio
     numero_cliente = models.CharField(
         max_length=10,
         unique=True,
         blank=True,
         verbose_name="Número Cliente",
+        db_index=True,
     )
+
     estudante = models.ForeignKey(
         RespostaFidelidade,
         on_delete=models.SET_NULL,
@@ -61,6 +56,7 @@ class Perfil(models.Model):
         blank=True,
         verbose_name="Estudante",
     )
+
     tipo_fidelidade = models.ForeignKey(
         Fidelidade,
         on_delete=models.SET_NULL,
@@ -68,6 +64,20 @@ class Perfil(models.Model):
         blank=True,
         verbose_name="Tipo Fidelidade",
     )
+
+    qr_code = models.ImageField(upload_to="assets/qrcodes/", blank=True, null=True)
+
+    # Onboarding (novo) — NÃO mexe no first_login do RN
+    onboarding_optional_completed = models.BooleanField(default=False)
+    phone_verified = models.BooleanField(default=False)
+    onboarding_required_completed = models.BooleanField(default=False)
+
+    terms_accepted_at = models.DateTimeField(null=True, blank=True)
+
+    # Capacidades (não-linear)
+    has_valid_nif = models.BooleanField(default=False)
+    has_delivery_address = models.BooleanField(default=False)
+    has_billing_address = models.BooleanField(default=False)
 
     ultima_atualizacao_data_nascimento = models.DateTimeField(
         null=True, blank=True)
@@ -84,6 +94,14 @@ class Perfil(models.Model):
         null=True,
         default=000000000
     )
+
+    reset_password_code_str = models.CharField(
+        verbose_name="Código de Reset de Password",
+        blank=True,
+        null=True,
+        max_length=6,
+    )
+
     reset_password_code_expires = models.DateTimeField(
         verbose_name="Expiração do Código de Reset de Password",
         blank=True,
@@ -108,95 +126,19 @@ class Perfil(models.Model):
         default=True,
     )
 
-    def save(self, *args, **kwargs):
-        # Atualiza a data da última atualização da data de nascimento
-        print('self.pk: ', self.pk)
-        if self.pk:
-            original = Perfil.objects.get(pk=self.pk)
-        
-            # Verifica se a data de nascimento foi alterada
-            if original.data_nascimento != self.data_nascimento:
-                agora = timezone.now()
-                ultima_atualizacao = self.ultima_atualizacao_data_nascimento
-
-                # Se há uma última atualização, verifica o período mínimo
-                if ultima_atualizacao:
-                    periodo_minimo = ultima_atualizacao + timedelta(days=182.5)  # 6 meses
-                    if agora < periodo_minimo:
-                        return
-                
-                # Atualiza a data da última alteração se a regra for cumprida
-                self.ultima_atualizacao_data_nascimento = agora
-
-        # Gera o número de cliente
-        if not self.numero_cliente:
-            last_perfil = Perfil.objects.order_by("id").last()
-
-            last_number: int | None = None
-            if last_perfil is not None and last_perfil.numero_cliente.startswith("CEW-"):
-                try:
-                    last_number = int(last_perfil.numero_cliente.split("-")[1])
-                except (IndexError, ValueError):
-                    last_number = None
-
-            novo_numero = (last_number + 1) if last_number is not None else 1050
-            self.numero_cliente = f"CEW-{novo_numero}"
-
-        if self.estudante:
-            # Aqui obtemos a instância de Fidelidade associada ao RespostaFidelidade
-            self.tipo_fidelidade = self.estudante.tipo_fidelidade
-        else:
-            self.tipo_fidelidade = None
-
-        # Crie um QRCode com base nas informações do perfil
-        numero_cliente_puro = ''.join(filter(str.isdigit, self.numero_cliente))
-
-        # Configuração do Qr Code
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
-
-        # Adicionando os dados JSON ao Qr Code
-        qr.add_data(numero_cliente_puro)
-        qr.make(fit=True)
-
-        # Crie uma imagem QRCode
-        img_qr = qr.make_image(fill_color="black", back_color="white")
-
-        # Salve a imagem QRCode no campo qr_code
-        img_io = BytesIO()
-        img_qr.save(img_io, 'PNG')
-        # Usando o número de cliente como nome do ficheiro
-        filename = f'qrcode_{self.numero_cliente}.png'
-        self.qr_code.save(
-            filename, File(img_io), save=False)
-
-        super().save(*args, **kwargs)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def clean(self):
         error_messages = {}
 
-        # Only require these fields after onboarding, not at registration time
-        # if not self.data_nascimento:
-        #     error_messages['data_nascimento'] = 'Data de Nascimento é obrigatória.'
-
-        if self.pk:
-            original = Perfil.objects.get(pk=self.pk)
-            if original.data_nascimento != self.data_nascimento:
-                agora = timezone.now()
-                if self.ultima_atualizacao_data_nascimento:
-                    periodo_minimo = self.ultima_atualizacao_data_nascimento + timedelta(days=182.5)
-                    if agora < periodo_minimo:
-                        error_messages['data_nascimento'] = (
-                            'A data de nascimento só pode ser alterada passados 6 meses da última alteração.'
-                        )
-                self.ultima_atualizacao_data_nascimento = agora
-
         if self.nif and not validar_nif(self.nif):
             error_messages['nif'] = 'NIF inválido.'
+
+        if self.telemovel:
+            t = self.telemovel.strip()
+            if len(t) != 9 or not t.isdigit():
+                error_messages['telemovel'] = "O telemóvel tem de ter 9 dígitos."
 
         if error_messages:
             raise ValidationError(error_messages)
@@ -205,51 +147,145 @@ class Perfil(models.Model):
         return f'{self.usuario.first_name} {self.usuario.last_name}'
 
 
+class PendingSignup(models.Model):
+    """
+    Temporary signup payload until code verification.
+    Stores password as a Django-compatible hash (never plaintext).
+    """
+
+    class Meta:
+        verbose_name = "Pending Signup"
+        verbose_name_plural = "Pending Signups"
+        indexes = [
+            models.Index(fields=["email"]),
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["used_at"]),
+        ]
+
+    email = models.EmailField(unique=True, db_index=True)
+    password_hash = models.CharField(max_length=255)
+
+    used_at = models.DateTimeField(blank=True, null=True)
+
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    user_agent = models.TextField(blank=True, null=True)
+
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def is_used(self) -> bool:
+        return self.used_at is not None
+
+    def set_temp_password(self, raw_password: str) -> None:
+        # English comment: store as Django password hash; can later be assigned to User.password directly.
+        self.password_hash = make_password(raw_password)
+
+    def mark_used(self) -> None:
+        self.used_at = timezone.now()
+        self.save(update_fields=["used_at"])
+
+
+class VerificationCode(models.Model):
+    """
+    Stores verification codes for multiple purposes (signup, email change, etc.)
+    Code is stored as a digest (never store the raw code).
+    """
+
+    class Meta:
+        verbose_name = "Verification Code"
+        verbose_name_plural = "Verification Codes"
+        indexes = [
+            models.Index(fields=["email", "purpose"]),
+            models.Index(fields=["purpose", "expires_at"]),
+            models.Index(fields=["created_at"]),
+
+            # cleanup speed (expired + used)
+            models.Index(fields=["expires_at"]),
+            models.Index(fields=["used_at"]),
+        ]
+
+    email = models.EmailField(db_index=True)
+    purpose = models.CharField(max_length=64, db_index=True)
+
+    # store only a digest (HMAC/sha256), never the raw code
+    code_digest = models.CharField(max_length=128)
+
+    expires_at = models.DateTimeField()
+    used_at = models.DateTimeField(blank=True, null=True)
+
+    # attempts/resends are useful for security + audit
+    attempts = models.PositiveSmallIntegerField(default=0)
+    resend_count = models.PositiveSmallIntegerField(default=0)
+
+    # Optional audit context (safe enough)
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    user_agent = models.TextField(blank=True, null=True)
+
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def is_used(self) -> bool:
+        return self.used_at is not None
+
+    @property
+    def is_expired(self) -> bool:
+        return timezone.now() > self.expires_at
+
 class Morada(models.Model):
+    """Moradas do utilizador (Entrega / Faturação)."""
+
     class Meta:
         verbose_name = "Morada"
         verbose_name_plural = "Moradas"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["usuario", "purpose"],
+                name="uniq_address_per_user_purpose",
+            )
+        ]
 
-    usuario = models.OneToOneField(
+    class Purpose(models.TextChoices):
+        DELIVERY = "delivery", "Entrega"
+        BILLING = "billing", "Faturação"
+
+    usuario = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        verbose_name="Usuário",
+        related_name="moradas",
+        verbose_name="Utilizador",
     )
-    finalidade_morada = models.CharField(blank=False, choices=(
-        ('E', 'Entrega'),
-        ('F', 'Faturação')
-    )
-    )
-    morada = models.CharField(max_length=100, blank=True)
-    numero = models.CharField(
-        max_length=10,
-        blank=True,
-        verbose_name="Número",)
-    codigo_postal = models.CharField(
-        max_length=4,
-        blank=True,
-        verbose_name="Código Postal",)
-    ext_codigo_postal = models.CharField(
-        max_length=3,
-        blank=True,
-        verbose_name="Extensão Código Postal",)
 
-    def clean(self):
-        error_messages = {}
+    purpose = models.CharField(max_length=20, choices=Purpose.choices)
+
+    morada = models.CharField(max_length=120)
+    numero = models.CharField(max_length=10)
+    codigo_postal = models.CharField(max_length=4)
+    ext_codigo_postal = models.CharField(max_length=3)
+
+    is_active = models.BooleanField(default=True)
+
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def clean(self) -> None:
+        errors: dict[str, str] = {}
+
         if not self.morada:
-            error_messages['morada'] = 'Morada é obrigatória.'
+            errors["morada"] = "Morada é obrigatória."
         if not self.numero:
-            error_messages['numero'] = 'Número é obrigatório.'
+            errors["numero"] = "Número é obrigatório."
         if not self.codigo_postal:
-            error_messages['codigo_postal'] = 'Código Postal é obrigatório.'
+            errors["codigo_postal"] = "Código Postal é obrigatório."
         if not self.ext_codigo_postal:
-            error_messages['ext_codigo_postal'] = 'Extensão Código Postal é obrigatória.'
+            errors["ext_codigo_postal"] = "Extensão do Código Postal é obrigatória."
 
-        if error_messages:
-            raise ValidationError(error_messages)
+        if errors:
+            raise ValidationError(errors)
 
-    def __str__(self):
-        return self.finalidade_morada
+    def __str__(self) -> str:
+        return f"{self.usuario_id} - {self.purpose}"
 
 
 class PasswordResetToken(models.Model):
@@ -258,7 +294,7 @@ class PasswordResetToken(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def is_expired(self):
-        return now() > self.created_at + timedelta(minutes=15)  # Expira em 15 minutos
+        return timezone.now() > self.created_at + timedelta(minutes=15)  # Expira em 15 minutos
 
     def __str__(self):
         return f"Reset Token for {self.user.email}"

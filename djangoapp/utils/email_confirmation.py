@@ -1,19 +1,13 @@
-from django.core.mail import send_mail
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User
+from django.core.mail import EmailMultiAlternatives
 
 
-def send_confirmation_email(request, email, username, code):
+def send_confirmation_email(request, email, code):
     ''' Sends the confirmation email. '''
     ''' Sends the reset password email. '''
     code = str(code)
-    # Get the session
-    temp_user = request.session.get('temp_user')
 
-    # Get the user's first and last name from the session
-    first_name = temp_user.get('first_name')
-    last_name = temp_user.get('last_name')
 
     # Format the reset code in grups of 3 digits
     formatted_code = (
@@ -25,7 +19,7 @@ def send_confirmation_email(request, email, username, code):
 
     # Email body in plain text(only for email clients that don't support HTML)
     text_content = (
-        f'Olá {first_name} {last_name}, o seu username é { username }.\n\n'
+        f'Bem vindo á Extreme Way, { email }.\n\n'
         'Para confirmar o seu registo, por favor insira o código código de verificação abaixo:\n\n'
         f'{formatted_code}\n\n'
         'Obrigado!'
@@ -36,8 +30,7 @@ def send_confirmation_email(request, email, username, code):
     <html>
     <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
         <div style="max-width: 600px; background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-            <h2 style="color: #333;">Olá, { first_name } { last_name }.</h2>
-            <p>O seu username é <strong>{username}</strong>.</p>
+            <h2 style="color: #333;">Bem vindo á Extreme Way, {email}.</h2>
             <p>Para confirmar o seu registo, insira o código de verificação abaixo:</p>
 
             <!-- Formatted code -->

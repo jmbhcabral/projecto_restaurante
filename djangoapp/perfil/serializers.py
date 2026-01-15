@@ -240,7 +240,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             }
             print('🔎 request.session:', request.session['temp_user'])
 
-        send_confirmation_email(request, email, username, code)
+        send_confirmation_email(request, email, code)
 
         return temp_user
 

@@ -1,89 +1,120 @@
 {% extends 'restau/base_front_perfil.html' %}
 {% block content %}
+
 <main class="section-content-wide section-gap front-content">
     <section class="section-gap-conta white-bg top-background">
         <div class="separator"></div>
-            <h1 class="center">Hamburgueria artesanal</h1>
-        <div class="separator "></div>
+        <h1 class="center">Hamburgueria artesanal</h1>
+        <div class="separator"></div>
+        {% comment %} <div class="d-block d-md-none center mb-3">
+            <h5>Formulário de registo depois do Login para criar a sua conta.</h5>
+        </div> {% endcomment %}
         {% include "restau/partials/_messages.html" %}
     </section>
-    <section>
-        <div class="center-form">
-            <div class="form-container">
-            {% if not request.user.is_authenticated %}
-            <div class="section-gap">
-                <div class="col section-gap">
-                    <h2>Login</h2>
-                    <h5>Se já se registou, entre com usuário e senha.</h5>
-                    <form method="POST" action="{% url 'perfil:login' %}">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label for="InputUsuario1">Usuário</label>
-                            <input type="text" name="username" class="form-control" id="InputUsuario1" aria-describedby="usuarioHelp" placeholder="Digite o seu usuário">
-                        </div>
-                        <div class="form-group">
-                            <label for="exampleInputPassword1">Palavra-passe:</label>
-                            <div class="input-group">
-                                <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Digite a sua palavra-passe">
-                                <div class="input-group-append">
-                                    <span class="input-group-text">
-                                        <i class="fas fa-eye toggle-password" style="cursor: pointer;"></i>
-                                    </span>
+
+    <section class="section-gap">
+        <div class="container">
+          <div class="signup-grid">
+
+                {# ===================== LOGIN ===================== #}
+                <div class="signup-col">
+                    <div class="form-container h-100">
+                        <h2 class="center">Login</h2>
+                        <h5>Se já se registou, entre com email e palavra-passe.</h5>
+
+                        <form method="POST" action="{% url 'perfil:login_v2' %}">
+                            {% csrf_token %}
+
+                            <div class="form-group">
+                                <label for="loginEmail">Email</label>
+                                <input
+                                    type="text"
+                                    name="identifier"
+                                    class="form-control"
+                                    id="loginEmail"
+                                    placeholder="Digite o seu email">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="loginPassword">Palavra-passe</label>
+                                <div class="input-group">
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        class="form-control"
+                                        id="loginPassword"
+                                        placeholder="Digite a sua palavra-passe">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-eye toggle-password" style="cursor: pointer;"></i>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block">Entrar</button>
-                    </form>   
-                    <h4>Esqueceu a palavra-passe?</h4>
-                    <p>Se esqueceu a palavra-passe, clique no botão abaixo para recuperar.</p>
-                    <a href="{% url 'perfil:request_reset_password' %}" class="btn btn-primary btn-block">Recuperar palavra-passe</a>
+
+                            <button type="submit" class="btn btn-primary btn-block">
+                                Entrar
+                            </button>
+                        </form>
+
+                        <hr>
+
+                        <h5>Esqueceu a palavra-passe?</h5>
+                        <a href="{% url 'perfil:request_reset_password' %}"
+                           class="btn btn-outline-primary btn-block">
+                            Recuperar palavra-passe
+                        </a>
+                    </div>
                 </div>
-                {% endif %}
-                <div class="col section-gap">
-                    {% block tituloregistar %}
-                    <h2>Registrar</h2>
-                    <h5>Se ainda não se registou, preencha os campos abaixo.</h5>
-                    <span>Os campos assinalados com </span><span style="color: red;">*</span> <span>são obrigatórios.</span>
-                    {% endblock  %}
-                    <form action="" method="POST">
-                        {% csrf_token %}
-                        {{ userform.non_field_errors }}
-                        
-                        <div class="form-group">
-                            {{ userform.email.label_tag }}
-                            {{ userform.email }}
-                        </div>
-                        <div class="form-group">
-                            {{ userform.password.label_tag }}
-                            <div class="input-group">
-                                {{ userform.password }}
-                                <div class="input-group-append">
-                                    <span class="input-group-text">
-                                        <i class="fas fa-eye toggle-password" style="cursor: pointer;"></i>
-                                    </span>
+            
+
+                {# ===================== REGISTO ===================== #}
+                <div class="signup-col">
+                    <div class="form-container h-100">
+                        <h2>Criar conta</h2>
+                        <h5>Preenche os campos abaixo para criar a sua conta.</h5>
+
+                        <form method="POST" action="">
+                            {% csrf_token %}
+
+                            {{ signup_form.non_field_errors }}
+
+                            <div class="form-group">
+                                {{ signup_form.email.label_tag }}
+                                {{ signup_form.email }}
+                            </div>
+
+                            <div class="form-group">
+                                {{ signup_form.password1.label_tag }}
+                                <div class="input-group">
+                                    {{ signup_form.password1 }}
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-eye toggle-password" style="cursor: pointer;"></i>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            {{ userform.password2.label_tag }}
-                            <div class="input-group">
-                                {{ userform.password2 }}
-                                <div class="input-group-append">
-                                    <span class="input-group-text">
-                                        <i class="fas fa-eye toggle-password" style="cursor: pointer;"></i>
-                                    </span>
+
+                            <div class="form-group">
+                                {{ signup_form.password2.label_tag }}
+                                <div class="input-group">
+                                    {{ signup_form.password2 }}
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-eye toggle-password" style="cursor: pointer;"></i>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row section-gap">
-                            <div class="col">
-                                <button type="submit" class="btn btn-primary">Registrar</button>
-                            </div>
-                        </div>
-                    </form>
+
+                            <button type="submit" class="btn btn-primary btn-block">
+                                Criar conta
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
         </div>
     </section>
 </main>
@@ -105,4 +136,46 @@
         });
     });
 </script>
+<style>
+.signup-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  @media (min-width: 992px) {
+    .signup-grid {
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+      position: relative;
+    }
+  
+    /* Vertical divider */
+    .signup-grid::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: linear-gradient(
+  to bottom,
+  transparent,
+  rgba(0, 0, 0, 0.15),
+  transparent
+);
+      transform: translateX(-50%);
+    }
+  }
+  
+  .signup-col {
+    display: flex;
+    justify-content: flex-start;
+  }
+  
+  .signup-col .form-container {
+    width: 100%;
+    max-width: 520px;
+  }
+</style>
 {% endblock content %}

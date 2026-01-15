@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 'restau.apps.RestauConfig',
     'rest_framework_simplejwt',
+    "rest_framework_simplejwt.token_blacklist",
     'rest_framework',
     "djangoapp.perfil.apps.PerfilConfig",
     'djangoapp.restau',
@@ -147,6 +148,7 @@ MESSAGE_TAGS = {
     constants.SUCCESS: 'alert-success',
     constants.WARNING: 'alert-warning',
 }
+
 # Sessão em dias: 60s * 60m * 24h * 1d * 3 meses
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30 * 3  
 
@@ -169,24 +171,53 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK: dict[str, Any] = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
+    "DEFAULT_RENDERER_CLASSES": (
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
     ),
-}
+    "EXCEPTION_HANDLER": "djangoapp.perfil.api.exception_handler.custom_exception_handler",
 
+    # Throttling (enterprise baseline)
+    "DEFAULT_THROTTLE_CLASSES": (
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
+    ),
+    "DEFAULT_THROTTLE_RATES": {
+        # global baseline (applies everywhere)
+        "anon": "60/min",
+        "user": "300/min",
+
+        # auth scopes (applies only where throttle_scope is set)
+        "auth_send": "6/min",     # signup/password reset start + resend
+        "auth_verify": "12/min",  # verify code endpoints
+        "auth_login": "10/min",   # login
+        "auth_logout": "30/min",  # logout
+
+    },
+}
 SIMPLE_JWT: dict[str, Any] = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=90),
-    "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": False,
-    "SIGNING_KEY": os.getenv('SECRET_KEY_JWT', 'change-me'),
+    # Segurança / UX balance (híbrido)
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+
+    # Hardening
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+
+    # Assinatura
+    "SIGNING_KEY": os.getenv("SECRET_KEY_JWT", SECRET_KEY),
+
+    # Header
     "AUTH_HEADER_TYPES": ("Bearer",),
+
+    # Opcional mas recomendado (auditoria / compatibilidade)
+    "UPDATE_LAST_LOGIN": True,
 }
 
 LOGGING: dict[str, Any] = {
@@ -262,6 +293,11 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'djangoapp.fidelidade.tasks.enviar_avisos_pontos_a_expirar_task',
         'schedule': crontab(hour=10, minute=5),  # todos os dias às 10:05
     },
+    "cleanup_verification_codes_daily": {
+        "task": "djangoapp.perfil.tasks.cleanup_verification_codes",
+        "schedule": crontab(hour=3, minute=0),  # 03:00 todos os dias
+        "args": (30,),
+    },
 }
 
 # Google Cloud Storage configuration
@@ -271,6 +307,12 @@ GCS_PUBLIC_BASE_URL = os.getenv(
     "GCS_PUBLIC_BASE_URL",
     "change-me",
 )
+
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    "djangoapp.perfil.auth_backends.IdentifierBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 # Authentication configuration
 # AUTH_USER_MODEL = 'perfil.User'
@@ -282,28 +324,18 @@ GCS_PUBLIC_BASE_URL = os.getenv(
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS: list[dict[str, Any]] = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-        "OPTIONS": {
-            "message": "A palavra-passe não pode ser igual ao nome de utilizador.",
-        },
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",     
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
         "OPTIONS": {
             "min_length": 8,
-            "message": "A palavra-passe deve ter no mínimo 8 caracteres.",
         },
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-        "OPTIONS": {
-            "message": "A palavra-passe não pode ser uma palavra comum.",
-        },
     },
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-        "OPTIONS": {
-            "message": "A palavra-passe não pode ser uma palavra numérica.",
-        },
     },
 ]
