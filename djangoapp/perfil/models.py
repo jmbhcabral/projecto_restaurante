@@ -10,7 +10,6 @@ from django.contrib.auth.hashers import make_password
 from django.db import models
 from django.forms import ValidationError
 from django.utils import timezone
-from django.utils.timezone import now
 
 from djangoapp.fidelidade.models import Fidelidade, RespostaFidelidade
 from djangoapp.utils.model_validators import validar_nif
@@ -295,7 +294,7 @@ class PasswordResetToken(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def is_expired(self):
-        return now() > self.created_at + timedelta(minutes=15)  # Expira em 15 minutos
+        return timezone.now() > self.created_at + timedelta(minutes=15)  # Expira em 15 minutos
 
     def __str__(self):
         return f"Reset Token for {self.user.email}"
