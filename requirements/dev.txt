@@ -1,0 +1,17 @@
+-r prod.txt
+
+# --- Typing / Stubs ---
+Django-stubs>=5.2.8,<5.3
+types-qrcode>=8.2.0,<8.3.0
+djangorestframework-stubs>=3.16.6,<3.17
+types-requests>=2.32.0,<2.33
+types-PyYAML>=6.0.12,<7
+
+# --- Tests ---
+pytest>=9.0.2,<9.1.0
+pytest-django>=4.11.1,<4.12.0
+
+# --- Tooling (opcional, mas recomendado em dev) ---
+ruff>=0.9,<0.10
+mypy>=1.19,<1.20
+black>=25.1,<26
